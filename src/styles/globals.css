@@ -23,6 +23,17 @@ html[lang="zh-CN"] body {
   font-family: "Noto Serif SC", serif;
 }
 
+
+@keyframes bounceIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-bounceIn {
+  animation: bounceIn 0.3s ease-out;
+}
+
+
 /* Minimal, modern look */
 .card {
   @apply rounded-2xl shadow-sm border border-[var(--ring)] bg-white;

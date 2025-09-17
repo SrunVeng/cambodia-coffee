@@ -6,5 +6,11 @@
     "facebook": "https://facebook.com/your-coffee",
     "instagram": "https://instagram.com/your-coffee"
   },
-  "CURRENCY": "KHR"
+  "CURRENCY": "KHR",
+  "HOME_IMAGES": {
+    "hero": "https://media.istockphoto.com/id/521697444/photo/cup-of-coffee-with-coffee-beans.jpg?s=612x612&w=0&k=20&c=yXtrjS2aFYUCo_LNfQmVuuGFaNnxYvp0Mt5RsB8Rg70=",
+    "farm": "https://media.istockphoto.com/id/521697444/photo/cup-of-coffee-with-coffee-beans.jpg?s=612x612&w=0&k=20&c=yXtrjS2aFYUCo_LNfQmVuuGFaNnxYvp0Mt5RsB8Rg70=",
+    "brew": "https://media.istockphoto.com/id/521697444/photo/cup-of-coffee-with-coffee-beans.jpg?s=612x612&w=0&k=20&c=yXtrjS2aFYUCo_LNfQmVuuGFaNnxYvp0Mt5RsB8Rg70=",
+    "featured": "https://media.istockphoto.com/id/521697444/photo/cup-of-coffee-with-coffee-beans.jpg?s=612x612&w=0&k=20&c=yXtrjS2aFYUCo_LNfQmVuuGFaNnxYvp0Mt5RsB8Rg70="
+  }
 }

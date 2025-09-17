@@ -59,9 +59,9 @@ function MobileDrawer({ open, onClose, children }) {
             {/* Panel */}
             <aside
                 id="mobile-drawer"
-                className={`fixed right-0 top-0 z-50 h-dvh w-[84vw] max-w-sm bg-[color:var(--brand-bg)]/95 backdrop-blur
-        border-l border-[var(--ring)] shadow-xl transition-transform duration-300
-        ${open ? 'translate-x-0' : 'translate-x-full'}`}
+                className={`fixed right-0 top-0 z-50 h-dvh w-[84vw] max-w-sm 
+        bg-[color:var(--brand-bg)]/95 backdrop-blur border-l border-[var(--ring)] shadow-xl 
+        transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}
                 onClick={(e) => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
@@ -87,7 +87,9 @@ export default function Navbar() {
     }, [])
 
     // close drawer on route change
-    useEffect(() => { setOpen(false) }, [pathname])
+    useEffect(() => {
+        setOpen(false)
+    }, [pathname])
 
     // body scroll lock while drawer open
     useEffect(() => {
@@ -98,7 +100,9 @@ export default function Navbar() {
     }, [open])
 
     // close on Esc
-    const onKeyDown = useCallback((e) => { if (e.key === 'Escape') setOpen(false) }, [])
+    const onKeyDown = useCallback((e) => {
+        if (e.key === 'Escape') setOpen(false)
+    }, [])
     useEffect(() => {
         if (!open) return
         window.addEventListener('keydown', onKeyDown)
@@ -107,15 +111,22 @@ export default function Navbar() {
 
     // close if resized to desktop
     useEffect(() => {
-        const onResize = () => { if (window.matchMedia('(min-width:768px)').matches) setOpen(false) }
+        const onResize = () => {
+            if (window.matchMedia('(min-width:768px)').matches) setOpen(false)
+        }
         window.addEventListener('resize', onResize)
         return () => window.removeEventListener('resize', onResize)
     }, [])
 
     return (
         <header
-            className={`sticky top-0 z-50 border-b border-[var(--ring)]/70 bg-[color:var(--brand-bg)]/80 backdrop-blur-md
-      transition-[height,box-shadow,background] duration-300 ${scrolled ? 'h-14 shadow-sm' : 'h-16'}`}
+            className={`fixed top-0 left-0 right-0 z-50 border-b border-[var(--ring)]
+      transition-[height,box-shadow,background] duration-300 ${
+                scrolled ? 'h-14 shadow-sm' : 'h-16'
+            }`}
+            style={{
+                background: 'linear-gradient(to bottom, #f5f1ea, #f8f4ef)', // latte foam gradient
+            }}
         >
             <div className="container-narrow flex h-full items-center justify-between">
                 {/* Brand */}
@@ -123,9 +134,9 @@ export default function Navbar() {
                     <img
                         src={data.APP_LOGO}
                         alt="logo"
-                        className="h-8 w-8 rounded-xl ring-1 ring-[var(--ring)]/70 object-cover group-hover:scale-105 transition"
+                        className="h-9 w-9 rounded-xl bg-white shadow-sm ring-1 ring-[var(--ring)] object-cover group-hover:scale-105 transition"
                     />
-                    <span className="font-semibold tracking-tight group-hover:opacity-90 transition">
+                    <span className="font-semibold tracking-tight text-[var(--brand-ink)] group-hover:opacity-90 transition">
             {data.APP_NAME}
           </span>
                 </Link>
@@ -138,12 +149,16 @@ export default function Navbar() {
                             to={to}
                             end
                             className={({ isActive }) =>
-                                `relative text-sm opacity-80 hover:opacity-100 transition ${isActive ? 'active opacity-100 font-semibold' : ''}`
+                                `relative text-sm opacity-80 hover:opacity-100 transition ${
+                                    isActive
+                                        ? 'active opacity-100 font-semibold text-[var(--brand-accent)]'
+                                        : ''
+                                }`
                             }
                         >
                             {t(`nav.${key}`)}
                             {/* underline indicator */}
-                            <span className="pointer-events-none absolute left-0 -bottom-1 h-0.5 w-0 rounded-full bg-[var(--brand-ink)] transition-all duration-300" />
+                            <span className="pointer-events-none absolute left-0 -bottom-1 h-0.5 w-0 rounded-full bg-[var(--brand-accent)] transition-all duration-300" />
                         </NavLink>
                     ))}
                 </nav>
@@ -162,7 +177,7 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* Desktop underline animation (needs "active" class above) */}
+            {/* Desktop underline animation */}
             <style>{`@media (min-width:768px){ nav a:hover>span, nav a.active>span { width:100% } }`}</style>
 
             {/* Mobile Drawer */}
@@ -175,8 +190,19 @@ export default function Navbar() {
                             onClick={() => setOpen(false)}
                             className="grid place-items-center w-10 h-10 rounded-2xl border border-[var(--ring)] bg-white hover:bg-white/90 transition"
                         >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M6 6l12 12M18 6L6 18"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                />
                             </svg>
                         </button>
                     </div>
@@ -188,7 +214,9 @@ export default function Navbar() {
                                 to={to}
                                 end
                                 className={({ isActive }) =>
-                                    `block rounded-2xl px-3 py-3 text-base transition ${isActive ? 'bg-white font-semibold' : 'hover:bg-white'}`
+                                    `block rounded-2xl px-3 py-3 text-base transition ${
+                                        isActive ? 'bg-white font-semibold' : 'hover:bg-white'
+                                    }`
                                 }
                                 onClick={() => setOpen(false)}
                             >
