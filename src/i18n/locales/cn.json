@@ -1,6 +1,23 @@
 {
   "nav": { "home":"首页","products":"产品","order":"下单","about":"关于我们","cart":"购物车" },
-  "home": { "heroTitle":"一杯咖啡，一份从容", "cta":"选购咖啡" },
+  "home": {
+    "heroTitle":"一杯咖啡，一份从容",
+    "cta":"选购咖啡",
+    "sections": {
+      "farm": {
+        "title": "源自咖啡农场",
+        "subtitle": "甄选优质咖啡豆，直达您的杯中"
+      },
+      "brew": {
+        "title": "匠心冲煮",
+        "subtitle": "每一杯都用心萃取，浓郁香气弥漫"
+      },
+      "featured": {
+        "title": "特色推荐",
+        "subtitle": "发现我们的热门精选咖啡"
+      }
+    }
+  },
   "products": { "title":"全部产品","sort":"排序","filter":"筛选","details":"详情","addToCart":"加入购物车" },
   "order": {
     "title":"结算",
@@ -9,5 +26,10 @@
     "name":"姓名","email":"邮箱","phone":"电话",
     "address":"地址","province":"省/直辖市","district":"区/县","commune":"乡/街道","village":"村/社区",
     "deliveryFee":"运费","subtotal":"小计","total":"合计"
+  },
+
+  "about": {
+    "title": "关于我们",
+    "story": "我们以平静、清晰和用心烘焙咖啡。从农场到杯中，为您带来温暖而极简的体验 —— 设计简约，但味道深邃。"
   }
 }
