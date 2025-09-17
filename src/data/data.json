@@ -2,7 +2,7 @@
   "APP_NAME_EN": "Cambodia Coffee",
   "APP_NAME_KH": "កាហ្វេកម្ពុជា",
   "APP_NAME_CN": "柬埔寨咖啡",
-  "APP_LOGO": "/src/assets/logo.png",
+  "APP_LOGO": "/public/assets/logo.png",
   "WAREHOUSE_COORDS": { "lat": 11.556, "lng": 104.928 },
   "SOCIAL": {
     "facebook": "https://facebook.com/your-coffee",
