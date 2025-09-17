@@ -1,25 +1,25 @@
-import { useEffect, useState, useCallback } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
-import LanguageSwitch from './LanguageSwitch'
-import data from '../../data/data.json'
-import CartIcon from '../cart/CartIcon'
-import { useTranslation } from 'react-i18next'
+import { useEffect, useState, useCallback } from "react"
+import { Link, NavLink, useLocation } from "react-router-dom"
+import LanguageSwitch from "./LanguageSwitch"
+import data from "../../data/data.json"
+import CartIcon from "../cart/CartIcon"
+import { useTranslation } from "react-i18next"
+import { AnimatePresence, motion } from "framer-motion"
 
 const NAV = [
-    { to: '/', key: 'home' },
-    { to: '/products', key: 'products' },
-    { to: '/order', key: 'order' },
-    { to: '/about', key: 'about' },
+    { to: "/", key: "home" },
+    { to: "/products", key: "products" },
+    { to: "/order", key: "order" },
+    { to: "/about", key: "about" }
 ]
 
-// helper to resolve app name by lang
 function getAppName(lang) {
     switch (lang) {
-        case 'kh':
-        case 'km':
+        case "kh":
+        case "km":
             return data.APP_NAME_KH
-        case 'cn':
-        case 'zh':
+        case "cn":
+        case "zh":
             return data.APP_NAME_CN
         default:
             return data.APP_NAME_EN
@@ -38,8 +38,8 @@ export default function Navbar() {
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 6)
         onScroll()
-        window.addEventListener('scroll', onScroll, { passive: true })
-        return () => window.removeEventListener('scroll', onScroll)
+        window.addEventListener("scroll", onScroll, { passive: true })
+        return () => window.removeEventListener("scroll", onScroll)
     }, [])
 
     // close drawer on route change
@@ -49,7 +49,7 @@ export default function Navbar() {
 
     // body scroll lock while drawer open
     useEffect(() => {
-        const cls = 'overflow-hidden'
+        const cls = "overflow-hidden"
         if (open) document.body.classList.add(cls)
         else document.body.classList.remove(cls)
         return () => document.body.classList.remove(cls)
@@ -57,31 +57,30 @@ export default function Navbar() {
 
     // close on Esc
     const onKeyDown = useCallback((e) => {
-        if (e.key === 'Escape') setOpen(false)
+        if (e.key === "Escape") setOpen(false)
     }, [])
     useEffect(() => {
         if (!open) return
-        window.addEventListener('keydown', onKeyDown)
-        return () => window.removeEventListener('keydown', onKeyDown)
+        window.addEventListener("keydown", onKeyDown)
+        return () => window.removeEventListener("keydown", onKeyDown)
     }, [open, onKeyDown])
 
     // close if resized to desktop
     useEffect(() => {
         const onResize = () => {
-            if (window.matchMedia('(min-width:768px)').matches) setOpen(false)
+            if (window.matchMedia("(min-width:768px)").matches) setOpen(false)
         }
-        window.addEventListener('resize', onResize)
-        return () => window.removeEventListener('resize', onResize)
+        window.addEventListener("resize", onResize)
+        return () => window.removeEventListener("resize", onResize)
     }, [])
 
     return (
         <header
             className={`fixed top-0 left-0 right-0 z-50 border-b border-[var(--ring)]
-      transition-[height,box-shadow,background] duration-300 ${
-                scrolled ? 'h-14 shadow-sm' : 'h-16'
-            }`}
+                  transition-[height,box-shadow] duration-300
+                  ${scrolled ? "h-14 shadow-md" : "h-16 shadow-sm"}`}
             style={{
-                background: 'linear-gradient(to bottom, #f5f1ea, #f8f4ef)',
+                background: "linear-gradient(to right, #f5f1ea, #f8f4ef)" // ✅ solid, never blur
             }}
         >
             <div className="container-narrow flex h-full items-center justify-between">
@@ -107,8 +106,8 @@ export default function Navbar() {
                             className={({ isActive }) =>
                                 `relative text-sm opacity-80 hover:opacity-100 transition ${
                                     isActive
-                                        ? 'active opacity-100 font-semibold text-[var(--brand-accent)]'
-                                        : ''
+                                        ? "active opacity-100 font-semibold text-[var(--brand-accent)]"
+                                        : ""
                                 }`
                             }
                         >
@@ -121,16 +120,127 @@ export default function Navbar() {
                 {/* Desktop actions */}
                 <div className="hidden md:flex items-center gap-2">
                     <LanguageSwitch />
-                    <CartIcon active={pathname === '/cart'} />
+                    <CartIcon active={pathname === "/cart"} />
                 </div>
 
                 {/* Mobile actions */}
                 <div className="md:hidden flex items-center gap-2">
                     <LanguageSwitch />
-                    <CartIcon active={pathname === '/cart'} />
-                    {/* Hamburger button code stays as is */}
+                    <CartIcon active={pathname === "/cart"} />
+
+                    {/* Animated Hamburger Button */}
+                    <button
+                        aria-label={open ? "Close menu" : "Open menu"}
+                        onClick={() => setOpen((v) => !v)}
+                        className="relative w-8 h-8 flex flex-col justify-center items-center"
+                    >
+                        {/* Top line */}
+                        <motion.span
+                            initial={false}
+                            animate={open ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="block w-6 h-0.5 bg-black rounded"
+                        />
+                        {/* Middle line */}
+                        <motion.span
+                            initial={false}
+                            animate={open ? { opacity: 0 } : { opacity: 1 }}
+                            transition={{ duration: 0.2 }}
+                            className="block w-6 h-0.5 bg-black rounded my-1"
+                        />
+                        {/* Bottom line */}
+                        <motion.span
+                            initial={false}
+                            animate={open ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="block w-6 h-0.5 bg-black rounded"
+                        />
+                    </button>
                 </div>
             </div>
+
+            {/* Mobile menu */}
+            <AnimatePresence>
+                {open && (
+                    <>
+                        {/* ✅ Overlay only below navbar (no blur on navbar) */}
+                        <motion.div
+                            key="overlay"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="md:hidden fixed left-0 right-0 bottom-0 z-40 bg-black/30 backdrop-blur-md"
+                            style={{ top: scrolled ? "56px" : "64px" }}
+                            onClick={() => setOpen(false)}
+                        />
+
+                        {/* Drawer */}
+                        <motion.div
+                            key="drawer"
+                            initial={{ y: -40, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -30, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 260, damping: 22 }}
+                            className="md:hidden absolute top-full left-0 right-0 z-50
+                         rounded-b-2xl shadow-2xl overflow-hidden
+                         bg-[var(--brand-bg)] border-b border-[var(--ring)]"
+                        >
+                            {/* Background image */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 0.08 }}
+                                transition={{ duration: 0.6 }}
+                                style={{ backgroundImage: `url(${data.NavBackground})` }}
+                                className="absolute inset-0 bg-cover bg-center"
+                            />
+
+                            {/* Nav links with stagger */}
+                            <motion.nav
+                                className="relative flex flex-col px-6 py-3 z-10"
+                                initial="hidden"
+                                animate="show"
+                                exit="hidden"
+                                variants={{
+                                    hidden: {},
+                                    show: {
+                                        transition: { staggerChildren: 0.08, delayChildren: 0.1 }
+                                    }
+                                }}
+                            >
+                                {NAV.map(({ to, key }) => (
+                                    <motion.div
+                                        key={key}
+                                        variants={{
+                                            hidden: { y: 15, opacity: 0 },
+                                            show: {
+                                                y: 0,
+                                                opacity: 1,
+                                                transition: { ease: "easeOut" }
+                                            }
+                                        }}
+                                    >
+                                        <NavLink
+                                            to={to}
+                                            end
+                                            className={({ isActive }) =>
+                                                `block text-base py-3 border-b border-dashed border-[var(--ring)] last:border-0 transition
+                         ${
+                                                    isActive
+                                                        ? "text-[var(--brand-accent)] font-semibold"
+                                                        : "text-[var(--brand-ink)] opacity-85 hover:opacity-100"
+                                                }`
+                                            }
+                                        >
+                                            {t(`nav.${key}`)}
+                                        </NavLink>
+                                    </motion.div>
+                                ))}
+                            </motion.nav>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </header>
     )
 }

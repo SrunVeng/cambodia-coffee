@@ -18,7 +18,20 @@
       }
     }
   },
-  "products": { "title":"All Products","sort":"Sort","filter":"Filter","details":"Details","addToCart":"Add to Cart" },
+  "products": { "title": "All Products",
+    "filter": "Filter",
+    "sort": "Sort",
+    "all": "All",
+    "sortPopular": "Popularity",
+    "sortPriceAsc": "Price ↑",
+    "sortPriceDesc": "Price ↓",
+    "sortNewest": "Newest",
+    "search": "Search",
+    "searchPlaceholder": "Search products...",
+    "details": "Details",
+    "addToCart": "Add to Cart",
+    "code": "Code",
+    "chooseSize": "Choose size"},
   "order": {
     "title":"Checkout",
     "steps":["Info","Items","Review","Payment","Receipt"],
@@ -32,6 +45,8 @@
     "title": "About Us",
     "story": "We roast coffee with calm, clarity and care. From farm to cup, we bring you a warm and minimal experience — where design is simple, but taste is deep."
   }
+
+
 }
 
 

@@ -18,7 +18,20 @@
       }
     }
   },
-  "products": { "title":"全部产品","sort":"排序","filter":"筛选","details":"详情","addToCart":"加入购物车" },
+  "products": { "title": "全部产品",
+    "filter": "筛选",
+    "sort": "排序",
+    "all": "全部",
+    "sortPopular": "人气",
+    "sortPriceAsc": "价格 ↑",
+    "sortPriceDesc": "价格 ↓",
+    "sortNewest": "最新",
+    "search": "搜索",
+    "searchPlaceholder": "搜索产品...",
+    "details": "详情",
+    "addToCart": "加入购物车",
+    "code": "编号",
+    "chooseSize": "选择规格"},
   "order": {
     "title":"结算",
     "steps":["信息","商品","确认","支付","收据"],

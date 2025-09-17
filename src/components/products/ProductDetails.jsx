@@ -1,37 +1,101 @@
-import { useState } from 'react'
-import { fmt } from '../../utils/currency'
-import { useCart } from '../../store/cart'
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
+import { fmt } from "../../utils/currency"
+import { useCart } from "../../store/cart"
+import { motion } from "framer-motion"
 
-export default function ProductDetails({ product, onClose }){
-    const add = useCart(s=>s.add)
-    const [variant, setVariant] = useState(product.variants?.[0]?.id || 'base')
-    const delta = product.variants?.find(v=>v.id===variant)?.delta || 0
+export default function ProductDetails({ product, onClose }) {
+    const { i18n, t } = useTranslation()
+    const add = useCart((s) => s.add)
+
+    const lang = i18n.language || "en"
+    const title = product.title?.[lang] || product.title?.en || ""
+    const desc = product.desc?.[lang] || product.desc?.en || ""
+    const code = product.code || product.id
+
+    const [variant, setVariant] = useState(product.variants?.[0]?.id || "base")
+    const delta = product.variants?.find((v) => v.id === variant)?.delta || 0
     const price = product.price + delta
 
     return (
-        <div className="fixed inset-0 bg-black/50 z-50 grid place-items-center px-4" onClick={onClose}>
-            <div className="card w-full max-w-2xl overflow-hidden" onClick={e=>e.stopPropagation()}>
+        <div
+            className="fixed inset-0 bg-black/50 z-50 grid place-items-center px-4"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                className="card w-full max-w-2xl overflow-hidden rounded-2xl shadow-xl bg-white"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <div className="grid md:grid-cols-2">
-                    <img src={product.images?.[0]} alt="" className="w-full h-full object-cover"/>
-                    <div className="p-5 space-y-3">
-                        <h3 className="text-xl font-semibold">{product.title}</h3>
-                        <p className="opacity-80 text-sm">{product.desc}</p>
-                        {product.variants?.length>0 && (
-                            <select className="badge"
-                                    value={variant} onChange={e=>setVariant(e.target.value)}>
-                                {product.variants.map(v=><option key={v.id} value={v.id}>{v.label}</option>)}
-                            </select>
-                        )}
-                        <div className="flex items-center justify-between">
-                            <div className="text-lg font-semibold">{fmt(price, product.currency)}</div>
-                            <button className="btn btn-primary"
-                                    onClick={()=> { add({ id:product.id, title:product.title, price, variantId:variant, qty:1 }); onClose?.() }}>
-                                Add to Cart
-                            </button>
+                    {/* Image */}
+                    <img
+                        src={product.images?.[0]}
+                        alt={title}
+                        className="w-full h-full object-cover"
+                    />
+
+                    {/* Content */}
+                    <div className="p-6 space-y-4 flex flex-col justify-between">
+                        <div>
+                            <h3 className="text-2xl font-bold text-[var(--brand-ink)]">
+                                {title}
+                            </h3>
+                            <div className="text-xs opacity-60 mt-1">
+                                {t("products.code")}: {code}
+                            </div>
+                            <p className="opacity-80 text-sm mt-2">{desc}</p>
+
+                            {product.variants?.length > 0 && (
+                                <div className="mt-4">
+                                    <label className="block text-sm mb-1 opacity-70">
+                                        {t("products.chooseSize")}
+                                    </label>
+                                    <select
+                                        className="badge"
+                                        value={variant}
+                                        onChange={(e) => setVariant(e.target.value)}
+                                    >
+                                        {product.variants.map((v) => (
+                                            <option key={v.id} value={v.id}>
+                                                {v.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Bottom row: Price + Add button */}
+                        <div className="flex items-center justify-between pt-4 border-t border-[var(--ring)]">
+                            <div className="text-lg font-semibold text-[var(--brand-accent)]">
+                                {fmt(price, product.currency)}
+                            </div>
+                            <motion.button
+                                whileTap={{ scale: 0.95 }}
+                                whileHover={{ scale: 1.05 }}
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    add({
+                                        id: product.id,
+                                        code,
+                                        title,
+                                        price,
+                                        variantId: variant,
+                                        qty: 1,
+                                    })
+                                    onClose?.()
+                                }}
+                            >
+                                {t("products.addToCart")}
+                            </motion.button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     )
 }

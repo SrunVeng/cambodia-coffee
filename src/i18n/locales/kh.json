@@ -18,7 +18,20 @@
       }
     }
   },
-  "products": { "title":"ផលិតផលទាំងអស់","sort":"តម្រៀប","filter":"តម្រង","details":"ព័ត៌មានលម្អិត","addToCart":"បញ្ចូលទៅកន្រ្តក" },
+  "products": {   "title": "ផលិតផលទាំងអស់",
+    "filter": "ត្រង",
+    "sort": "តម្រៀប",
+    "all": "ទាំងអស់",
+    "sortPopular": "ពេញនិយម",
+    "sortPriceAsc": "តម្លៃ ↑",
+    "sortPriceDesc": "តម្លៃ ↓",
+    "sortNewest": "ថ្មីបំផុត",
+    "search": "ស្វែងរក",
+    "searchPlaceholder": "ស្វែងរកផលិតផល...",
+    "details": "ព័ត៌មានលម្អិត",
+    "addToCart": "បញ្ចូលកន្ត្រក",
+    "code": "កូដ",
+    "chooseSize": "ជ្រើសទំហំ"},
   "order": {
     "title":"ការទូទាត់",
     "steps":["ព័ត៌មាន","ឥវ៉ាន់","ពិនិត្យឡើងវិញ","ការទូទាត់","បង្កាន់ដៃ"],
