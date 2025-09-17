@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import logo from "../assets/logo.png" // <- update path to your logo
+import logo from "../../public/assets/logo.png" // <- update path to your logo
 
 export default function About() {
     const { t } = useTranslation()
