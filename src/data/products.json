@@ -1,0 +1,32 @@
+[
+  {
+    "id": "bean-ethiopia-wash",
+    "title": "Ethiopia Washed",
+    "category": "beans",
+    "price": 22000,
+    "currency": "KHR",
+    "images": ["/img/ethiopia.jpg"],
+    "rating": 4.8,
+    "variants": [
+      { "id":"500g", "label":"500g", "delta": 0 },
+      { "id":"1kg", "label":"1kg", "delta": 65000 }
+    ],
+    "tags": ["light roast","floral"],
+    "desc": "Delicate florals, citrus, tea-like body."
+  },
+  {
+    "id": "powder-house",
+    "title": "House Blend Powder",
+    "category": "powder",
+    "price": 16000,
+    "currency": "KHR",
+    "images": ["/img/house.jpg"],
+    "rating": 4.6,
+    "variants": [
+      { "id":"500g", "label":"500g", "delta": 0 },
+      { "id":"1kg", "label":"1kg", "delta": 12000 }
+    ],
+    "tags": ["balanced","daily"],
+    "desc": "Chocolatey, balanced and friendly."
+  }
+]

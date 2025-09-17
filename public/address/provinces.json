@@ -1,0 +1,228 @@
+{
+"provinces": [
+	{
+		"code" : "PROV_1",
+		"latitude" : "13.585",
+		"longitude" : "102.973",
+		"name_en" : "Banteay Meanchey",
+		"name_km" : "បន្ទាយមានជ័យ",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_2",
+		"latitude" : "13.028",
+		"longitude" : "102.989",
+		"name_en" : "Battambang",
+		"name_km" : "បាត់ដំបង",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_3",
+		"latitude" : "11.992",
+		"longitude" : "105.463",
+		"name_en" : "Kampong Cham",
+		"name_km" : "កំពង់ចាម",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_4",
+		"latitude" : "12.25",
+		"longitude" : "104.667",
+		"name_en" : "Kampong Chhnang",
+		"name_km" : "កំពង់ឆ្នាំង",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_5",
+		"latitude" : "11.45",
+		"longitude" : "104.52",
+		"name_en" : "Kampong Speu",
+		"name_km" : "កំពង់ស្ពឺ",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_6",
+		"latitude" : "12.711",
+		"longitude" : "104.889",
+		"name_en" : "Kampong Thom",
+		"name_km" : "កំពង់ធំ",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_7",
+		"latitude" : "10.61",
+		"longitude" : "104.18",
+		"name_en" : "Kampot",
+		"name_km" : "កំពត",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_8",
+		"latitude" : "11.483",
+		"longitude" : "104.95",
+		"name_en" : "Kandal",
+		"name_km" : "កណ្ដាល",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_9",
+		"latitude" : "11.615",
+		"longitude" : "102.983",
+		"name_en" : "Koh Kong",
+		"name_km" : "កោះកុង",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_10",
+		"latitude" : "12.488",
+		"longitude" : "106.018",
+		"name_en" : "Kratie",
+		"name_km" : "ក្រចេះ",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_11",
+		"latitude" : "12.455",
+		"longitude" : "107.188",
+		"name_en" : "Mondul Kiri",
+		"name_km" : "មណ្ឌលគិរី",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_12",
+		"latitude" : "11.556",
+		"longitude" : "104.928",
+		"name_en" : "Phnom Penh",
+		"name_km" : "រាជធានីភ្នំពេញ",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_13",
+		"latitude" : "13.814",
+		"longitude" : "104.973",
+		"name_en" : "Preah Vihear",
+		"name_km" : "ព្រះវិហារ",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_14",
+		"latitude" : "11.485",
+		"longitude" : "105.325",
+		"name_en" : "Prey Veng",
+		"name_km" : "ព្រៃវែង",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_15",
+		"latitude" : "12.538",
+		"longitude" : "103.919",
+		"name_en" : "Pursat",
+		"name_km" : "ពោធិ៍សាត់",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_16",
+		"latitude" : "13.75",
+		"longitude" : "107.0",
+		"name_en" : "Ratanak Kiri",
+		"name_km" : "រតនគិរី",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_17",
+		"latitude" : "13.361",
+		"longitude" : "103.86",
+		"name_en" : "Siemreap",
+		"name_km" : "សៀមរាប",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_18",
+		"latitude" : "10.609",
+		"longitude" : "103.529",
+		"name_en" : "Preah Sihanouk",
+		"name_km" : "ព្រះសីហនុ",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_19",
+		"latitude" : "13.525",
+		"longitude" : "105.968",
+		"name_en" : "Stung Treng",
+		"name_km" : "ស្ទឹងត្រែង",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_20",
+		"latitude" : "11.087",
+		"longitude" : "105.8",
+		"name_en" : "Svay Rieng",
+		"name_km" : "ស្វាយរៀង",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_21",
+		"latitude" : "10.99",
+		"longitude" : "104.785",
+		"name_en" : "Takeo",
+		"name_km" : "តាកែវ",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_22",
+		"latitude" : "14.0",
+		"longitude" : "103.5",
+		"name_en" : "Oddar Meanchey",
+		"name_km" : "ឧត្ដរមានជ័យ",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_23",
+		"latitude" : "10.48",
+		"longitude" : "104.317",
+		"name_en" : "Kep",
+		"name_km" : "កែប",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_24",
+		"latitude" : "12.85",
+		"longitude" : "102.6",
+		"name_en" : "Pailin",
+		"name_km" : "ប៉ៃលិន",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	},
+	{
+		"code" : "PROV_25",
+		"latitude" : "11.87",
+		"longitude" : "105.85",
+		"name_en" : "Tboung Khmum",
+		"name_km" : "ត្បូងឃ្មុំ",
+		"type" : "ខេត្ត",
+		"country_code" : "KH"
+	}
+]}

@@ -1,0 +1,13 @@
+{
+  "nav": { "home":"首页","products":"产品","order":"下单","about":"关于我们","cart":"购物车" },
+  "home": { "heroTitle":"一杯咖啡，一份从容", "cta":"选购咖啡" },
+  "products": { "title":"全部产品","sort":"排序","filter":"筛选","details":"详情","addToCart":"加入购物车" },
+  "order": {
+    "title":"结算",
+    "steps":["信息","商品","确认","支付","收据"],
+    "info":"客户信息",
+    "name":"姓名","email":"邮箱","phone":"电话",
+    "address":"地址","province":"省/直辖市","district":"区/县","commune":"乡/街道","village":"村/社区",
+    "deliveryFee":"运费","subtotal":"小计","total":"合计"
+  }
+}

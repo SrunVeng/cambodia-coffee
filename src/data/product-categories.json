@@ -1,0 +1,7 @@
+[
+  { "id":"beans", "name":"Coffee Bean" },
+  { "id":"powder", "name":"Coffee Powder" },
+  { "id":"accessories", "name":"Accessories" },
+  { "id":"machines", "name":"Coffee Machine" },
+  { "id":"other", "name":"Other" }
+]

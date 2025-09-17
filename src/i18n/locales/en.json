@@ -1,0 +1,13 @@
+{
+  "nav": { "home":"Home","products":"Products","order":"Order","about":"About Us","cart":"My Cart" },
+  "home": { "heroTitle":"Coffee, Calm & Clarity", "cta":"Shop Coffee" },
+  "products": { "title":"All Products","sort":"Sort","filter":"Filter","details":"Details","addToCart":"Add to Cart" },
+  "order": {
+    "title":"Checkout",
+    "steps":["Info","Items","Review","Payment","Receipt"],
+    "info":"Customer Information",
+    "name":"Full Name","email":"Email","phone":"Phone",
+    "address":"Address","province":"Province","district":"District","commune":"Commune","village":"Village",
+    "deliveryFee":"Delivery Fee","subtotal":"Subtotal","total":"Total"
+  }
+}

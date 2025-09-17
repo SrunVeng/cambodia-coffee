@@ -1,0 +1,10 @@
+{
+  "APP_NAME": "Café Neutral",
+  "APP_LOGO": "/logo.svg",
+  "WAREHOUSE_COORDS": { "lat": 11.556, "lng": 104.928 },
+  "SOCIAL": {
+    "facebook": "https://facebook.com/your-coffee",
+    "instagram": "https://instagram.com/your-coffee"
+  },
+  "CURRENCY": "KHR"
+}
