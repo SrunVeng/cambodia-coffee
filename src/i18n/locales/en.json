@@ -4,21 +4,13 @@
     "heroTitle":"Coffee, Calm & Clarity",
     "cta":"Shop Coffee",
     "sections": {
-      "farm": {
-        "title": "From the Coffee Farm",
-        "subtitle": "Sourcing the finest beans, straight to your cup"
-      },
-      "brew": {
-        "title": "Crafted Brewing",
-        "subtitle": "Every cup brewed with care, rich in aroma"
-      },
-      "featured": {
-        "title": "Featured Selection",
-        "subtitle": "Discover our most popular coffees"
-      }
+      "farm": { "title": "From the Coffee Farm", "subtitle": "Sourcing the finest beans, straight to your cup" },
+      "brew": { "title": "Crafted Brewing", "subtitle": "Every cup brewed with care, rich in aroma" },
+      "featured": { "title": "Featured Selection", "subtitle": "Discover our most popular coffees" }
     }
   },
-  "products": { "title": "All Products",
+  "products": {
+    "title": "All Products",
     "filter": "Filter",
     "sort": "Sort",
     "all": "All",
@@ -31,7 +23,8 @@
     "details": "Details",
     "addToCart": "Add to Cart",
     "code": "Code",
-    "chooseSize": "Choose size"},
+    "chooseSize": "Choose size"
+  },
   "order": {
     "title":"Checkout",
     "steps":["Info","Items","Review","Payment","Receipt"],
@@ -40,13 +33,50 @@
     "address":"Address","province":"Province","district":"District","commune":"Commune","village":"Village",
     "deliveryFee":"Delivery Fee","subtotal":"Subtotal","total":"Total"
   },
-
   "about": {
     "title": "About Us",
     "story": "We roast coffee with calm, clarity and care. From farm to cup, we bring you a warm and minimal experience — where design is simple, but taste is deep."
+  },
+  "common": {
+    "back": "Back"
+  },
+  "payment": {
+    "cod": "Cash on Delivery",
+    "aba": "ABA Pay",
+    "subtotal": "Subtotal",
+    "delivery": "Delivery",
+    "total": "Total",
+    "generating_qr": "Generating QR...",
+    "qr_hint": "Click to generate the QR code.",
+    "payment_id": "Payment ID",
+    "scan_wait": "Scan to pay. Waiting for confirmation...",
+    "processing": "Processing...",
+    "confirm_cod": "Confirm COD",
+    "generating": "Generating...",
+    "generate_qr": "Generate QR"
+  },
+  "review": {
+    "customer": "Customer",
+    "address": "Address",
+    "no_address": "—",
+    "order_items": "Order Items",
+    "no_items": "No items.",
+    "subtotal": "Subtotal",
+    "delivery": "Delivery",
+    "total": "Total",
+    "proceed_payment": "Proceed to Payment",
+    "qty": "Qty",
+    "each": "ea",
+    "item": "Item"
+  },
+  "address": {
+    "search_placeholder": "Search…",
+    "no_results": "No results",
+    "select_province": "Select province",
+    "select_district": "Select district",
+    "select_commune": "Select commune",
+    "select_village": "Select village",
+    "street": "Street",
+    "street_placeholder": "e.g., Street/House/Building/Floor"
   }
-
-
 }
-
-

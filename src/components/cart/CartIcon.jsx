@@ -9,7 +9,7 @@ export default function CartIcon({ active }) {
 
     return (
         <Link
-            to="/cart"
+            to="/order"
             aria-label={t('nav.cart')}
             className={`relative flex items-center justify-center w-10 h-10 rounded-2xl border border-[var(--ring)] 
                 bg-white/90 text-[var(--brand-ink)] transition-all duration-200

@@ -34,7 +34,6 @@ export default function Navbar() {
 
     const appName = getAppName(i18n.language)
 
-    // shrink on scroll
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 6)
         onScroll()
@@ -42,12 +41,10 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", onScroll)
     }, [])
 
-    // close drawer on route change
     useEffect(() => {
         setOpen(false)
     }, [pathname])
 
-    // body scroll lock while drawer open
     useEffect(() => {
         const cls = "overflow-hidden"
         if (open) document.body.classList.add(cls)
@@ -55,7 +52,6 @@ export default function Navbar() {
         return () => document.body.classList.remove(cls)
     }, [open])
 
-    // close on Esc
     const onKeyDown = useCallback((e) => {
         if (e.key === "Escape") setOpen(false)
     }, [])
@@ -65,7 +61,6 @@ export default function Navbar() {
         return () => window.removeEventListener("keydown", onKeyDown)
     }, [open, onKeyDown])
 
-    // close if resized to desktop
     useEffect(() => {
         const onResize = () => {
             if (window.matchMedia("(min-width:768px)").matches) setOpen(false)
@@ -79,9 +74,7 @@ export default function Navbar() {
             className={`fixed top-0 left-0 right-0 z-50 border-b border-[var(--ring)]
                   transition-[height,box-shadow] duration-300
                   ${scrolled ? "h-14 shadow-md" : "h-16 shadow-sm"}`}
-            style={{
-                background: "linear-gradient(to right, #f5f1ea, #f8f4ef)" // ✅ solid, never blur
-            }}
+            style={{ background: "linear-gradient(to right, #f5f1ea, #f8f4ef)" }}
         >
             <div className="container-narrow flex h-full items-center justify-between">
                 {/* Brand */}
@@ -105,9 +98,7 @@ export default function Navbar() {
                             end
                             className={({ isActive }) =>
                                 `relative text-sm opacity-80 hover:opacity-100 transition ${
-                                    isActive
-                                        ? "active opacity-100 font-semibold text-[var(--brand-accent)]"
-                                        : ""
+                                    isActive ? "active opacity-100 font-semibold text-[var(--brand-accent)]" : ""
                                 }`
                             }
                         >
@@ -120,13 +111,27 @@ export default function Navbar() {
                 {/* Desktop actions */}
                 <div className="hidden md:flex items-center gap-2">
                     <LanguageSwitch />
-                    <CartIcon active={pathname === "/cart"} />
+                    {/* Cart -> Order page */}
+                    <Link
+                        to="/order"
+                        aria-label={t("nav.cart", { defaultValue: "My Cart" })}
+                        className="inline-flex"
+                    >
+                        <CartIcon active={pathname === "/order"} />
+                    </Link>
                 </div>
 
                 {/* Mobile actions */}
                 <div className="md:hidden flex items-center gap-2">
                     <LanguageSwitch />
-                    <CartIcon active={pathname === "/cart"} />
+                    {/* Cart -> Order page */}
+                    <Link
+                        to="/order"
+                        aria-label={t("nav.cart", { defaultValue: "My Cart" })}
+                        className="inline-flex"
+                    >
+                        <CartIcon active={pathname === "/order"} />
+                    </Link>
 
                     {/* Animated Hamburger Button */}
                     <button
@@ -134,21 +139,18 @@ export default function Navbar() {
                         onClick={() => setOpen((v) => !v)}
                         className="relative w-8 h-8 flex flex-col justify-center items-center"
                     >
-                        {/* Top line */}
                         <motion.span
                             initial={false}
                             animate={open ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
                             transition={{ duration: 0.3 }}
                             className="block w-6 h-0.5 bg-black rounded"
                         />
-                        {/* Middle line */}
                         <motion.span
                             initial={false}
                             animate={open ? { opacity: 0 } : { opacity: 1 }}
                             transition={{ duration: 0.2 }}
                             className="block w-6 h-0.5 bg-black rounded my-1"
                         />
-                        {/* Bottom line */}
                         <motion.span
                             initial={false}
                             animate={open ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
@@ -163,7 +165,6 @@ export default function Navbar() {
             <AnimatePresence>
                 {open && (
                     <>
-                        {/* ✅ Overlay only below navbar (no blur on navbar) */}
                         <motion.div
                             key="overlay"
                             initial={{ opacity: 0 }}
@@ -175,7 +176,6 @@ export default function Navbar() {
                             onClick={() => setOpen(false)}
                         />
 
-                        {/* Drawer */}
                         <motion.div
                             key="drawer"
                             initial={{ y: -40, opacity: 0 }}
@@ -186,7 +186,6 @@ export default function Navbar() {
                          rounded-b-2xl shadow-2xl overflow-hidden
                          bg-[var(--brand-bg)] border-b border-[var(--ring)]"
                         >
-                            {/* Background image */}
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 0.08 }}
@@ -195,7 +194,6 @@ export default function Navbar() {
                                 className="absolute inset-0 bg-cover bg-center"
                             />
 
-                            {/* Nav links with stagger */}
                             <motion.nav
                                 className="relative flex flex-col px-6 py-3 z-10"
                                 initial="hidden"
@@ -203,9 +201,7 @@ export default function Navbar() {
                                 exit="hidden"
                                 variants={{
                                     hidden: {},
-                                    show: {
-                                        transition: { staggerChildren: 0.08, delayChildren: 0.1 }
-                                    }
+                                    show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } }
                                 }}
                             >
                                 {NAV.map(({ to, key }) => (
@@ -213,11 +209,7 @@ export default function Navbar() {
                                         key={key}
                                         variants={{
                                             hidden: { y: 15, opacity: 0 },
-                                            show: {
-                                                y: 0,
-                                                opacity: 1,
-                                                transition: { ease: "easeOut" }
-                                            }
+                                            show: { y: 0, opacity: 1, transition: { ease: "easeOut" } }
                                         }}
                                     >
                                         <NavLink
