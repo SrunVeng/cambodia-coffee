@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next"
-import logo from "../../public/logo.png" // <- update path to your logo
+
+import data from "../data/data.json"; // <- update path to your logo
 
 export default function About() {
     const { t } = useTranslation()
@@ -10,7 +11,7 @@ export default function About() {
                 {/* Logo */}
                 <div className="flex justify-center mb-8">
                     <img
-                        src={logo}
+                        src={data.APP_LOGO}
                         alt="Coffee Brand Logo"
                         className="w-24 h-24 md:w-32 md:h-32 object-contain"
                     />
