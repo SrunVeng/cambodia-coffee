@@ -30,9 +30,17 @@ export default function Footer() {
                         alt="logo"
                         className="h-8 w-8 rounded-lg bg-white shadow-sm ring-1 ring-[var(--ring)] object-cover"
                     />
-                    <span className="text-sm opacity-80">
-            © {new Date().getFullYear()} {appName}
-          </span>
+                    <span
+                        className={`text-sm opacity-80 ${
+                            normalizeLang(i18n.resolvedLanguage || i18n.language) === "KH"
+                                ? "font-kh" // Khmer font class (e.g. Noto Sans Khmer, Hanuman)
+                                : normalizeLang(i18n.resolvedLanguage || i18n.language) === "CN"
+                                    ? "font-cn" // Chinese font class (e.g. Noto Sans SC, Source Han Sans CN)
+                                    : "font-en" // Default English font class
+                        }`}
+                    >
+  © {new Date().getFullYear()} {appName}
+</span>
                 </div>
 
                 {/* Right: Social links */}
