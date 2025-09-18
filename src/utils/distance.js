@@ -16,3 +16,56 @@ export function deliveryFeeByKm(km){
     const perKm = 1000
     return Math.round(base + perKm * Math.max(0, km))
 }
+
+
+
+// utils/distance.js
+// Delivery fee helpers and computation
+
+export const FEE_TABLE = {
+    pickup: 0,
+    urban: 3000,     // Phnom Penh
+    nonUrban: 6000,  // other provinces
+};
+
+export function norm(s) {
+    return (s || "").toString().trim().toLowerCase();
+}
+
+export function isUrbanProvince(province) {
+    const p = norm(province);
+    return (
+        p.includes("phnom penh") ||
+        p.includes("phnompenh") ||
+        p === "pp" ||
+        p === "ភ្នំពេញ" ||
+        p.includes("phnom")
+    );
+}
+
+export function extractProvince(info) {
+    return (
+        info?.province ??
+        info?.address?.province ??
+        info?.shippingAddress?.province ??
+        ""
+    );
+}
+
+export function extractMethod(info) {
+    return info?.deliveryMethod ?? info?.delivery?.method ?? "";
+}
+
+/**
+ * Compute delivery fee from user info (delivery method + province).
+ * - pickup => 0
+ * - Phnom Penh => urban fee
+ * - elsewhere => non-urban fee
+ */
+export function computeDeliveryFee(info) {
+    const method = norm(extractMethod(info));
+    if (method === "pickup" || method === "self-pickup") return FEE_TABLE.pickup;
+
+    const province = extractProvince(info);
+    return isUrbanProvince(province) ? FEE_TABLE.urban : FEE_TABLE.nonUrban;
+}
