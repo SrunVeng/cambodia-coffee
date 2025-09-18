@@ -153,8 +153,8 @@
     "images": ["/img/espresso-powder.jpg"],
     "rating": 4.7,
     "variants": [
-      { "id": "250g", "label": "250g", "delta": 0 },
-      { "id": "500g", "label": "500g", "delta": 8000 }
+      { "id": "500g", "label": "500g", "delta": 0 },
+      { "id": "1kg", "label": "1kg", "delta": 18000 }
     ],
     "tags": {
       "en": ["espresso", "rich"],
@@ -181,8 +181,8 @@
     "images": ["/img/cappuccino.jpg"],
     "rating": 4.4,
     "variants": [
-      { "id": "200g", "label": "200g", "delta": 0 },
-      { "id": "400g", "label": "400g", "delta": 7000 }
+      { "id": "500g", "label": "500g", "delta": 0 },
+      { "id": "1kg", "label": "1kg", "delta": 19000 }
     ],
     "tags": {
       "en": ["creamy", "sweet"],
