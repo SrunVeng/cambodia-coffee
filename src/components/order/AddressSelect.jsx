@@ -60,7 +60,6 @@ function MobilePicker({ open, onClose, items, value, onSelect, label }) {
 }
 
 function Dropdown({ label, items, value, onSelect, disabled }) {
-    const selected = items.find((i) => i.code === value)
     return (
         <select
             className="block w-full rounded-xl border border-[#e7dbc9] bg-[#fffaf3] px-3 py-2 text-sm text-[#3b2a1d] placeholder-[#9b8b7c] shadow-sm focus:border-[#c9a44c] focus:ring-2 focus:ring-[#c9a44c] disabled:bg-[#f2ede5] disabled:text-[#9b8b7c]"
@@ -152,7 +151,10 @@ export default function AddressSelect({ value, onChange }) {
             {/* Province */}
             <div className="md:hidden">
                 <button
-                    onClick={() => setOpen("province")}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        setOpen("province")
+                    }}
                     className="w-full rounded-xl border border-[#e7dbc9] bg-[#fffaf3] px-3 py-2 text-left text-sm text-[#3b2a1d]"
                 >
                     {v.provinceName || t("order.province", { defaultValue: "Province" })}
@@ -178,7 +180,10 @@ export default function AddressSelect({ value, onChange }) {
             {/* District */}
             <div className="md:hidden">
                 <button
-                    onClick={() => v.province && setOpen("district")}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        v.province && setOpen("district")
+                    }}
                     className="w-full rounded-xl border border-[#e7dbc9] bg-[#fffaf3] px-3 py-2 text-left text-sm text-[#3b2a1d] disabled:text-[#9b8b7c]"
                     disabled={!v.province}
                 >
@@ -206,7 +211,10 @@ export default function AddressSelect({ value, onChange }) {
             {/* Commune */}
             <div className="md:hidden">
                 <button
-                    onClick={() => v.district && setOpen("commune")}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        v.district && setOpen("commune")
+                    }}
                     className="w-full rounded-xl border border-[#e7dbc9] bg-[#fffaf3] px-3 py-2 text-left text-sm text-[#3b2a1d] disabled:text-[#9b8b7c]"
                     disabled={!v.district}
                 >
@@ -234,7 +242,10 @@ export default function AddressSelect({ value, onChange }) {
             {/* Village */}
             <div className="md:hidden">
                 <button
-                    onClick={() => v.commune && setOpen("village")}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        v.commune && setOpen("village")
+                    }}
                     className="w-full rounded-xl border border-[#e7dbc9] bg-[#fffaf3] px-3 py-2 text-left text-sm text-[#3b2a1d] disabled:text-[#9b8b7c]"
                     disabled={!v.commune}
                 >
