@@ -100,7 +100,7 @@ export default function ProductPicker({ open, onClose, onAdd, currency, initialS
                                     value={cat}
                                     onChange={setCat}
                                     onClose={() => setFiltersOpen(false)}
-                                    translateCat={(k) => (k === "all" ? t("products.all", { defaultValue: "All" }) : k)}
+                                 //   translateCat={(k) => (k === "all" ? t("products.all", { defaultValue: "All" }) : k)}
                                 />
                             )}
                         </AnimatePresence>

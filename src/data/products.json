@@ -51,7 +51,7 @@
     },
     "desc": {
       "en": "Rich aroma, smooth body with nutty notes.",
-      "kh": "ក្លិនក្រអូបខ្លាំង មានរូបរាងទន់ និងរសជាតិនុត។",
+      "kh": "ក្លិនក្រអូបខ្លាំង មានរូបរាងទន់ และរសជាតិនុត។",
       "cn": "浓郁香气，顺滑口感，带坚果风味。"
     }
   },
@@ -222,5 +222,166 @@
       "kh": "ម្សៅសម្រាប់កាហ្វេទឹកកក មានរសជាតិឆ្ងាញ់ត្រជាក់។",
       "cn": "专为冰咖啡设计，清爽顺滑。"
     }
+  },
+
+
+  {
+    "id": "acc-hand-grinder",
+    "code": "ACC-001",
+    "title": {
+      "en": "Hand Coffee Grinder",
+      "kh": "ម៉ាស៊ីនកិនកាហ្វេដៃ",
+      "cn": "手摇磨豆机"
+    },
+    "category": "accessories",
+    "price": 85000,
+    "currency": "KHR",
+    "images": ["https://placehold.co/800x800?text=Hand+Grinder"],
+    "rating": 4.6,
+    "variants": [
+      { "id": "standard", "label": "Standard", "delta": 0 },
+      { "id": "pro", "label": "Pro Burr", "delta": 30000 }
+    ],
+    "tags": {
+      "en": ["manual", "portable", "consistent grind"],
+      "kh": ["ដៃ", "ងាយយក", "កិនស្មើ"],
+      "cn": ["手动", "便携", "均匀研磨"]
+    },
+    "desc": {
+      "en": "Portable hand grinder with adjustable burrs for consistent grind.",
+      "kh": "ម៉ាស៊ីនកិនដៃ មានប៊័រកែតម្រូវ កិនស្មើ និងងាយយកតាមដងផ្លូវ។",
+      "cn": "便携式手摇磨豆机，研磨粗细可调，均匀稳定。"
+    }
+  },
+  {
+    "id": "acc-gooseneck-kettle",
+    "code": "ACC-002",
+    "title": {
+      "en": "Gooseneck Kettle",
+      "kh": "កាដាយទឹក Gooseneck",
+      "cn": "细口手冲壶"
+    },
+    "category": "accessories",
+    "price": 65000,
+    "currency": "KHR",
+    "images": ["https://placehold.co/800x800?text=Gooseneck+Kettle"],
+    "rating": 4.5,
+    "variants": [
+      { "id": "600ml", "label": "600ml", "delta": 0 },
+      { "id": "1l", "label": "1L", "delta": 15000 }
+    ],
+    "tags": {
+      "en": ["pour-over", "precision spout"],
+      "kh": ["hand drip", "លំហូរត្រឹមត្រូវ"],
+      "cn": ["手冲", "控水精准"]
+    },
+    "desc": {
+      "en": "Controlled water flow for smooth pour-over extractions.",
+      "kh": "គ្រប់គ្រងលំហូរទឹកបានត្រឹមត្រូវ សម្រាប់ hand drip ល្អប្រសើរ។",
+      "cn": "精准控水，手冲萃取更稳定。"
+    }
+  },
+  {
+    "id": "acc-v60-filters",
+    "code": "ACC-003",
+    "title": {
+      "en": "V60 Filter Papers",
+      "kh": "ក្រដាសតម្រង V60",
+      "cn": "V60 滤纸"
+    },
+    "category": "accessories",
+    "price": 5000,
+    "currency": "KHR",
+    "images": ["https://placehold.co/800x800?text=V60+Filters"],
+    "rating": 4.4,
+    "variants": [
+      { "id": "40pcs", "label": "40 sheets", "delta": 0 },
+      { "id": "100pcs", "label": "100 sheets", "delta": 4000 }
+    ],
+    "tags": {
+      "en": ["filters", "clean cup"],
+      "kh": ["តម្រង", "ពែងស្អាត"],
+      "cn": ["滤纸", "干净风味"]
+    },
+    "desc": {
+      "en": "Fast-flow filter papers for bright, clean cups.",
+      "kh": "ក្រដាសតម្រងហូរលឿន ផ្តល់ពែងស្អាតពន្លឺ។",
+      "cn": "流速快，风味干净明亮。"
+    }
+  },
+  {
+    "id": "acc-digital-scale",
+    "code": "ACC-004",
+    "title": {
+      "en": "Digital Coffee Scale",
+      "kh": "តុល្យការឌីជីថល",
+      "cn": "咖啡电子秤"
+    },
+    "category": "accessories",
+    "price": 45000,
+    "currency": "KHR",
+    "images": ["https://placehold.co/800x800?text=Digital+Scale"],
+    "rating": 4.6,
+    "variants": [
+      { "id": "basic", "label": "Basic", "delta": 0 },
+      { "id": "timer", "label": "With Timer", "delta": 8000 }
+    ],
+    "tags": {
+      "en": ["precision", "timer"],
+      "kh": ["ត្រឹមត្រូវ", "ម៉ោងកំណត់"],
+      "cn": ["精确", "计时"]
+    },
+    "desc": {
+      "en": "Accurate scale to dial in your brew ratio, optional timer.",
+      "kh": "តុល្យការដែលមានភាពត្រឹមត្រូវ ដាក់សមមូល ក៏អាចមានម៉ោងកំណត់។",
+      "cn": "精准称量冲煮比例，可选计时功能。"
+    }
+  },
+  {
+    "id": "acc-ceramic-mug",
+    "code": "ACC-005",
+    "title": {
+      "en": "Ceramic Coffee Mug",
+      "kh": "កែវកាហ្វេសេរ៉ាមិច",
+      "cn": "陶瓷咖啡杯"
+    },
+    "category": "accessories",
+    "price": 12000,
+    "currency": "KHR",
+    "images": [
+      "https://placehold.co/800x800?text=Ceramic+Mug"
+    ],
+    "rating": 4.5,
+    "variants": [
+      {
+        "id": "300ml",
+        "label": "300ml",
+        "delta": 0
+      },
+      {
+        "id": "400ml",
+        "label": "400ml",
+        "delta": 3000
+      }
+    ],
+    "tags": {
+      "en": [
+        "mug",
+        "heat-retaining"
+      ],
+      "kh": [
+        "កែវ",
+        "រក្សាកម្ដៅ"
+      ],
+      "cn": [
+        "杯子",
+        "保温"
+      ]
+    },
+    "desc": {
+      "en": "Durable ceramic mug that keeps your coffee warm.",
+      "kh": "កែវសេរ៉ាមិចរឹងមាំ រក្សាកាហ្វេឱ្យក្តៅយូរ។",
+      "cn": "耐用陶瓷杯，更好保温。"
+    }
   }
-]
+  ]

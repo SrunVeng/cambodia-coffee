@@ -187,6 +187,17 @@ export default function Info({ data, onNext, onResetClick }) {
             {/* Actions row: Reset left, Next right */}
             <div className="pt-1">
                 <div className="flex items-center justify-between">
+
+                    <button
+                        type="button"
+                        onClick={handleResetPress}
+                        className="inline-flex items-center justify-center rounded-xl px-5 py-3 font-medium
+                       bg-gradient-to-br from-red-600 to-red-700 text-white shadow-md
+                       transition focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
+                    >
+                        {t("common.reset", { defaultValue: "Reset" })}
+                    </button>
+
                     <button
                         type="submit"
                         disabled={!canSubmit}
@@ -203,15 +214,7 @@ export default function Info({ data, onNext, onResetClick }) {
                     </button>
 
 
-                    <button
-                        type="button"
-                        onClick={handleResetPress}
-                        className="inline-flex items-center justify-center rounded-xl px-5 py-3 font-medium
-                       bg-gradient-to-br from-red-600 to-red-700 text-white shadow-md
-                       transition focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
-                    >
-                        {t("common.reset", { defaultValue: "Reset" })}
-                    </button>
+
                 </div>
 
                 <p className="mt-2 text-[11px] text-[#857567]">
