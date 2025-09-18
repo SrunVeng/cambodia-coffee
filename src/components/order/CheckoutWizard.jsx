@@ -72,8 +72,10 @@ export default function CheckoutWizard() {
         <div className="max-w-3xl mx-auto p-4 space-y-4">
             {/* Sticky stepper under the navbar — fully transparent wrapper */}
             <div
-                className="top-14 sm:top-20 z-30 bg-transparent py-1 mb-2"
-                style={{ backgroundColor: "transparent" }}
+                className="
+         top-14 sm:top-20 z-30
+        -mx-4 px-4 py-15 mb-2
+       "
             >
                 <Stepper
                     steps={steps}

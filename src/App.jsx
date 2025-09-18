@@ -8,7 +8,7 @@ export default function App() {
         <div className="flex min-h-screen flex-col">
             <Navbar />
             {/* Leave room for the fixed/sticky header so content (and stepper) never hides behind it */}
-            <main className="flex-1 pt-16 sm:pt-20">
+            <main className="flex-1">
                 <RoutesView />
             </main>
             <Footer />

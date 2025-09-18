@@ -76,7 +76,7 @@ export default function Navbar() {
                   ${scrolled ? "h-14 shadow-md" : "h-16 shadow-sm"}`}
             style={{ background: "linear-gradient(to right, #f5f1ea, #f8f4ef)" }}
         >
-            <div className="container-narrow flex h-full items-center justify-between">
+            <div className="container-narrow flex h-full items-center justify-between ">
                 {/* Brand */}
                 <Link to="/" className="group flex items-center gap-2">
                     <img
