@@ -3,9 +3,11 @@ import { useCart } from "../../../store/cart";
 import { fmt } from "../../../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { Trash2 } from "lucide-react";
 
 import ProductPicker from "../../../components/ProductPicker.jsx";
 import Line from "../../../components/Line";
+import LeaveGuard from "../../../components/animate/LeaveGuard.jsx";
 
 export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBack }) {
     const { t } = useTranslation();
@@ -19,6 +21,7 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
     const decrement = useCart((s) => s.decrement);
 
     const [pickerOpen, setPickerOpen] = useState(false);
+    const [clearOpen, setClearOpen] = useState(false);
 
     const total = useMemo(() => (subtotal || 0) + (deliveryFee || 0), [subtotal, deliveryFee]);
 
@@ -39,10 +42,7 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
     return (
         <div className="space-y-4">
             {/* Header / Actions */}
-            <div className="
-        rounded-2xl border border-[#e7dbc9] bg-[#fffaf3] shadow-sm
-        p-4 sm:p-5
-      ">
+            <div className="rounded-2xl border border-[#e7dbc9] bg-[#fffaf3] shadow-sm p-4 sm:p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                     <div className="font-semibold text-base sm:text-lg text-[#2d1a14]">
                         {t("items.title", { defaultValue: "Your Cart" })}
@@ -78,7 +78,7 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
                   hover:bg-[#f1e7d6]
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a44c] focus-visible:ring-offset-2
                 "
-                                onClick={() => replace([])}
+                                onClick={() => setClearOpen(true)}
                             >
                                 {/* trash icon */}
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -163,10 +163,7 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
             </div>
 
             {/* Summary card */}
-            <div className="
-        rounded-2xl border border-[#e7dbc9] bg-[#fffaf3] shadow-sm
-        p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4
-      ">
+            <div className="rounded-2xl border border-[#e7dbc9] bg-[#fffaf3] shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
                     <div className="opacity-80">
                         {t("payment.subtotal", { defaultValue: "Subtotal" })}: {fmt(subtotal || 0, currency)}
@@ -209,9 +206,10 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
             inline-flex items-center justify-center rounded-xl px-5 py-3
             text-sm font-semibold transition
             focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-            ${items.length === 0
-                        ? "bg-[#e8dfd0] text-[#9b8b7c] cursor-not-allowed"
-                        : "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white shadow-md focus-visible:ring-[#c9a44c]"
+            ${
+                        items.length === 0
+                            ? "bg-[#e8dfd0] text-[#9b8b7c] cursor-not-allowed"
+                            : "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white shadow-md focus-visible:ring-[#c9a44c]"
                     }
           `}
                 >
@@ -230,6 +228,23 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
                     />
                 )}
             </AnimatePresence>
+
+            {/* Clear cart confirmation */}
+            <LeaveGuard
+                open={clearOpen}
+                onCancel={() => setClearOpen(false)}
+                onConfirm={() => {
+                    setClearOpen(false);
+                    replace([]);
+                }}
+                danger
+                title={t("items.clearTitle", { defaultValue: "Clear your cart?" })}
+                hint={t("items.clearHint", {
+                    defaultValue: "This will remove all items from your cart. This action cannot be undone.",
+                })}
+                confirmLabel={t("items.clear", { defaultValue: "Clear cart" })}
+                cancelLabel={t("common.cancel", { defaultValue: "Cancel" })}
+            />
         </div>
     );
 }

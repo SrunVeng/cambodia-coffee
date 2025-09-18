@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import { fmt } from "../utils/currency";
 import { normalizeLang, tField } from "../utils/i18n-helpers.js";
 import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
+import LeaveGuard from "./animate/LeaveGuard.jsx";
 
 /** Normalize possible JSON shapes to a plain array */
 function toProductsArray(src) {
@@ -20,10 +22,12 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
     const { t, i18n } = useTranslation();
     const lang = normalizeLang(i18n.language);
 
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
     const product = PRODUCTS.find((p) => p.id === item.id);
     const img = item.image || product?.images?.[0];
 
-    // Localized title & variant label
+    // Localized title & variant label — prefer live i18n first so switches update UI
     const variantObj = product?.variants?.find((v) => v.id === item.variantId);
     const variantLabel =
         (variantObj ? tField(variantObj.label, lang) : null) ||
@@ -31,9 +35,10 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
         (item.variantId && item.variantId !== "base" ? item.variantId : "");
 
     const title =
-        item.title ||
         tField(product?.title, lang) ||
+        item.title ||
         t("products.untitled", { defaultValue: "Untitled" });
+
     const code = item.code || product?.code || item.id;
 
     const unit = Number(item.price || 0);
@@ -41,22 +46,15 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
     const lineTotal = unit * qty;
     const lineCurrency = item.currency || currency;
 
-    const removeClick = () => {
-        const msg = t("cart.confirmRemove", { defaultValue: "Remove this item?" });
-        if (typeof window !== "undefined") {
-            if (window.confirm(msg)) onRemove?.(item);
-        } else {
-            onRemove?.(item);
-        }
+    const askRemove = () => setConfirmOpen(true);
+    const confirmRemove = () => {
+        setConfirmOpen(false);
+        onRemove?.(item);
     };
 
     return (
         <article
-            className="
-        relative max-w-full rounded-2xl border border-[#e7dbc9] bg-white/90
-        p-3 sm:p-4 transition-[box-shadow,border-color] hover:border-[#c9a44c]
-        hover:shadow-sm overflow-hidden
-      "
+            className="relative max-w-full rounded-2xl border border-[#e7dbc9] bg-white/90 p-3 sm:p-4 transition-[box-shadow,border-color] hover:border-[#c9a44c] hover:shadow-sm overflow-hidden"
             role="listitem"
         >
             {/* HEADER: image | title/meta | desktop unit */}
@@ -107,8 +105,7 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
                                         >
                       <Tag className="w-3 h-3" aria-hidden="true" />
                       <span className="truncate">
-                        {t("products.variant", { defaultValue: "Variant" })}:{" "}
-                          {variantLabel}
+                        {t("products.variant", { defaultValue: "Variant" })}: {variantLabel}
                       </span>
                     </span>
                                     </>
@@ -136,7 +133,7 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
                         </div>
                     </div>
 
-                    {/* MOBILE: Unit price badge (always visible) */}
+                    {/* MOBILE: Unit price badge */}
                     <div className="mt-1 sm:hidden">
             <span className="inline-flex items-center gap-1 rounded-md border border-[#e7dbc9] bg-[#fffaf3] px-2 py-0.5 text-[12px] text-[#2d1a14]">
               <span className="uppercase tracking-wide text-[10px] text-[#857567]">
@@ -156,10 +153,10 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
           items-center gap-2 sm:gap-4
         "
             >
-                {/* Remove (compact on mobile) */}
+                {/* Remove */}
                 <motion.button
                     type="button"
-                    onClick={removeClick}
+                    onClick={askRemove}
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}
                     className="
@@ -188,10 +185,8 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
                     />
                 </div>
 
-                {/* Spacer */}
-                <div className="justify-self-end sm:hidden text-[11px] text-[#857567]">
-                    {/* Empty on purpose to keep grid shape on mobile */}
-                </div>
+                {/* Spacer (keeps grid shape on mobile) */}
+                <div className="justify-self-end sm:hidden text-[11px] text-[#857567]" />
 
                 {/* Desktop total */}
                 <div className="hidden sm:block justify-self-end text-right leading-tight min-w-[7.5rem]">
@@ -213,7 +208,7 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
                 </div>
             </div>
 
-            {/* MOBILE SUMMARY BAR: "Unit × Qty = Total" (always visible) */}
+            {/* MOBILE SUMMARY BAR */}
             <div
                 className="
           sm:hidden mt-2 -mx-3 px-3 py-2 rounded-xl
@@ -229,6 +224,25 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
                     {fmt(lineTotal, lineCurrency)}
                 </div>
             </div>
+
+            {/* Remove confirmation */}
+            <LeaveGuard
+                open={confirmOpen}
+                onCancel={() => setConfirmOpen(false)}
+                onConfirm={confirmRemove}
+                danger
+                title={t("cart.confirmRemoveTitle", { defaultValue: "Remove this item?" })}
+                hint={
+                    <span className="block">
+            {t("cart.confirmRemoveHint", {
+                defaultValue: "“{{title}}” will be removed from your cart.",
+                title,
+            })}
+          </span>
+                }
+                confirmLabel={t("common.remove", { defaultValue: "Remove" })}
+                cancelLabel={t("common.cancel", { defaultValue: "Cancel" })}
+            />
         </article>
     );
 }

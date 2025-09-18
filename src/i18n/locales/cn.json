@@ -13,6 +13,7 @@
   "products": {
     "title": "全部产品",
     "filter": "筛选",
+    "variant": "规格",
     "base": "基础",
     "soldOut": "已售罄",
     "price": "价格",
@@ -46,7 +47,10 @@
   "common": {
     "back": "返回",
     "next" : "下一步",
-    "addToCart": "加入购物车"
+    "addToCart": "加入购物车",
+    "unit": "单位",
+    "total": "合计",
+    "remove": "移除"
   },
   "payment": {
     "cod": "货到付款",
@@ -106,7 +110,15 @@
     "title": "购物车",
     "addMore": "添加更多商品",
     "clear": "清空购物车",
-    "empty": "购物车里还没有商品。"
+    "empty": "购物车里还没有商品。",
+    "clearTitle": "清空购物车？",
+    "clearHint": "这将把购物车中的所有商品移除。此操作无法撤销。"
+  },
+  "cart": {
+    "confirmRemoveTitle": "移除此商品？",
+    "confirmRemoveHint": "“{{title}}” 将从您的购物车中移除。",
+    "unit": "单位",
+    "total": "合计"
   },
   "qty": {
     "decrease": "减少",

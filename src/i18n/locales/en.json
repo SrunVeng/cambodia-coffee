@@ -13,6 +13,7 @@
   "products": {
     "title": "All Products",
     "filter": "Filter",
+    "variant": "variant",
     "base": "Base",
     "soldOut": "Sold out",
     "price": "Price",
@@ -46,7 +47,8 @@
   "common": {
     "back": "Back",
     "next": "Next",
-    "addToCart": "Add to cart"
+    "addToCart": "Add to cart",
+    "remove": "remove"
   },
   "payment": {
     "cod": "Cash on Delivery",
@@ -106,7 +108,15 @@
   "title": "Your Cart",
   "addMore": "Add more products",
   "clear": "Clear cart",
-  "empty": "No items in cart."
+  "empty": "No items in cart.",
+    "clearTitle": "Clear your cart?",
+    "clearHint": "This will remove all items from your cart. This action cannot be undone."
+  },
+  "cart": {
+    "confirmRemoveTitle": "Remove this item?",
+    "confirmRemoveHint": "“{{title}}” will be removed from your cart.",
+    "unit": "unit",
+    "total": "Total"
   },
   "qty": {
     "decrease": "Decrease",

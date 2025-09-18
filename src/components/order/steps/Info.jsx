@@ -5,8 +5,11 @@ import { useTranslation } from "react-i18next";
 
 const normalizeLang = (L) => {
     const x = String(L || "en").toLowerCase();
-    if (x === "km") return "kh";
-    if (x === "zh") return "cn";
+    // Khmer
+    if (x === "km" || x.startsWith("km-") || x === "kh" || x.startsWith("kh-")) return "kh";
+    // Chinese (treat all zh variants as cn)
+    if (x === "zh" || x.startsWith("zh-") || x === "cn" || x.startsWith("cn-")) return "cn";
+    // English
     return ["en", "kh", "cn"].includes(x) ? x : "en";
 };
 
@@ -24,7 +27,10 @@ export default function Info({ data, onNext }) {
     const { t, i18n } = useTranslation();
 
     const {
-        register, handleSubmit, setError, clearErrors,
+        register,
+        handleSubmit,
+        setError,
+        clearErrors,
         formState: { errors, isValid, isSubmitting },
     } = useForm({
         defaultValues: { name: "", email: "", phone: "", ...(data || {}) },
@@ -32,6 +38,7 @@ export default function Info({ data, onNext }) {
     });
 
     const [addr, setAddr] = useState(data?.address || {});
+
     const canSubmit = useMemo(
         () =>
             isValid &&
@@ -56,7 +63,9 @@ export default function Info({ data, onNext }) {
     const submit = async (v) => {
         if (!canSubmit) return;
         const next = { ...v, address: addr };
-        try { localStorage.setItem("info", JSON.stringify(next)); } catch {}
+        try {
+            localStorage.setItem("info", JSON.stringify(next));
+        } catch {}
         await onNext?.(next);
     };
 
@@ -66,10 +75,12 @@ export default function Info({ data, onNext }) {
     const okRing = "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]";
     const errRing = "border-red-300 focus:border-red-400 focus:ring-red-300";
 
-    // Pick localized names from AddressSelect value if present; fall back to default Name
+    // Current normalized language
     const L = normalizeLang(i18n.language);
+
+    // Safely pick a localized part name from AddressSelect's value container
     const pickName = (base) =>
-        addr?.[`${base}Name${L.toUpperCase()}`] || // e.g., provinceNameKH / provinceNameCN (if you use upper)
+        addr?.[`${base}Name${L.toUpperCase()}`] || // provinceNameKH / provinceNameCN
         addr?.[`${base}Name${L.charAt(0).toUpperCase() + L.slice(1)}`] || // provinceNameKh / provinceNameCn
         addr?.[`${base}Name_${L}`] || // provinceName_kh / provinceName_cn
         addr?.[`${base}Name`] || // default (likely English)
@@ -77,11 +88,15 @@ export default function Info({ data, onNext }) {
         addr?.[base]?.name || // generic
         "";
 
-    const selectedParts = [pickName("village"), pickName("commune"), pickName("district"), pickName("province")]
-        .filter(Boolean)
-        .join(", ");
+    // Recompute selected parts whenever language OR address changes
+    const selectedParts = useMemo(() => {
+        return [pickName("village"), pickName("commune"), pickName("district"), pickName("province")]
+            .filter(Boolean)
+            .join(", ");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [addr, L]);
 
-    // Translate error message keys at render time
+    // Translate error message keys at render time (instant swap on language change)
     const trErr = (key) => t(key, { defaultValue: ERR_DEFAULTS[key] || "Invalid value." });
 
     return (
@@ -111,11 +126,7 @@ export default function Info({ data, onNext }) {
                         })}
                         className={`${inputBase} ${errors.name ? errRing : okRing}`}
                     />
-                    {errors.name && (
-                        <p className="mt-1 text-xs text-red-600">
-                            {trErr(errors.name.message)}
-                        </p>
-                    )}
+                    {errors.name && <p className="mt-1 text-xs text-red-600">{trErr(errors.name.message)}</p>}
                 </div>
 
                 <div>
@@ -130,16 +141,11 @@ export default function Info({ data, onNext }) {
                         autoComplete="email"
                         placeholder={t("order.email_placeholder", { defaultValue: "you@domain.com" })}
                         {...register("email", {
-                            validate: (v) =>
-                                !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "errors.email_invalid",
+                            validate: (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "errors.email_invalid",
                         })}
                         className={`${inputBase} ${errors.email ? errRing : okRing}`}
                     />
-                    {errors.email && (
-                        <p className="mt-1 text-xs text-red-600">
-                            {trErr(errors.email.message)}
-                        </p>
-                    )}
+                    {errors.email && <p className="mt-1 text-xs text-red-600">{trErr(errors.email.message)}</p>}
                 </div>
 
                 <div>
@@ -161,11 +167,7 @@ export default function Info({ data, onNext }) {
                         })}
                         className={`${inputBase} ${errors.phone ? errRing : okRing}`}
                     />
-                    {errors.phone && (
-                        <p className="mt-1 text-xs text-red-600">
-                            {trErr(errors.phone.message)}
-                        </p>
-                    )}
+                    {errors.phone && <p className="mt-1 text-xs text-red-600">{trErr(errors.phone.message)}</p>}
                 </div>
             </div>
 
@@ -174,10 +176,19 @@ export default function Info({ data, onNext }) {
                     {t("order.address", { defaultValue: "Address" })}
                     <span className="text-red-500"> *</span>
                 </label>
+
                 <div
-                    className={`rounded-xl border ${errors.address ? "border-red-300" : "border-[#e7dbc9]"} bg-[#fffaf3] p-3 shadow-sm`}
+                    className={`rounded-xl border ${
+                        errors.address ? "border-red-300" : "border-[#e7dbc9]"
+                    } bg-[#fffaf3] p-3 shadow-sm`}
                 >
-                    <AddressSelect value={addr} onChange={setAddr} />
+                    {/* Force AddressSelect to remount on language change so its internal UI updates instantly */}
+                    <AddressSelect
+                        key={L}
+                        lang={L}
+                        value={addr}
+                        onChange={setAddr}
+                    />
                 </div>
 
                 {(addr.province || addr.provinceName) && (
@@ -187,9 +198,7 @@ export default function Info({ data, onNext }) {
                 )}
 
                 {errors.address && (
-                    <p className="mt-1 text-xs text-red-600">
-                        {trErr(errors.address.message)}
-                    </p>
+                    <p className="mt-1 text-xs text-red-600">{trErr(errors.address.message)}</p>
                 )}
             </div>
 
@@ -200,9 +209,11 @@ export default function Info({ data, onNext }) {
                     aria-disabled={!canSubmit}
                     className={`inline-flex items-center justify-center rounded-xl px-5 py-3 font-medium transition
             focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-            ${canSubmit
-                        ? "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white shadow-md focus-visible:ring-[#c9a44c]"
-                        : "bg-[#e8dfd0] text-[#9b8b7c] cursor-not-allowed"}`}
+            ${
+                        canSubmit
+                            ? "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white shadow-md focus-visible:ring-[#c9a44c]"
+                            : "bg-[#e8dfd0] text-[#9b8b7c] cursor-not-allowed"
+                    }`}
                 >
                     {t("common.next", { defaultValue: "Next" })}
                 </button>
