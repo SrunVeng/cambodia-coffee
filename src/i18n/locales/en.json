@@ -1,13 +1,45 @@
 {
   "nav": { "home":"Home","products":"Products","order":"Order","about":"About Us","cart":"My Cart" },
   "home": {
-    "heroTitle":"Coffee, Calm & Clarity",
+    "heroTitle": "Coffee, Calm & Clarity",
     "heroSubtitle": "From farm to cup, discover single-origin beans and signature blends you’ll love.",
-    "cta":"Shop Coffee",
+    "cta": "Shop Coffee",
+    "cards": {
+      "fresh": {
+        "title": "Fresh Roast",
+        "text": "We roast in small batches and ship quickly for peak flavor."
+      },
+      "origin": {
+        "title": "Single Origin",
+        "text": "Traceable beans from trusted farms—clean, complex, memorable."
+      },
+      "delivery": {
+        "title": "Fast Delivery",
+        "text": "Same-day options in town and reliable shipping nationwide."
+      }
+    },
+    "stats": {
+      "farmers": "Partner farmers",
+      "profiles": "Roast profiles",
+      "rating": "Average rating"
+    },
     "sections": {
-      "farm": { "title": "From the Coffee Farm", "subtitle": "Sourcing the finest beans, straight to your cup" },
-      "brew": { "title": "Crafted Brewing", "subtitle": "Every cup brewed with care, rich in aroma" },
-      "featured": { "title": "Featured Selection", "subtitle": "Discover our most popular coffees" }
+      "farm": {
+        "title": "From the Coffee Farm",
+        "subtitle": "We partner directly with growers to ensure fair pricing and consistent quality."
+      },
+      "brew": {
+        "title": "Crafted Brewing",
+        "subtitle": "Dial in your cup with our brew guides—pour-over, espresso, cold brew and more."
+      },
+      "featured": {
+        "title": "Featured Selection",
+        "subtitle": "Seasonal lots and community favorites, roasted to highlight origin character."
+      }
+    },
+    "banner": {
+      "title": "Ready for a better morning?",
+      "subtitle": "Fresh-roasted coffee, shipped fast. Your new favorite is waiting."
     }
   },
   "products": {

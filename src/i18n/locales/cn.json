@@ -1,13 +1,45 @@
 {
   "nav": { "home":"首页","products":"产品","order":"下单","about":"关于我们","cart":"购物车" },
   "home": {
-    "heroTitle":"一杯咖啡，一份从容",
-    "cta":"选购咖啡",
+    "heroTitle": "一杯咖啡，一份从容",
     "heroSubtitle": "从农场到杯子，发现您喜爱的单一产地咖啡豆和特色混合咖啡。",
+    "cta": "选购咖啡",
+    "cards": {
+      "fresh": {
+        "title": "新鲜烘焙",
+        "text": "小批量烘焙，快速寄送，保持最佳风味。"
+      },
+      "origin": {
+        "title": "单一产地",
+        "text": "可追溯的优质产地咖啡，风味纯净而独特。"
+      },
+      "delivery": {
+        "title": "快速送达",
+        "text": "市区当日送达，全国可靠配送。"
+      }
+    },
+    "stats": {
+      "farmers": "合作农户",
+      "profiles": "烘焙曲线",
+      "rating": "平均评分"
+    },
     "sections": {
-      "farm": { "title": "源自咖啡农场", "subtitle": "甄选优质咖啡豆，直达您的杯中" },
-      "brew": { "title": "匠心冲煮", "subtitle": "每一杯都用心萃取，浓郁香气弥漫" },
-      "featured": { "title": "特色推荐", "subtitle": "发现我们的热门精选咖啡" }
+      "farm": {
+        "title": "源自咖啡农场",
+        "subtitle": "我们与农户直接合作，确保公平价格和稳定品质。"
+      },
+      "brew": {
+        "title": "匠心冲煮",
+        "subtitle": "学习手冲、意式、冷萃等冲煮指南，找到你的理想口感。"
+      },
+      "featured": {
+        "title": "特色推荐",
+        "subtitle": "应季精品与社区热门，彰显独特产地风味。"
+      }
+    },
+    "banner": {
+      "title": "迎接更好的清晨？",
+      "subtitle": "新鲜烘焙，极速寄送。你的心头好正在等你。"
     }
   },
   "products": {
