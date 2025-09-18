@@ -161,7 +161,7 @@ export default function Info({ data, onNext }) {
                         {...register("phone", {
                             required: "errors.phone_required",
                             pattern: {
-                                value: /^[0-9+\-\s]{6,20}$/i,
+                                value: /^0\d{8,9}$/,
                                 message: "errors.phone_invalid",
                             },
                         })}
