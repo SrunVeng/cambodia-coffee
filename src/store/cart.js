@@ -21,7 +21,7 @@ function readItems() {
 
 function writeItems(items) {
     if (typeof window === "undefined") return;
-    try { localStorage.setItem(KEY, JSON.stringify(items)); } catch {}
+    try { localStorage.setItem(KEY, JSON.stringify(items)); } catch { /* empty */ }
 }
 
 export const useCart = create((set, get) => ({
@@ -90,7 +90,7 @@ export const useCart = create((set, get) => ({
     },
 
     clear() {
-        try { localStorage.removeItem(KEY); } catch {}
+        try { localStorage.removeItem(KEY); } catch { /* empty */ }
         set({ items: [] });
     },
 
@@ -113,7 +113,7 @@ if (typeof window !== "undefined") {
                 if (JSON.stringify(items) !== JSON.stringify(curr)) {
                     useCart.setState({ items });
                 }
-            } catch {}
+            } catch { /* empty */ }
         }
     });
 }

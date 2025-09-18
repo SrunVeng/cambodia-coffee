@@ -2,6 +2,7 @@
   "nav": { "home":"Home","products":"Products","order":"Order","about":"About Us","cart":"My Cart" },
   "home": {
     "heroTitle":"Coffee, Calm & Clarity",
+    "heroSubtitle": "From farm to cup, discover single-origin beans and signature blends you’ll love.",
     "cta":"Shop Coffee",
     "sections": {
       "farm": { "title": "From the Coffee Farm", "subtitle": "Sourcing the finest beans, straight to your cup" },

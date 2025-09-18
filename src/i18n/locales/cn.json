@@ -3,6 +3,7 @@
   "home": {
     "heroTitle":"一杯咖啡，一份从容",
     "cta":"选购咖啡",
+    "heroSubtitle": "从农场到杯子，发现您喜爱的单一产地咖啡豆和特色混合咖啡。",
     "sections": {
       "farm": { "title": "源自咖啡农场", "subtitle": "甄选优质咖啡豆，直达您的杯中" },
       "brew": { "title": "匠心冲煮", "subtitle": "每一杯都用心萃取，浓郁香气弥漫" },

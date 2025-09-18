@@ -1,6 +1,6 @@
 import rawProducts from "../data/products.json";
 import QtyStepper from "./QtyStepper";
-import { X, Tag } from "lucide-react";
+import { Tag, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { fmt } from "../utils/currency";
 import { normalizeLang, tField } from "../utils/i18n-helpers.js";
@@ -23,13 +23,14 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
     const product = PRODUCTS.find((p) => p.id === item.id);
     const img = item.image || product?.images?.[0];
 
+    // Localized title & variant label
     const variantObj = product?.variants?.find((v) => v.id === item.variantId);
     const variantLabel =
         (variantObj ? tField(variantObj.label, lang) : null) ||
         item.variantLabel ||
         (item.variantId && item.variantId !== "base" ? item.variantId : "");
 
-    const title = item.title || tField(product?.title, lang);
+    const title = item.title || tField(product?.title, lang) || t("products.untitled", { defaultValue: "Untitled" });
     const code = item.code || product?.code || item.id;
 
     const unit = Number(item.price || 0);
@@ -37,126 +38,156 @@ export default function Line({ item, currency, onInc, onDec, onRemove }) {
     const lineTotal = unit * qty;
     const lineCurrency = item.currency || currency;
 
+    const removeClick = () => {
+        const msg = t("cart.confirmRemove", { defaultValue: "Remove this item?" });
+        if (typeof window !== "undefined") {
+            if (window.confirm(msg)) onRemove?.(item);
+        } else {
+            onRemove?.(item);
+        }
+    };
+
     return (
-        <div
+        <article
             className="
-        flex flex-col gap-3 sm:gap-4
-        sm:flex-row sm:items-center sm:justify-between
+        relative max-w-full rounded-2xl border border-[#e7dbc9] bg-white/80
+        p-3 sm:p-4 transition-[box-shadow,border-color]
+        hover:border-[#c9a44c] hover:shadow-sm overflow-hidden
       "
+            role="listitem"
         >
-            {/* LEFT: image + meta */}
-            <div className="flex items-center gap-3 min-w-0">
-                {img ? (
-                    <img
-                        src={img}
-                        alt={title}
-                        className="h-14 w-14 sm:h-16 sm:w-16 rounded-xl object-cover flex-shrink-0 border border-[#e7dbc9] bg-white"
-                        loading="lazy"
-                    />
-                ) : (
-                    <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-xl bg-[#fffaf3] border border-[#e7dbc9] grid place-items-center text-[11px] text-[#857567]">
-                        IMG
-                    </div>
-                )}
+            {/* GRID: image | content | unit (≥sm) */}
+            <div className="grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_auto] gap-3 sm:gap-4 items-start">
+                {/* Image */}
+                <div className="shrink-0">
+                    {img ? (
+                        <img
+                            src={img}
+                            alt={title}
+                            className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl object-cover border border-[#e7dbc9] bg-white"
+                            loading="lazy"
+                        />
+                    ) : (
+                        <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl bg-[#fffaf3] border border-[#e7dbc9] grid place-items-center text-[11px] text-[#857567]">
+                            IMG
+                        </div>
+                    )}
+                </div>
 
+                {/* Content */}
                 <div className="min-w-0">
-                    <div className="font-medium text-[#2d1a14] truncate" title={title}>
-                        {title}
-                    </div>
+                    {/* Title + meta */}
+                    <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                            <h3 className="font-semibold text-[#241611] text-[15px] sm:text-base truncate" title={title}>
+                                {title}
+                            </h3>
 
-                    <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-[#6b5545]">
-            <span className="truncate">
-              {t("products.code", { defaultValue: "Code" })}: {code}
-            </span>
-                        {variantLabel ? (
-                            <>
-                                <span className="opacity-50">•</span>
-                                <span
-                                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-[#e7dbc9] bg-white/70 text-[11px] text-[#6b5545]"
-                                    title={variantLabel}
-                                >
-                  <Tag className="w-3 h-3" />
-                  <span className="truncate max-w-[10rem]">
-                    {t("products.variant", { defaultValue: "Variant" })}: {variantLabel}
-                  </span>
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[#6b5545]">
+                <span className="truncate">
+                  {t("products.code", { defaultValue: "Code" })}: {code}
                 </span>
-                            </>
-                        ) : null}
+
+                                {variantLabel ? (
+                                    <>
+                                        <span className="opacity-40">•</span>
+                                        <span
+                                            className="
+                        inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full
+                        border border-[#e7dbc9] bg-white/70 text-[11px] leading-none
+                        max-w-[12rem]
+                      "
+                                            title={variantLabel}
+                                        >
+                      <Tag className="w-3 h-3" aria-hidden="true" />
+                      <span className="truncate">
+                        {t("products.variant", { defaultValue: "Variant" })}: {variantLabel}
+                      </span>
+                    </span>
+                                    </>
+                                ) : null}
+                            </div>
+                        </div>
+
+                        {/* Desktop-only Unit */}
+                        <div className="hidden sm:block text-right leading-tight shrink-0">
+                            <div className="text-[11px] uppercase tracking-wide text-[#857567]">
+                                {t("cart.unit", { defaultValue: "Unit" })}
+                            </div>
+                            <AnimatePresence mode="popLayout" initial={false}>
+                                <motion.div
+                                    key={`u-${unit}-${lineCurrency}`}
+                                    initial={{ opacity: 0, y: 6 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -6 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="font-semibold text-[#2d1a14]"
+                                >
+                                    {fmt(unit, lineCurrency)}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
                     </div>
 
-                    {/* Mobile: unit x qty */}
-                    <div className="sm:hidden mt-1 text-[11px] text-[#857567]">
-                        {fmt(unit, lineCurrency)} × {qty}
+                    {/* Controls: REMOVE | QTY | (spacer) | TOTAL */}
+                    <div
+                        className="
+              mt-2 sm:mt-3
+              grid grid-cols-[auto_auto_1fr_auto] items-center gap-2 sm:gap-4
+            "
+                    >
+                        {/* Remove — now next to qty for better UX */}
+                        <motion.button
+                            type="button"
+                            onClick={removeClick}
+                            whileHover={{ scale: 1.04 }}
+                            whileTap={{ scale: 0.96 }}
+                            className="
+                h-9 px-3 inline-flex items-center gap-2 rounded-full border
+                border-red-200 text-red-600 bg-white/90
+                hover:bg-red-50 hover:shadow-sm
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:ring-offset-2
+                shrink-0
+              "
+                            aria-label={t("common.remove", { defaultValue: "Remove" })}
+                        >
+                            <Trash2 className="w-4 h-4" aria-hidden="true" />
+                            <span className="hidden sm:inline text-sm">
+                {t("common.remove", { defaultValue: "Remove" })}
+              </span>
+                        </motion.button>
+
+                        {/* Qty */}
+                        <div>
+                            <QtyStepper value={qty} min={1} onDec={() => onDec?.(item)} onInc={() => onInc?.(item)} size="md" />
+                        </div>
+
+                        {/* Mobile helper: Unit × Qty */}
+                        <div className="col-span-1 sm:col-span-1 justify-self-end sm:hidden text-[11px] text-[#857567]">
+                            {fmt(unit, lineCurrency)} × {qty}
+                        </div>
+
+                        {/* Total */}
+                        <div className="justify-self-end text-right leading-tight min-w-[7.5rem]">
+                            <div className="text-[11px] uppercase tracking-wide text-[#857567]">
+                                {t("cart.total", { defaultValue: "Total" })}
+                            </div>
+                            <AnimatePresence mode="popLayout" initial={false}>
+                                <motion.div
+                                    key={`t-${lineTotal}-${lineCurrency}`}
+                                    initial={{ opacity: 0, y: 6 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -6 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="font-semibold text-[#2d1a14]"
+                                >
+                                    {fmt(lineTotal, lineCurrency)}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {/* RIGHT: prices + qty + remove */}
-            <div className="flex items-center gap-3 sm:gap-4 self-end sm:self-auto">
-                {/* Unit (desktop) */}
-                <div className="hidden sm:block text-right leading-tight min-w-[9rem]">
-                    <div className="text-[11px] uppercase tracking-wide text-[#857567]">
-                        {t("cart.unit", { defaultValue: "Unit" })}
-                    </div>
-                    <AnimatePresence mode="popLayout" initial={false}>
-                        <motion.div
-                            key={`u-${unit}-${lineCurrency}`}
-                            initial={{ opacity: 0, y: 6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -6 }}
-                            transition={{ duration: 0.15 }}
-                            className="font-semibold text-[#2d1a14]"
-                        >
-                            {fmt(unit, lineCurrency)}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-
-                {/* Qty */}
-                <QtyStepper
-                    value={qty}
-                    onDec={() => onDec(item)}
-                    onInc={() => onInc(item)}
-                    min={1}
-                />
-
-                {/* Total */}
-                <div className="text-right leading-tight min-w-[10.5rem]">
-                    <div className="text-[11px] uppercase tracking-wide text-[#857567]">
-                        {t("cart.total", { defaultValue: "Total" })}
-                    </div>
-                    <AnimatePresence mode="popLayout" initial={false}>
-                        <motion.div
-                            key={`t-${lineTotal}-${lineCurrency}`}
-                            initial={{ opacity: 0, y: 6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -6 }}
-                            transition={{ duration: 0.15 }}
-                            className="font-semibold text-[#2d1a14]"
-                        >
-                            {fmt(lineTotal, lineCurrency)}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-
-                {/* Remove button (separate, rounded, animated) */}
-                <motion.button
-                    type="button"
-                    onClick={() => onRemove(item)}
-                    title={t("common.remove", { defaultValue: "Remove" })}
-                    aria-label={t("common.remove", { defaultValue: "Remove" })}
-                    whileHover={{ scale: 1.06 }}
-                    whileTap={{ scale: 0.92 }}
-                    className="
-            h-9 w-9 grid place-items-center rounded-full border
-            border-red-200 text-red-600 bg-white/70
-            hover:bg-red-50 hover:shadow-sm
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:ring-offset-2
-          "
-                >
-                    <X className="w-4 h-4" />
-                </motion.button>
-            </div>
-        </div>
+        </article>
     );
 }
