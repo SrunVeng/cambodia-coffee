@@ -12,6 +12,9 @@
   "products": {
     "title": "全部产品",
     "filter": "筛选",
+    "base": "基础",
+    "soldOut": "已售罄",
+    "price": "价格",
     "sort": "排序",
     "all": "全部",
     "sortPopular": "人气",
@@ -27,6 +30,8 @@
   },
   "order": {
     "title":"结算",
+    "info_hint": "我们会使用这些信息来处理您的订单和配送。",
+    "privacy_hint": "我们绝不会分享您的信息。只有邮箱是可选的。",
     "steps":["信息","商品","确认","支付","收据"],
     "info":"客户信息",
     "name":"姓名","email":"邮箱","phone":"电话",
@@ -38,7 +43,9 @@
     "story": "我们以平静、清晰和用心烘焙咖啡。从农场到杯中，为您带来温暖而极简的体验 —— 设计简约，但味道深邃。"
   },
   "common": {
-    "back": "返回"
+    "back": "返回",
+    "next" : "下一步",
+    "addToCart": "加入购物车"
   },
   "payment": {
     "cod": "货到付款",
@@ -77,6 +84,32 @@
     "select_commune": "选择乡/街道",
     "select_village": "选择村/社区",
     "street": "详细地址",
-    "street_placeholder": "如：XX路 XX号 / 楼层/门牌号"
+    "street_placeholder": "如：XX路 XX号 / 楼层/门牌号",
+    "selected": "已选择",
+    "required": "请完善您的地址。"
+  },
+  "errors": {
+    "name_required": "请输入姓名。",
+    "name_short": "姓名过短。",
+    "email_invalid": "请输入有效的邮箱地址。",
+    "phone_required": "请输入电话号码。",
+    "phone_invalid": "请使用 6–20 位数字（允许数字、空格、+ 或 -）。"
+  },
+  "footer": {
+    "facebook": "脸书",
+    "instagram": "照片墙",
+    "wechat": "微信",
+    "telegram": "电报"
+  },
+  "items": {
+    "title": "购物车",
+    "addMore": "添加更多商品",
+    "clear": "清空购物车",
+    "empty": "购物车里还没有商品。"
+  },
+  "qty": {
+    "decrease": "减少",
+    "increase": "增加",
+    "quantity": "数量"
   }
 }

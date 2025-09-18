@@ -1,12 +1,14 @@
-import React from "react";
+import React from "react"
 
 /**
- * Stepper
+ * Props
  * - steps: string[] | { id?: string|number, label: string }[]
  * - active: number (0-based)
- * - completed?: boolean[]                 // which steps are finished
- * - maxReachable?: number                 // highest step index user can click
+ * - completed?: boolean[]
+ * - maxReachable?: number
  * - onStepClick?: (index:number) => void
+ * - size?: "sm" | "md"   // dot size (sm=36px, md=48px)
+ * - showPartial?: boolean // fill half of the next connector from the active step
  * - className?: string
  */
 export default function Stepper({
@@ -15,99 +17,98 @@ export default function Stepper({
                                     completed,
                                     maxReachable,
                                     onStepClick,
+                                    size = "md",
+                                    showPartial = true,
                                     className = "",
                                 }) {
     const items = steps.map((s, i) =>
         typeof s === "string" ? { id: i, label: s } : { id: s.id ?? i, label: s.label }
-    );
+    )
+    const last = Math.max(items.length - 1, 0)
+    const safeActive = Math.min(Math.max(active, 0), last)
 
-    const safeActive = Math.min(Math.max(active, 0), Math.max(items.length - 1, 0));
-
-    // If completed[] provided, default unlocked step = lastDone + 1
     const fallbackReachable =
         Array.isArray(completed) && completed.length
-            ? Math.min(
-                Math.max(completed.lastIndexOf(true) + 1, 0),
-                Math.max(items.length - 1, 0)
-            )
-            : safeActive;
+            ? Math.min(Math.max(completed.lastIndexOf(true) + 1, 0), last)
+            : safeActive
 
     const highestReachable =
-        typeof maxReachable === "number" ? Math.max(0, Math.min(maxReachable, items.length - 1)) : fallbackReachable;
+        typeof maxReachable === "number"
+            ? Math.max(0, Math.min(maxReachable, last))
+            : fallbackReachable
+
+    // === Layout math ===
+    // Grid columns: [DOT][SEG][DOT][SEG]...[DOT]
+    // DOT columns are fixed to --dot; SEG columns are 1fr (equal length)
+    const segCount = Math.max(items.length - 1, 0)
+    const dotPx = size === "sm" ? 36 : 48
+    const cols = []
+    for (let i = 0; i < items.length; i++) {
+        cols.push("var(--dot)")
+        if (i < items.length - 1) cols.push("1fr")
+    }
+
+    const connectorState = (i) => {
+        // connector between step i and i+1
+        if (i < safeActive) return "full"
+        if (i === safeActive && i < segCount && showPartial) return "half"
+        return "empty"
+    }
 
     return (
-        <nav aria-label="Progress" className={`w-full ${className}`}>
-            {/* Mobile helper text */}
-            <p className="sm:hidden mb-2 text-[11px] text-slate-600">
-                {items.length > 0
-                    ? `Step ${Math.min(safeActive + 1, items.length)} of ${items.length}`
-                    : "—"}
+        <nav
+            aria-label="Progress"
+            className={`w-full bg-transparent ${className}`}
+            style={{ backgroundColor: "transparent" }}
+        >
+
+        {/* Mobile helper */}
+            <p className="sm:hidden mb-3 text-xs text-[#857567] text-center">
+                {items.length ? `Step ${safeActive + 1} of ${items.length}` : "—"}
             </p>
 
-            <ol
-                role="list"
-                className="
-          flex items-center w-full
-          gap-2 sm:gap-3
-          px-1 sm:px-0
-          overflow-x-auto sm:overflow-visible
-          pb-1 sm:pb-0
-          snap-x sm:snap-none snap-mandatory
-          [scrollbar-width:none] [-ms-overflow-style:none]
-        "
-                style={{ scrollbarWidth: "none" }}
+            {/* Main grid: row 1 => dots + connectors, row 2 => labels. */}
+            <div
+                className="grid gap-y-2 sm:gap-y-3"
+                style={{
+                    // equal connector segments, fixed-size dots
+                    gridTemplateColumns: cols.join(" "),
+                    // dot size variable used by DOT columns
+                    ["--dot"]: `${dotPx}px`,
+                }}
             >
+                {/* ==== Row 1: Dots & Connectors (placed into alternating columns) ==== */}
                 {items.map((step, i) => {
-                    const isDone = Array.isArray(completed) ? !!completed[i] : i < safeActive;
-                    const isActive = i === safeActive;
-                    const canClick = typeof onStepClick === "function" && i <= highestReachable;
+                    const isDone = Array.isArray(completed) ? !!completed[i] : i < safeActive
+                    const isActive = i === safeActive
+                    const canClick = typeof onStepClick === "function" && i <= highestReachable
 
-                    const circleBase =
-                        "relative grid place-items-center rounded-full transition-all duration-300 shadow-sm border";
-                    const circleSize = "w-9 h-9 sm:w-10 sm:h-10";
-                    const circleTheme = isDone
-                        ? "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white border-transparent ring-1 ring-[#c9a44c]/60"
-                        : isActive
-                            ? "bg-[#fffaf3] text-[#3b2a1d] border-[#c9a44c] ring-2 ring-[#c9a44c]"
-                            : "bg-[#fbf8f3] text-[#6b5545] border-[#e7dbc9]";
-
-                    const labelTheme = isDone
-                        ? "text-[#3b2a1d] font-medium"
-                        : isActive
-                            ? "text-[#3b2a1d] font-semibold"
-                            : "text-[#857567]";
-
+                    // DOT (odd index in conceptual sequence, but actual grid column)
                     return (
-                        <li
-                            key={step.id}
-                            className="
-                flex items-center flex-1 min-w-[112px] sm:min-w-0
-                snap-start sm:snap-none
-              "
-                        >
-                            {/* Step node */}
-                            <button
-                                type="button"
-                                title={step.label}
-                                aria-current={isActive ? "step" : undefined}
-                                aria-disabled={!canClick}
-                                disabled={!canClick}
-                                onClick={() => (canClick ? onStepClick(i) : null)}
-                                className={`
-                  group flex flex-col items-center flex-shrink-0
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c]
-                  !ring-offset-transparent
-                  ${canClick ? "cursor-pointer" : "cursor-not-allowed opacity-70"}
-                `}
-                            >
-                                {/* Circle */}
-                                <div className={`${circleBase} ${circleSize} ${circleTheme}`}>
+                        <React.Fragment key={step.id}>
+                            <div className="row-start-1 col-span-1 flex items-center justify-center">
+                                <button
+                                    type="button"
+                                    onClick={() => (canClick ? onStepClick(i) : null)}
+                                    disabled={!canClick}
+                                    aria-current={isActive ? "step" : undefined}
+                                    className={`flex items-center justify-center rounded-full border shadow-sm transition-all duration-300
+                    w-[var(--dot)] h-[var(--dot)]
+                    ${
+                                        isDone
+                                            ? "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white border-transparent"
+                                            : isActive
+                                                ? "bg-[#fffaf3] text-[#3b2a1d] border-[#c9a44c] ring-2 ring-[#c9a44c]"
+                                                : "bg-[#fbf8f3] text-[#857567] border-[#e7dbc9]"
+                                    }
+                    ${canClick ? "cursor-pointer" : "cursor-not-allowed opacity-60"}
+                  `}
+                                >
                                     {isDone ? (
-                                        // Check icon for completed (brown highlight)
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 24 24"
-                                            className="w-4 h-4 sm:w-5 sm:h-5"
+                                            className="w-5 h-5"
                                             fill="none"
                                             stroke="currentColor"
                                             strokeWidth="2.5"
@@ -117,65 +118,60 @@ export default function Stepper({
                                             <path d="M20 6 9 17l-5-5" />
                                         </svg>
                                     ) : (
-                                        <span className="text-[11px] sm:text-[12px] font-bold">{i + 1}</span>
+                                        <span className="text-sm font-semibold">{i + 1}</span>
                                     )}
+                                </button>
+                            </div>
 
-                                    {/* Subtle coffee-bean accent for active */}
-                                    {isActive && (
-                                        <span
-                                            aria-hidden="true"
-                                            className="
-                        pointer-events-none absolute -bottom-2 sm:-bottom-2.5
-                        w-3 h-2 sm:w-3.5 sm:h-2.5
-                        rotate-12 rounded-full
-                        bg-[#c9a44c]/90
-                        shadow-[0_1px_2px_rgba(0,0,0,.15)]
-                      "
-                                            style={{
-                                                boxShadow:
-                                                    "inset 0 0 0.5px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.18)",
-                                            }}
-                                        />
-                                    )}
-                                </div>
-
-                                {/* Label */}
-                                <div
-                                    className={`
-                    mt-1.5 sm:mt-2 text-[11px] sm:text-[13px] leading-tight text-center
-                    ${labelTheme}
-                    px-2 max-w-[140px]
-                  `}
-                                >
-                                    <span className="block line-clamp-2">{step.label}</span>
-                                </div>
-                            </button>
-
-                            {/* Connector */}
-                            {i < items.length - 1 && (
-                                <div className="flex-1 flex items-center mx-2 sm:mx-3">
-                                    {/* Track */}
-                                    <div className="relative w-full h-[2px] sm:h-[3px] rounded-full bg-[#efe6d6]">
-                                        {/* Fill (done = left step completed) */}
+                            {/* CONNECTOR segment after every dot except the last */}
+                            {i < segCount && (
+                                <div className="row-start-1 col-span-1 flex items-center">
+                                    <div className="w-full h-[2px] sm:h-[3px] rounded-full bg-[#e7dbc9] overflow-hidden">
                                         <div
-                                            className={`
-                        absolute inset-y-0 left-0 rounded-full transition-all duration-500
-                        ${isDone ? "w-full bg-[#4b2e24]" : "w-0"}
-                      `}
+                                            className={`h-full rounded-full transition-[width] duration-500 sm:duration-700 ease-in-out ${
+                                                connectorState(i) === "full"
+                                                    ? "bg-[#4b2e24] w-full"
+                                                    : connectorState(i) === "half"
+                                                        ? "bg-gradient-to-r from-[#4b2e24] to-[#c9a44c] w-1/2"
+                                                        : "w-0"
+                                            }`}
                                         />
-                                        {/* Half-fill into the active step for a subtle cue */}
-                                        {isActive && !isDone && (
-                                            <div className="absolute inset-y-0 left-0 w-1/2 sm:w-2/3 rounded-full bg-gradient-to-r from-[#4b2e24] to-[#7a533f] transition-all duration-500" />
-                                        )}
                                     </div>
-
-                                    <div className="hidden sm:block ml-2 w-1.5 h-1.5 rounded-full bg-[#e7dbc9]" />
                                 </div>
                             )}
-                        </li>
-                    );
+                        </React.Fragment>
+                    )
                 })}
-            </ol>
+
+                {/* ==== Row 2: Labels (aligned under each dot column only) ==== */}
+                {items.map((step, i) => {
+                    const isDone = Array.isArray(completed) ? !!completed[i] : i < safeActive
+                    const isActive = i === safeActive
+                    return (
+                        <div
+                            key={`label-${step.id}`}
+                            className="row-start-2 flex items-start justify-center"
+                            // Place each label directly under its DOT column (every other col)
+                            style={{ gridColumn: `${i * 2 + 1} / span 1` }}
+                        >
+              <span
+                  className={`text-xs sm:text-sm text-center max-w-[120px] sm:max-w-[160px] leading-tight truncate
+                  ${
+                      isDone
+                          ? "text-[#3b2a1d] font-medium"
+                          : isActive
+                              ? "text-[#3b2a1d] font-semibold"
+                              : "text-[#857567]"
+                  }
+                `}
+                  title={step.label}
+              >
+                {step.label}
+              </span>
+                        </div>
+                    )
+                })}
+            </div>
         </nav>
-    );
+    )
 }

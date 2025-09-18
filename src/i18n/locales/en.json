@@ -12,6 +12,9 @@
   "products": {
     "title": "All Products",
     "filter": "Filter",
+    "base": "Base",
+    "soldOut": "Sold out",
+    "price": "Price",
     "sort": "Sort",
     "all": "All",
     "sortPopular": "Popularity",
@@ -27,6 +30,8 @@
   },
   "order": {
     "title":"Checkout",
+    "info_hint": "We’ll use this to process your order and delivery",
+    "privacy_hint": "We’ll never share your info. Only email is optional.",
     "steps":["Info","Items","Review","Payment","Receipt"],
     "info":"Customer Information",
     "name":"Full Name","email":"Email","phone":"Phone",
@@ -38,7 +43,9 @@
     "story": "We roast coffee with calm, clarity and care. From farm to cup, we bring you a warm and minimal experience — where design is simple, but taste is deep."
   },
   "common": {
-    "back": "Back"
+    "back": "Back",
+    "next": "Next",
+    "addToCart": "Add to cart"
   },
   "payment": {
     "cod": "Cash on Delivery",
@@ -77,6 +84,32 @@
     "select_commune": "Select commune",
     "select_village": "Select village",
     "street": "Street",
-    "street_placeholder": "e.g., Street/House/Building/Floor"
+    "street_placeholder": "e.g., Street/House/Building/Floor",
+    "selected": "Selected",
+    "required": "Please complete your address."
+  },
+  "errors": {
+    "name_required": "Your name is required.",
+    "name_short": "Name is too short.",
+    "email_invalid": "Please enter a valid email.",
+    "phone_required": "Your phone number is required.",
+    "phone_invalid": "Use 6–20 digits (numbers, spaces, + or - allowed)."
+  },
+  "footer": {
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "wechat": "WeChat",
+    "telegram": "Telegram"
+  },
+  "items": {
+  "title": "Your Cart",
+  "addMore": "Add more products",
+  "clear": "Clear cart",
+  "empty": "No items in cart."
+  },
+  "qty": {
+    "decrease": "Decrease",
+    "increase": "Increase",
+    "quantity": "Quantity"
   }
 }

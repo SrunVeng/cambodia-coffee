@@ -1,0 +1,118 @@
+// src/pages/order/steps/components/ProductPicker.jsx
+import { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import rawProducts from "../data/products.json"; // adjust path if needed
+
+import SearchBar from "./SearchBar";
+import FilterPill from "./FilterPill";
+import CategoryPopover from "./CategoryPopover";
+import ProductCard from "./ProductCard";
+import { normalizeLang, tField } from "../utils/i18n-helpers.js";
+
+// --- normalize any of these shapes to a plain array ---
+// 1) [ ... ]
+// 2) { products: [ ... ] }
+// 3) { default: [ ... ] }  (some bundlers)
+// 4) { default: { products: [ ... ] } }
+function toProductsArray(src) {
+    if (!src) return [];
+    const unwrapped = src.default ?? src;
+    if (Array.isArray(unwrapped)) return unwrapped;
+    if (Array.isArray(unwrapped?.products)) return unwrapped.products;
+    return [];
+}
+
+export default function ProductPicker({ open, onClose, onAdd, currency }) {
+    const { t, i18n } = useTranslation();
+    const lang = normalizeLang(i18n.language);
+    const [q, setQ] = useState("");
+    const [cat, setCat] = useState("all");
+    const [filtersOpen, setFiltersOpen] = useState(false);
+
+    // ✅ use normalized array
+    const products = useMemo(() => toProductsArray(rawProducts), []);
+
+    const categories = useMemo(() => {
+        const set = new Set(products.map((p) => p.category).filter(Boolean));
+        return ["all", ...Array.from(set)];
+    }, [products]);
+
+    const activeFilterCount = cat === "all" ? 0 : 1;
+
+    const list = useMemo(() => {
+        const needle = q.trim().toLowerCase();
+        return products
+            .filter((p) => (cat === "all" ? true : p.category === cat))
+            .filter((p) => {
+                if (!needle) return true;
+                const title = tField(p.title, lang).toLowerCase();
+                const code = (p.code || "").toLowerCase();
+                return title.includes(needle) || code.includes(needle);
+            });
+    }, [q, cat, lang, products]);
+
+    if (!open) return null;
+
+    return (
+        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" onClick={onClose}>
+            {/* Backdrop */}
+            <motion.div className="absolute inset-0 bg-black/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+
+            {/* Slide-over */}
+            <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "spring", stiffness: 260, damping: 30 }}
+                className="absolute right-0 top-0 h-full w-full sm:w-[640px] bg-white shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="p-4 border-b flex items-center gap-3">
+                    <SearchBar
+                        value={q}
+                        onChange={setQ}
+                        placeholder={t("products.search", { defaultValue: "Search products..." })}
+                    />
+
+                    <div className="relative">
+                        <FilterPill
+                            activeCount={activeFilterCount}
+                            onClick={() => setFiltersOpen((s) => !s)}
+                            label={t("products.filter", { defaultValue: "Filter" })}
+                        />
+                        <AnimatePresence>
+                            {filtersOpen && (
+                                <CategoryPopover
+                                    open={filtersOpen}
+                                    categories={categories}
+                                    value={cat}
+                                    onChange={setCat}
+                                    onClose={() => setFiltersOpen(false)}
+                                    translateCat={(k) => (k === "all" ? t("products.all", { defaultValue: "All" }) : k)}
+                                />
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    <button type="button" className="btn btn-ghost ml-auto" onClick={onClose}>
+                        {t("common.close", { defaultValue: "Close" })}
+                    </button>
+                </div>
+
+                {/* List */}
+                <div className="p-4 grid gap-3 sm:grid-cols-1 overflow-y-auto max-h-[calc(100%-64px)]">
+                    {list.map((p) => (
+                        <ProductCard key={p.id} p={p} lang={lang} currency={currency} onAdd={onAdd} />
+                    ))}
+                    {list.length === 0 && (
+                        <div className="text-sm text-gray-500 p-6 text-center">
+                            {t("products.empty", { defaultValue: "No products found." })}
+                        </div>
+                    )}
+                </div>
+            </motion.div>
+        </div>
+    );
+}

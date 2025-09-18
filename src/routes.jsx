@@ -3,6 +3,7 @@ import Home from './pages/Home'
 import Products from './pages/Products'
 import Order from './pages/Order'
 import About from './pages/About'
+import Confirm from './pages/Confirm.jsx'
 
 export default function RoutesView(){
     return (
@@ -11,6 +12,7 @@ export default function RoutesView(){
             <Route path="/products" element={<Products/>} />
             <Route path="/order" element={<Order/>} />
             <Route path="/about" element={<About/>} />
+            <Route path="/reciept" element={<Confirm/>} />
         </Routes>
     )
 }

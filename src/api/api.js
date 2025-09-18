@@ -1,24 +1,55 @@
-import axios from 'axios'
+// src/api/api.js
+// Hardcode your base here (change any time). No mock, no .env.
+export const API_BASE = "http://localhost:8080";
 
-const client = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE || '',
-    timeout: 20000
-})
+export async function postJson(path, body, init = {}) {
+    const url = `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+    const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(init.headers || {}) },
+        body: JSON.stringify(body),
+        ...init,
+    });
 
-export async function createOrder(payload){
-    // payload: { currency, amount, items, address, email, name, phone, method, note? }
-    const { data } = await client.post('/create/order', payload)
-    return data // expect { orderId, receiptNo, createdAt, ... }
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
+
+    if (!res.ok) {
+        const err = new Error(data?.message || `Request failed (${res.status})`);
+        err.status = res.status;
+        err.data = data;
+        throw err;
+    }
+    return data;
 }
 
-export async function requestAbaPayment(payload){
-    // returns { paymentId, qrString, ... }
-    const { data } = await client.post('/payment/aba', payload)
-    return data
+export async function getJson(path, init = {}) {
+    const url = `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+    const res = await fetch(url, { method: "GET", ...init });
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
+    if (!res.ok) {
+        const err = new Error(data?.message || `Request failed (${res.status})`);
+        err.status = res.status;
+        err.data = data;
+        throw err;
+    }
+    return data;
 }
 
-export async function pollPaymentStatus(paymentId){
-    // optional helper if your backend exposes it; otherwise you can rely on webhook -> /create/order callback flow
-    const { data } = await client.get(`/payment/status/${paymentId}`)
-    return data // { status: 'pending'|'paid'|'failed' }
+// Public endpoints you can change later on the backend side:
+export function createOrder(payload) {
+    // COD or generic “create order”
+    return postJson("/orders", payload);
+}
+
+export function requestAbaPayment(payload) {
+    // Backend should return { paymentId, qrString }
+    return postJson("/payments/aba", payload);
+}
+
+export function pollPaymentStatus(paymentId) {
+    return getJson(`/payments/aba/${encodeURIComponent(paymentId)}`);
 }
