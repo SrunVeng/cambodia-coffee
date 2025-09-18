@@ -80,7 +80,8 @@
     "back": "Back",
     "next": "Next",
     "addToCart": "Add to cart",
-    "remove": "remove"
+    "remove": "remove",
+    "optional": "(Optional)"
   },
   "payment": {
     "cod": "Cash on Delivery",
