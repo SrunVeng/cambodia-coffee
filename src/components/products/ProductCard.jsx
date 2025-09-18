@@ -2,10 +2,12 @@ import { useTranslation } from "react-i18next"
 import { useCart } from "../../store/cart"
 import { fmt } from "../../utils/currency"
 import { motion } from "framer-motion"
+import { useToast } from "../ui/ToastHub.jsx" // ← adjust path if needed
 
 export default function ProductCard({ p, onClick }) {
     const { i18n, t } = useTranslation()
     const add = useCart((s) => s.add)
+    const toast = useToast()
 
     const lang = i18n.language || "en"
     const title = p.title?.[lang] || p.title?.en || ""
@@ -14,6 +16,18 @@ export default function ProductCard({ p, onClick }) {
 
     const firstVariant = p.variants?.[0]
     const basePrice = p.price + (firstVariant?.delta || 0)
+
+    const handleAdd = () => {
+        add({
+            id: p.id,
+            code,
+            title,
+            price: p.price,
+            variantId: firstVariant?.id || "base",
+            qty: 1,
+        })
+        toast(`${title} — ${t("common.added", { defaultValue: "Added to cart" })}`)
+    }
 
     return (
         <motion.div
@@ -72,16 +86,7 @@ export default function ProductCard({ p, onClick }) {
                         whileTap={{ scale: 0.95 }}
                         whileHover={{ scale: 1.05 }}
                         className="flex-1 btn btn-primary text-sm"
-                        onClick={() =>
-                            add({
-                                id: p.id,
-                                code,
-                                title,
-                                price: p.price,
-                                variantId: firstVariant?.id || "base",
-                                qty: 1,
-                            })
-                        }
+                        onClick={handleAdd}
                     >
                         {t("products.addToCart")}
                     </motion.button>

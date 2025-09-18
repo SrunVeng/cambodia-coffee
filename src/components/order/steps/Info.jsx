@@ -1,31 +1,26 @@
-import { useForm } from "react-hook-form";
-import AddressSelect from "../AddressSelect";
-import { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useForm } from "react-hook-form"
+import AddressSelect from "../AddressSelect"
+import { useEffect, useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const normalizeLang = (L) => {
-    const x = String(L || "en").toLowerCase();
-    // Khmer
-    if (x === "km" || x.startsWith("km-") || x === "kh" || x.startsWith("kh-")) return "kh";
-    // Chinese (treat all zh variants as cn)
-    if (x === "zh" || x.startsWith("zh-") || x === "cn" || x.startsWith("cn-")) return "cn";
-    // English
-    return ["en", "kh", "cn"].includes(x) ? x : "en";
-};
+    const x = String(L || "en").toLowerCase()
+    if (x === "km" || x.startsWith("km-") || x === "kh" || x.startsWith("kh-")) return "kh"
+    if (x === "zh" || x.startsWith("zh-") || x === "cn" || x.startsWith("cn-")) return "cn"
+    return ["en", "kh", "cn"].includes(x) ? x : "en"
+}
 
-// Default fallbacks per error key (used if your locale file misses a key)
 const ERR_DEFAULTS = {
     "address.required": "Please complete your address.",
     "errors.name_required": "Your name is required.",
     "errors.name_short": "Name is too short.",
     "errors.email_invalid": "Please enter a valid email.",
     "errors.phone_required": "Your phone number is required.",
-    "errors.phone_invalid": "Use 6–20 digits (numbers, spaces, + or - allowed).",
-};
+    "errors.phone_invalid": "Use a valid phone number.",
+}
 
 export default function Info({ data, onNext }) {
-    const { t, i18n } = useTranslation();
-
+    const { t, i18n } = useTranslation()
     const {
         register,
         handleSubmit,
@@ -35,9 +30,9 @@ export default function Info({ data, onNext }) {
     } = useForm({
         defaultValues: { name: "", email: "", phone: "", ...(data || {}) },
         mode: "onChange",
-    });
+    })
 
-    const [addr, setAddr] = useState(data?.address || {});
+    const [addr, setAddr] = useState(data?.address || {})
 
     const canSubmit = useMemo(
         () =>
@@ -48,56 +43,36 @@ export default function Info({ data, onNext }) {
             !!addr?.village &&
             !isSubmitting,
         [isValid, addr?.province, addr?.district, addr?.commune, addr?.village, isSubmitting]
-    );
+    )
 
-    // Use KEY (not translated text) so language switching re-renders with t()
     useEffect(() => {
-        const ok = !!(addr?.province && addr?.district && addr?.commune && addr?.village);
-        if (!ok) {
-            setError("address", { type: "required", message: "address.required" });
-        } else {
-            clearErrors("address");
-        }
-    }, [addr, setError, clearErrors]);
+        const ok = !!(addr?.province && addr?.district && addr?.commune && addr?.village)
+        if (!ok) setError("address", { type: "required", message: "address.required" })
+        else clearErrors("address")
+    }, [addr, setError, clearErrors])
 
     const submit = async (v) => {
-        if (!canSubmit) return;
-        const next = { ...v, address: addr };
+        if (!canSubmit) return
+        const next = { ...v, address: addr }
         try {
-            localStorage.setItem("info", JSON.stringify(next));
+            localStorage.setItem("info", JSON.stringify(next))
         } catch {}
-        await onNext?.(next);
-    };
+        await onNext?.(next)
+    }
 
     const inputBase =
         "block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] " +
-        "text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2";
-    const okRing = "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]";
-    const errRing = "border-red-300 focus:border-red-400 focus:ring-red-300";
+        "text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2"
+    const okRing = "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"
+    const errRing = "border-red-300 focus:border-red-400 focus:ring-red-300"
 
-    // Current normalized language
-    const L = normalizeLang(i18n.language);
+    const L = normalizeLang(i18n.language)
+    const trErr = (key) => t(key, { defaultValue: ERR_DEFAULTS[key] || "Invalid value." })
 
-    // Safely pick a localized part name from AddressSelect's value container
-    const pickName = (base) =>
-        addr?.[`${base}Name${L.toUpperCase()}`] || // provinceNameKH / provinceNameCN
-        addr?.[`${base}Name${L.charAt(0).toUpperCase() + L.slice(1)}`] || // provinceNameKh / provinceNameCn
-        addr?.[`${base}Name_${L}`] || // provinceName_kh / provinceName_cn
-        addr?.[`${base}Name`] || // default (likely English)
-        addr?.[base]?.name?.[L] || // if AddressSelect returns object with name map
-        addr?.[base]?.name || // generic
-        "";
-
-    // Recompute selected parts whenever language OR address changes
+    // Build "Selected: ..." line from the live names (kept in sync by AddressSelect)
     const selectedParts = useMemo(() => {
-        return [pickName("village"), pickName("commune"), pickName("district"), pickName("province")]
-            .filter(Boolean)
-            .join(", ");
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [addr, L]);
-
-    // Translate error message keys at render time (instant swap on language change)
-    const trErr = (key) => t(key, { defaultValue: ERR_DEFAULTS[key] || "Invalid value." });
+        return [addr.villageName, addr.communeName, addr.districtName, addr.provinceName].filter(Boolean).join(", ")
+    }, [addr.villageName, addr.communeName, addr.districtName, addr.provinceName])
 
     return (
         <form onSubmit={handleSubmit(submit)} className="space-y-6">
@@ -113,8 +88,7 @@ export default function Info({ data, onNext }) {
             <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                     <label className="mb-1.5 block text-sm font-medium text-[#3b2a1d]">
-                        {t("order.name", { defaultValue: "Full Name" })}
-                        <span className="text-red-500"> *</span>
+                        {t("order.name", { defaultValue: "Full Name" })}<span className="text-red-500"> *</span>
                     </label>
                     <input
                         type="text"
@@ -132,9 +106,7 @@ export default function Info({ data, onNext }) {
                 <div>
                     <label className="mb-1.5 block text-sm font-medium text-[#3b2a1d]">
                         {t("order.email", { defaultValue: "Email" })}{" "}
-                        <span className="text-[#857567] font-normal">
-              {t("common.optional", { defaultValue: "(optional)" })}
-            </span>
+                        <span className="text-[#857567] font-normal">{t("common.optional", { defaultValue: "(optional)" })}</span>
                     </label>
                     <input
                         type="email"
@@ -150,8 +122,7 @@ export default function Info({ data, onNext }) {
 
                 <div>
                     <label className="mb-1.5 block text-sm font-medium text-[#3b2a1d]">
-                        {t("order.phone", { defaultValue: "Phone" })}
-                        <span className="text-red-500"> *</span>
+                        {t("order.phone", { defaultValue: "Phone" })}<span className="text-red-500"> *</span>
                     </label>
                     <input
                         type="tel"
@@ -160,10 +131,8 @@ export default function Info({ data, onNext }) {
                         placeholder={t("order.phone_placeholder", { defaultValue: "+855 12 345 678" })}
                         {...register("phone", {
                             required: "errors.phone_required",
-                            pattern: {
-                                value: /^0\d{8,9}$/,
-                                message: "errors.phone_invalid",
-                            },
+                            // Keep simple; front-end validation shouldn't over-restrict Cambodian formats
+                            pattern: { value: /^[+0-9()\-\s]{6,20}$/, message: "errors.phone_invalid" },
                         })}
                         className={`${inputBase} ${errors.phone ? errRing : okRing}`}
                     />
@@ -173,22 +142,12 @@ export default function Info({ data, onNext }) {
 
             <div>
                 <label className="mb-1.5 block text-sm font-medium text-[#3b2a1d]">
-                    {t("order.address", { defaultValue: "Address" })}
-                    <span className="text-red-500"> *</span>
+                    {t("order.address", { defaultValue: "Address" })}<span className="text-red-500"> *</span>
                 </label>
 
-                <div
-                    className={`rounded-xl border ${
-                        errors.address ? "border-red-300" : "border-[#e7dbc9]"
-                    } bg-[#fffaf3] p-3 shadow-sm`}
-                >
-                    {/* Force AddressSelect to remount on language change so its internal UI updates instantly */}
-                    <AddressSelect
-                        key={L}
-                        lang={L}
-                        value={addr}
-                        onChange={setAddr}
-                    />
+                <div className={`rounded-xl border ${errors.address ? "border-red-300" : "border-[#e7dbc9]"} bg-[#fffaf3] p-3 shadow-sm`}>
+                    {/* No remounting needed; AddressSelect syncs names on lang change */}
+                    <AddressSelect value={addr} onChange={setAddr} lang={L} />
                 </div>
 
                 {(addr.province || addr.provinceName) && (
@@ -197,9 +156,7 @@ export default function Info({ data, onNext }) {
                     </p>
                 )}
 
-                {errors.address && (
-                    <p className="mt-1 text-xs text-red-600">{trErr(errors.address.message)}</p>
-                )}
+                {errors.address && <p className="mt-1 text-xs text-red-600">{trErr(errors.address.message)}</p>}
             </div>
 
             <div className="pt-1">
@@ -222,5 +179,5 @@ export default function Info({ data, onNext }) {
                 </p>
             </div>
         </form>
-    );
+    )
 }

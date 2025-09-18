@@ -3,10 +3,12 @@ import { useTranslation } from "react-i18next"
 import { fmt } from "../../utils/currency"
 import { useCart } from "../../store/cart"
 import { motion } from "framer-motion"
+import { useToast } from "../ui/ToastHub.jsx" // ← adjust path if needed
 
 export default function ProductDetails({ product, onClose }) {
     const { i18n, t } = useTranslation()
     const add = useCart((s) => s.add)
+    const toast = useToast()
 
     const lang = i18n.language || "en"
     const title = product.title?.[lang] || product.title?.en || ""
@@ -16,6 +18,19 @@ export default function ProductDetails({ product, onClose }) {
     const [variant, setVariant] = useState(product.variants?.[0]?.id || "base")
     const delta = product.variants?.find((v) => v.id === variant)?.delta || 0
     const price = product.price + delta
+
+    const handleAdd = () => {
+        add({
+            id: product.id,
+            code,
+            title,
+            price,
+            variantId: variant,
+            qty: 1,
+        })
+        toast(`${title} — ${t("common.added", { defaultValue: "Added to cart" })}`)
+        onClose?.()
+    }
 
     return (
         <div
@@ -78,17 +93,7 @@ export default function ProductDetails({ product, onClose }) {
                                 whileTap={{ scale: 0.95 }}
                                 whileHover={{ scale: 1.05 }}
                                 className="btn btn-primary"
-                                onClick={() => {
-                                    add({
-                                        id: product.id,
-                                        code,
-                                        title,
-                                        price,
-                                        variantId: variant,
-                                        qty: 1,
-                                    })
-                                    onClose?.()
-                                }}
+                                onClick={handleAdd}
                             >
                                 {t("products.addToCart")}
                             </motion.button>

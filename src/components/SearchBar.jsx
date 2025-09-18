@@ -1,27 +1,27 @@
-import { useEffect, useRef } from "react";
-import { Search, X, SlidersHorizontal, Check, Tag } from "lucide-react"; // ← as requested
+import { useEffect, useRef } from "react"
+import { Search, X } from "lucide-react"
 
 export default function SearchBar({ value, onChange, placeholder }) {
-    const inputRef = useRef(null);
+    const inputRef = useRef(null)
 
-    // Press "/" anywhere to focus the search
+    // Press "/" anywhere to focus search
     useEffect(() => {
         const onKey = (e) => {
-            const tag = document.activeElement?.tagName?.toLowerCase();
-            if (tag === "input" || tag === "textarea" || tag === "select" || e.metaKey || e.ctrlKey || e.altKey) return;
+            const tag = document.activeElement?.tagName?.toLowerCase()
+            if (["input", "textarea", "select"].includes(tag) || e.metaKey || e.ctrlKey || e.altKey) return
             if (e.key === "/") {
-                e.preventDefault();
-                inputRef.current?.focus();
+                e.preventDefault()
+                inputRef.current?.focus()
             }
-        };
-        window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
-    }, []);
+        }
+        window.addEventListener("keydown", onKey)
+        return () => window.removeEventListener("keydown", onKey)
+    }, [])
 
     return (
         <div className="relative w-full">
-            {/* exact icon line you asked for */}
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+            {/* Search icon */}
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
 
             <input
                 ref={inputRef}
@@ -40,8 +40,11 @@ export default function SearchBar({ value, onChange, placeholder }) {
             {value ? (
                 <button
                     type="button"
-                    aria-label="Clear"
-                    onClick={() => onChange("")}
+                    aria-label="Clear search"
+                    onClick={() => {
+                        onChange("")
+                        inputRef.current?.focus()
+                    }}
                     className="
             absolute right-2 top-1/2 -translate-y-1/2
             grid place-items-center h-7 w-7 rounded-full
@@ -62,5 +65,5 @@ export default function SearchBar({ value, onChange, placeholder }) {
         </span>
             )}
         </div>
-    );
+    )
 }

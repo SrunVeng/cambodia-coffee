@@ -7,7 +7,7 @@ import { Trash2 } from "lucide-react";
 
 import ProductPicker from "../../../components/ProductPicker.jsx";
 import Line from "../../../components/Line";
-import LeaveGuard from "../../../components/animate/LeaveGuard.jsx";
+import LeaveGuard from "../../ui/LeaveGuard.jsx";
 
 export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBack }) {
     const { t } = useTranslation();

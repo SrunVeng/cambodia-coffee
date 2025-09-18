@@ -6,7 +6,7 @@ import { fmt } from "../utils/currency";
 import { normalizeLang, tField } from "../utils/i18n-helpers.js";
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useState } from "react";
-import LeaveGuard from "./animate/LeaveGuard.jsx";
+import LeaveGuard from "./ui/LeaveGuard.jsx";
 
 /** Normalize possible JSON shapes to a plain array */
 function toProductsArray(src) {

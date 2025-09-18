@@ -40,7 +40,7 @@ export default function CartIcon({ active }) {
             {/* Badge */}
             {count > 0 && (
                 <span
-                    key={count} // re-animate when count changes
+                    key={count} // re-ui when count changes
                     className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px]
                         rounded-full bg-[var(--brand-ink)] text-white text-[11px] font-semibold
                         shadow-md animate-bounceIn"

@@ -10,7 +10,7 @@ const NAV = [
     { to: "/", key: "home" },
     { to: "/products", key: "products" },
     { to: "/order", key: "order" },
-    { to: "/about", key: "about" }
+    { to: "/about", key: "about" },
 ]
 
 function getAppName(lang) {
@@ -76,7 +76,7 @@ export default function Navbar() {
                   ${scrolled ? "h-14 shadow-md" : "h-16 shadow-sm"}`}
             style={{ background: "linear-gradient(to right, #f5f1ea, #f8f4ef)" }}
         >
-            <div className="container-narrow flex h-full items-center justify-between ">
+            <div className="container-narrow flex h-full items-center justify-between">
                 {/* Brand */}
                 <Link to="/" className="group flex items-center gap-2">
                     <img
@@ -89,47 +89,53 @@ export default function Navbar() {
           </span>
                 </Link>
 
-                {/* Desktop nav */}
-                <nav className="hidden md:flex items-center gap-6">
+                {/* Desktop nav (tight spacing) */}
+                <nav className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-5">
                     {NAV.map(({ to, key }) => (
                         <NavLink
                             key={key}
                             to={to}
                             end
                             className={({ isActive }) =>
-                                `relative text-sm opacity-80 hover:opacity-100 transition ${
-                                    isActive ? "active opacity-100 font-semibold text-[var(--brand-accent)]" : ""
-                                }`
+                                `group relative px-1 text-[13px] md:text-sm leading-5 tracking-tight
+                 opacity-85 hover:opacity-100 transition whitespace-nowrap
+                 ${isActive ? "active opacity-100 font-semibold text-[var(--brand-accent)]" : ""}`
                             }
                         >
                             {t(`nav.${key}`)}
-                            <span className="pointer-events-none absolute left-0 -bottom-1 h-0.5 w-0 rounded-full bg-[var(--brand-accent)] transition-all duration-300" />
+                            <span
+                                className="pointer-events-none absolute left-0 -bottom-1 h-0.5 w-0 rounded-full
+                           bg-[var(--brand-accent)] transition-[width] duration-300 group-hover:w-full"
+                            />
                         </NavLink>
                     ))}
                 </nav>
 
-                {/* Desktop actions */}
+                {/* Desktop actions (LanguageSwitch disabled when menu is open) */}
                 <div className="hidden md:flex items-center gap-2">
-                    <LanguageSwitch />
-                    {/* Cart -> Order page */}
-                    <Link
-                        to="/order"
-                        aria-label={t("nav.cart", { defaultValue: "My Cart" })}
-                        className="inline-flex"
+                    <div
+                        className={open ? "pointer-events-none opacity-50" : ""}
+                        aria-disabled={open ? "true" : undefined}
+                        title={open ? t("common.disabled", { defaultValue: "Disabled while menu is open" }) : undefined}
                     >
+                        <LanguageSwitch key={open ? "ls-disabled" : "ls-enabled"} disabled={open} />
+                    </div>
+                    <Link to="/order" aria-label={t("nav.cart", { defaultValue: "My Cart" })} className="inline-flex">
                         <CartIcon active={pathname === "/order"} />
                     </Link>
                 </div>
 
                 {/* Mobile actions */}
                 <div className="md:hidden flex items-center gap-2">
-                    <LanguageSwitch />
-                    {/* Cart -> Order page */}
-                    <Link
-                        to="/order"
-                        aria-label={t("nav.cart", { defaultValue: "My Cart" })}
-                        className="inline-flex"
+                    <div
+                        className={open ? "pointer-events-none opacity-50" : ""}
+                        aria-disabled={open ? "true" : undefined}
+                        title={open ? t("common.disabled", { defaultValue: "Disabled while menu is open" }) : undefined}
                     >
+                        <LanguageSwitch key={open ? "lsm-disabled" : "lsm-enabled"} disabled={open} />
+                    </div>
+
+                    <Link to="/order" aria-label={t("nav.cart", { defaultValue: "My Cart" })} className="inline-flex">
                         <CartIcon active={pathname === "/order"} />
                     </Link>
 
@@ -161,7 +167,7 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* Mobile menu */}
+            {/* Mobile menu with hover/tap & selected effects */}
             <AnimatePresence>
                 {open && (
                     <>
@@ -195,37 +201,43 @@ export default function Navbar() {
                             />
 
                             <motion.nav
-                                className="relative flex flex-col px-6 py-3 z-10"
+                                className="relative flex flex-col px-4 py-2 z-10"
                                 initial="hidden"
                                 animate="show"
                                 exit="hidden"
-                                variants={{
-                                    hidden: {},
-                                    show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } }
-                                }}
+                                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }}
                             >
-                                {NAV.map(({ to, key }) => (
+                                {NAV.map(({ to, key }, idx) => (
                                     <motion.div
                                         key={key}
-                                        variants={{
-                                            hidden: { y: 15, opacity: 0 },
-                                            show: { y: 0, opacity: 1, transition: { ease: "easeOut" } }
-                                        }}
+                                        variants={{ hidden: { y: 15, opacity: 0 }, show: { y: 0, opacity: 1, transition: { ease: "easeOut" } } }}
+                                        whileTap={{ scale: 0.985 }}
                                     >
                                         <NavLink
                                             to={to}
                                             end
                                             className={({ isActive }) =>
-                                                `block text-base py-3 border-b border-dashed border-[var(--ring)] last:border-0 transition
-                         ${
+                                                [
+                                                    "group relative block rounded-lg px-4 py-3 transition-colors outline-none",
+                                                    "hover:bg-[var(--brand-ink)]/5 active:bg-[var(--brand-ink)]/10",
+                                                    "focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)]/40",
                                                     isActive
-                                                        ? "text-[var(--brand-accent)] font-semibold"
-                                                        : "text-[var(--brand-ink)] opacity-85 hover:opacity-100"
-                                                }`
+                                                        ? "active bg-[var(--brand-accent)]/10 text-[var(--brand-accent)] font-semibold ring-1 ring-[var(--brand-accent)]/30"
+                                                        : "text-[var(--brand-ink)] opacity-85 hover:opacity-100",
+                                                ].join(" ")
                                             }
                                         >
-                                            {t(`nav.${key}`)}
+                      <span className="flex items-center gap-3">
+                        <span className="flex-1">{t(`nav.${key}`)}</span>
+                      </span>
                                         </NavLink>
+
+                                        {/* Thin divider between items */}
+                                        {idx < NAV.length - 1 && (
+                                            <div aria-hidden className="px-2">
+                                                <div className="h-px bg-[var(--ring)]/60" />
+                                            </div>
+                                        )}
                                     </motion.div>
                                 ))}
                             </motion.nav>

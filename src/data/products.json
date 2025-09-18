@@ -10,7 +10,7 @@
     "category": "beans",
     "price": 22000,
     "currency": "KHR",
-    "images": ["/img/ethiopia.jpg"],
+    "images": ["https://scoopwholefoodsshop.com/cdn/shop/files/Scoop-Whole-Bean-Coffee_1200x.jpg?v=1754929794"],
     "rating": 4.8,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -38,7 +38,7 @@
     "category": "beans",
     "price": 24000,
     "currency": "KHR",
-    "images": ["/img/colombia.jpg"],
+    "images": ["https://www.ethicalbean.com/cdn/shop/products/ethicalbeancoffeelushwholebean_800x.png?v=1676408213"],
     "rating": 4.7,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -66,7 +66,7 @@
     "category": "beans",
     "price": 20000,
     "currency": "KHR",
-    "images": ["/img/mondulkiri.jpg"],
+    "images": ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwhvSlv-5RUmfWNTmCuJmixSh5zqk7aCo17w&s"],
     "rating": 4.5,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -94,7 +94,7 @@
     "category": "powder",
     "price": 16000,
     "currency": "KHR",
-    "images": ["/img/house.jpg"],
+    "images": ["https://cdn.ready-market.com.tw/7afaaa6a/Templates/pic/m/Instant-Coffee-Powder_Arabica-02.jpg?v=27d77f4d"],
     "rating": 4.6,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -122,7 +122,7 @@
     "category": "powder",
     "price": 17000,
     "currency": "KHR",
-    "images": ["/img/dark.jpg"],
+    "images": ["https://bonhomiaworld.com/cdn/shop/products/1_c3039941-0d4f-49ff-b63f-3e358472f527.jpg?v=1631007429"],
     "rating": 4.5,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -150,7 +150,7 @@
     "category": "powder",
     "price": 18000,
     "currency": "KHR",
-    "images": ["/img/espresso-powder.jpg"],
+    "images": ["https://mir-s3-cdn-cf.behance.net/projects/404/5403ae206347651.Y3JvcCwxNjAxLDEyNTMsOTksMA.png"],
     "rating": 4.7,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -178,7 +178,7 @@
     "category": "powder",
     "price": 19000,
     "currency": "KHR",
-    "images": ["/img/cappuccino.jpg"],
+    "images": ["https://m.media-amazon.com/images/I/61Yx8o4pDqL._UF894,1000_QL80_.jpg"],
     "rating": 4.4,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -206,7 +206,7 @@
     "category": "powder",
     "price": 15000,
     "currency": "KHR",
-    "images": ["/img/iced.jpg"],
+    "images": ["https://m.media-amazon.com/images/I/71ZZjhqApzL._UF894,1000_QL80_.jpg"],
     "rating": 4.3,
     "variants": [
       { "id": "200g", "label": "200g", "delta": 0 },
