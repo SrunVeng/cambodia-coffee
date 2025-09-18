@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Tag, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import cats from "../data/product-categories.json"; // [{ id, name: { en, kh, cn } }]
 
 export default function CategoryPopover({
                                             open,
@@ -8,13 +10,47 @@ export default function CategoryPopover({
                                             value,
                                             onChange,
                                             onClose,
-                                            translateCat, // (key) => localized label; expects "all" and category keys
+                                            translateCat, // optional; if omitted, built-in i18n is used
                                         }) {
-    const popoverRef = useRef(null);
-    const itemRefs = useRef([]);
+    const panelRef = useRef(null);
+    const listboxRef = useRef(null);
     const [focusIndex, setFocusIndex] = useState(0);
 
-    // Ensure unique list and keep "all" (if present) pinned to the top.
+    const { t, i18n } = useTranslation();
+
+    const normalizeLang = (lang = "en") => {
+        const l = (lang || "en").toLowerCase();
+        if (l === "km") return "kh";
+        if (l === "zh") return "cn";
+        return ["en", "kh", "cn"].includes(l) ? l : "en";
+    };
+    const L = useMemo(() => normalizeLang(i18n.language), [i18n.language]);
+
+    // Build: id -> {en,kh,cn}
+    const catMap = useMemo(() => {
+        const m = new Map();
+        (cats || []).forEach((c) => m.set(c.id, c.name || {}));
+        return m;
+    }, []);
+
+    // Translator (uses prop if provided, else our i18n-aware default)
+    const tcat = useMemo(() => {
+        if (translateCat) return translateCat;
+
+        const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : "");
+
+        return (key) => {
+            if (key === "category") return t("products.category", { defaultValue: "Category" });
+            if (key === "close") return t("common.close", { defaultValue: "Close" });
+            if (key === "all") return t("products.all", { defaultValue: "All" });
+
+            const nameObj = catMap.get(key);
+            if (nameObj) return nameObj[L] ?? nameObj.en ?? cap(key);
+            return cap(key);
+        };
+    }, [translateCat, catMap, L, t]);
+
+    // Ensure unique list; keep "all" on top if present
     const list = useMemo(() => {
         const uniq = Array.from(new Set(categories.filter(Boolean)));
         const i = uniq.indexOf("all");
@@ -25,54 +61,59 @@ export default function CategoryPopover({
         return uniq;
     }, [categories]);
 
-    // Find initial focus (selected or first)
+    // Clamp focusIndex when list length changes
+    useEffect(() => {
+        setFocusIndex((i) => Math.min(Math.max(i, 0), Math.max(0, list.length - 1)));
+    }, [list.length]);
+
+    // When opened or value changes, move focus to selected (or first)
     useEffect(() => {
         if (!open) return;
-        const idx = Math.max(0, list.indexOf(value));
-        setFocusIndex(idx === -1 ? 0 : idx);
-        // focus the selected item on open
-        requestAnimationFrame(() => itemRefs.current[idx]?.focus());
+        const sel = list.indexOf(value);
+        const idx = sel === -1 ? 0 : sel;
+        setFocusIndex(idx);
+
+        const id = requestAnimationFrame(() => {
+            listboxRef.current?.focus();
+            document.getElementById(`cat-item-${idx}`)?.scrollIntoView({ block: "nearest" });
+        });
+        return () => cancelAnimationFrame(id);
     }, [open, value, list]);
 
-    // Click outside & Esc to close
+    // Outside click & Esc to close
     useEffect(() => {
         if (!open) return;
-        const onDocClick = (e) => {
-            if (!popoverRef.current?.contains(e.target)) onClose?.();
+
+        const onPointerDown = (e) => {
+            if (!panelRef.current?.contains(e.target)) onClose?.();
         };
         const onDocKey = (e) => {
-            if (e.key === "Escape") onClose?.();
+            if (e.key === "Escape") {
+                e.stopPropagation();
+                onClose?.();
+            }
         };
-        document.addEventListener("mousedown", onDocClick);
-        document.addEventListener("keydown", onDocKey);
+        document.addEventListener("pointerdown", onPointerDown, { capture: true });
+        document.addEventListener("keydown", onDocKey, { capture: true });
         return () => {
-            document.removeEventListener("mousedown", onDocClick);
-            document.removeEventListener("keydown", onDocKey);
+            document.removeEventListener("pointerdown", onPointerDown, { capture: true });
+            document.removeEventListener("keydown", onDocKey, { capture: true });
         };
     }, [open, onClose]);
 
-    const labelOf = (c) => {
-        if (c === "all") return translateCat?.("all") ?? "All";
-        // fallback: Title Case
-        const fallback = c.charAt(0).toUpperCase() + c.slice(1);
-        return translateCat?.(c) ?? fallback;
-    };
-
     const ensureVisible = (i) => {
-        const el = itemRefs.current[i];
-        if (el) el.scrollIntoView({ block: "nearest" });
+        document.getElementById(`cat-item-${i}`)?.scrollIntoView({ block: "nearest" });
     };
 
     const moveFocus = (delta) => {
+        if (!list.length) return;
         const n = list.length;
-        if (n === 0) return;
-        let i = (focusIndex + delta + n) % n;
+        const i = (focusIndex + delta + n) % n;
         setFocusIndex(i);
-        itemRefs.current[i]?.focus();
         ensureVisible(i);
     };
 
-    const onKeyDown = (e) => {
+    const onListKeyDown = (e) => {
         switch (e.key) {
             case "ArrowDown":
                 e.preventDefault();
@@ -85,13 +126,11 @@ export default function CategoryPopover({
             case "Home":
                 e.preventDefault();
                 setFocusIndex(0);
-                itemRefs.current[0]?.focus();
                 ensureVisible(0);
                 break;
             case "End":
                 e.preventDefault();
                 setFocusIndex(list.length - 1);
-                itemRefs.current[list.length - 1]?.focus();
                 ensureVisible(list.length - 1);
                 break;
             case "Enter":
@@ -105,33 +144,33 @@ export default function CategoryPopover({
         }
     };
 
+    const headerId = "category-popover-header";
+
     return (
         <AnimatePresence>
             {open && (
                 <div className="absolute top-12 right-0 z-50">
                     <motion.div
-                        ref={popoverRef}
+                        ref={panelRef}
                         initial={{ opacity: 0, y: -8, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -8, scale: 0.98 }}
                         transition={{ duration: 0.16, ease: "easeOut" }}
-                        className="
-              w-64 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3] shadow-xl ring-1 ring-black/5
-              overflow-hidden
-            "
+                        className="w-64 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3] shadow-xl ring-1 ring-black/5 overflow-hidden"
                         role="dialog"
                         aria-modal="true"
+                        aria-labelledby={headerId}
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between px-3 py-2">
-                            <div className="text-xs uppercase tracking-wide text-[#857567]">
-                                {translateCat?.("category") ?? "Category"}
+                            <div id={headerId} className="text-xs uppercase tracking-wide text-[#857567]">
+                                {tcat("category")}
                             </div>
                             <button
                                 type="button"
                                 onClick={onClose}
                                 className="p-1.5 rounded-md text-[#6b5545] hover:bg-[#f6efe3] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a44c] focus-visible:ring-offset-2"
-                                aria-label={translateCat?.("close") ?? "Close"}
+                                aria-label={tcat("close")}
                             >
                                 <X className="h-4 w-4" />
                             </button>
@@ -139,40 +178,37 @@ export default function CategoryPopover({
 
                         <div className="h-px bg-[#e7dbc9]" />
 
-                        {/* List */}
+                        {/* Listbox */}
                         <div
+                            ref={listboxRef}
                             role="listbox"
+                            tabIndex={0}
                             aria-activedescendant={`cat-item-${focusIndex}`}
-                            className="max-h-64 overflow-auto p-2"
-                            onKeyDown={onKeyDown}
-                            tabIndex={-1} // container itself doesn't grab focus; items do
+                            className="max-h-64 overflow-auto p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a44c]"
+                            onKeyDown={onListKeyDown}
                         >
                             {list.map((c, idx) => {
                                 const selected = value === c;
                                 return (
-                                    <button
+                                    <div
                                         key={c}
                                         id={`cat-item-${idx}`}
                                         role="option"
                                         aria-selected={selected}
-                                        type="button"
-                                        ref={(el) => (itemRefs.current[idx] = el)}
+                                        className={[
+                                            "w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm cursor-pointer",
+                                            selected ? "bg-[#2d1a14] text-white" : "text-[#2d1a14] hover:bg-[#f6efe3]",
+                                        ].join(" ")}
+                                        onMouseDown={(e) => e.preventDefault()}
                                         onClick={() => {
                                             onChange?.(c);
                                             onClose?.();
                                         }}
-                                        className={[
-                                            "w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm text-[#2d1a14]",
-                                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a44c]",
-                                            selected
-                                                ? "bg-[#2d1a14] text-white"
-                                                : "hover:bg-[#f6efe3]",
-                                        ].join(" ")}
                                     >
                                         <Check className={`h-4 w-4 ${selected ? "opacity-100" : "opacity-0"}`} />
                                         <Tag className={`h-4 w-4 ${selected ? "opacity-80" : "text-[#6b5545]"}`} />
-                                        <span className="truncate">{labelOf(c)}</span>
-                                    </button>
+                                        <span className="truncate">{tcat(c)}</span>
+                                    </div>
                                 );
                             })}
                         </div>

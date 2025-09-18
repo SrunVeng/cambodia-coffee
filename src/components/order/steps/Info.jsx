@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form"
 import AddressSelect from "../AddressSelect"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useCallback } from "react"
 import { useTranslation } from "react-i18next"
 
 const normalizeLang = (L) => {
@@ -19,13 +19,14 @@ const ERR_DEFAULTS = {
     "errors.phone_invalid": "Use a valid phone number.",
 }
 
-export default function Info({ data, onNext }) {
+export default function Info({ data, onNext, onResetClick }) {
     const { t, i18n } = useTranslation()
     const {
         register,
         handleSubmit,
         setError,
         clearErrors,
+        reset: resetForm, // <-- we’ll use this to clear inputs
         formState: { errors, isValid, isSubmitting },
     } = useForm({
         defaultValues: { name: "", email: "", phone: "", ...(data || {}) },
@@ -33,6 +34,16 @@ export default function Info({ data, onNext }) {
     })
 
     const [addr, setAddr] = useState(data?.address || {})
+
+    // Keep inputs + address fully in sync with parent `data` (e.g., after LeaveGuard confirm reset)
+    useEffect(() => {
+        resetForm({
+            name: data?.name || "",
+            email: data?.email || "",
+            phone: data?.phone || "",
+        })
+        setAddr(data?.address || {})
+    }, [data, resetForm])
 
     const canSubmit = useMemo(
         () =>
@@ -60,6 +71,21 @@ export default function Info({ data, onNext }) {
         await onNext?.(next)
     }
 
+    // Local clear (inputs + address). Called if no onResetClick is provided.
+    const clearLocal = useCallback(() => {
+        resetForm({ name: "", email: "", phone: "" })
+        setAddr({})
+        try {
+            // Keep localStorage tidy in the fallback path
+            localStorage.removeItem("info")
+        } catch {}
+    }, [resetForm])
+
+    const handleResetPress = () => {
+        if (onResetClick) onResetClick()   // parent will open LeaveGuard, confirm -> parent clears `data`
+        else clearLocal()                  // fallback: clear locally if no guard provided
+    }
+
     const inputBase =
         "block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] " +
         "text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2"
@@ -69,9 +95,10 @@ export default function Info({ data, onNext }) {
     const L = normalizeLang(i18n.language)
     const trErr = (key) => t(key, { defaultValue: ERR_DEFAULTS[key] || "Invalid value." })
 
-    // Build "Selected: ..." line from the live names (kept in sync by AddressSelect)
     const selectedParts = useMemo(() => {
-        return [addr.villageName, addr.communeName, addr.districtName, addr.provinceName].filter(Boolean).join(", ")
+        return [addr.villageName, addr.communeName, addr.districtName, addr.provinceName]
+            .filter(Boolean)
+            .join(", ")
     }, [addr.villageName, addr.communeName, addr.districtName, addr.provinceName])
 
     return (
@@ -131,7 +158,6 @@ export default function Info({ data, onNext }) {
                         placeholder={t("order.phone_placeholder", { defaultValue: "+855 12 345 678" })}
                         {...register("phone", {
                             required: "errors.phone_required",
-                            // Keep simple; front-end validation shouldn't over-restrict Cambodian formats
                             pattern: { value: /^[+0-9()\-\s]{6,20}$/, message: "errors.phone_invalid" },
                         })}
                         className={`${inputBase} ${errors.phone ? errRing : okRing}`}
@@ -146,7 +172,6 @@ export default function Info({ data, onNext }) {
                 </label>
 
                 <div className={`rounded-xl border ${errors.address ? "border-red-300" : "border-[#e7dbc9]"} bg-[#fffaf3] p-3 shadow-sm`}>
-                    {/* No remounting needed; AddressSelect syncs names on lang change */}
                     <AddressSelect value={addr} onChange={setAddr} lang={L} />
                 </div>
 
@@ -159,21 +184,36 @@ export default function Info({ data, onNext }) {
                 {errors.address && <p className="mt-1 text-xs text-red-600">{trErr(errors.address.message)}</p>}
             </div>
 
+            {/* Actions row: Reset left, Next right */}
             <div className="pt-1">
-                <button
-                    type="submit"
-                    disabled={!canSubmit}
-                    aria-disabled={!canSubmit}
-                    className={`inline-flex items-center justify-center rounded-xl px-5 py-3 font-medium transition
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-            ${
-                        canSubmit
-                            ? "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white shadow-md focus-visible:ring-[#c9a44c]"
-                            : "bg-[#e8dfd0] text-[#9b8b7c] cursor-not-allowed"
-                    }`}
-                >
-                    {t("common.next", { defaultValue: "Next" })}
-                </button>
+                <div className="flex items-center justify-between">
+                    <button
+                        type="submit"
+                        disabled={!canSubmit}
+                        aria-disabled={!canSubmit}
+                        className={`inline-flex items-center justify-center rounded-xl px-5 py-3 font-medium transition
+                        focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+                        ${
+                            canSubmit
+                                ? "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white shadow-md focus-visible:ring-[#c9a44c]"
+                                : "bg-[#e8dfd0] text-[#9b8b7c] cursor-not-allowed"
+                        }`}
+                    >
+                        {t("common.next", { defaultValue: "Next" })}
+                    </button>
+
+
+                    <button
+                        type="button"
+                        onClick={handleResetPress}
+                        className="inline-flex items-center justify-center rounded-xl px-5 py-3 font-medium
+                       bg-gradient-to-br from-red-600 to-red-700 text-white shadow-md
+                       transition focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
+                    >
+                        {t("common.reset", { defaultValue: "Reset" })}
+                    </button>
+                </div>
+
                 <p className="mt-2 text-[11px] text-[#857567]">
                     {t("order.privacy_hint", { defaultValue: "We’ll never share your info. Only email is optional." })}
                 </p>

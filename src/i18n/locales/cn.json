@@ -70,7 +70,13 @@
     "info":"客户信息",
     "name":"姓名","email":"邮箱","phone":"电话",
     "address":"地址","province":"省/直辖市","district":"区/县","commune":"乡/街道","village":"村/社区",
-    "deliveryFee":"运费","subtotal":"小计","total":"合计"
+    "deliveryFee":"运费","subtotal":"小计","total":"合计",
+    "reset": {
+      "title": "要重置订单吗？",
+      "hint": "这将清空联系人、地址、商品和总价。",
+      "hintShort": "需要重新开始？",
+      "done": "订单已重置。"
+    }
   },
   "about": {
     "title": "关于我们",
@@ -84,7 +90,10 @@
     "total": "合计",
     "remove": "移除",
     "optional": "（可选）",
-    "added": "已加入购物车！"
+    "added": "已加入购物车！",
+    "confirm": "确认",
+    "cancel": "取消",
+    "reset": "重置"
   },
   "payment": {
     "cod": "货到付款",

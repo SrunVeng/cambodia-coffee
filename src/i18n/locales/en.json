@@ -70,7 +70,13 @@
     "info":"Customer Information",
     "name":"Full Name","email":"Email","phone":"Phone",
     "address":"Address","province":"Province","district":"District","commune":"Commune","village":"Village",
-    "deliveryFee":"Delivery Fee","subtotal":"Subtotal","total":"Total"
+    "deliveryFee":"Delivery Fee","subtotal":"Subtotal","total":"Total",
+    "reset": {
+      "title": "ចាប់ផ្តើមការបញ្ជាទិញម្ដងទៀត?",
+      "hint": "វានឹងលុបព័ត៌មានទំនាក់ទាក់ អាសយដ្ឋាន ទំនិញ និងតម្លៃសរុប។",
+      "hintShort": "ចង់ចាប់ផ្តើមសូន្យ?",
+      "done": "បានកំណត់ការបញ្ជាទិញឡើងវិញ។"
+    }
   },
   "about": {
     "title": "About Us",
@@ -81,8 +87,11 @@
     "next": "Next",
     "addToCart": "Add to cart",
     "remove": "remove",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
     "optional": "(Optional)",
-    "added": "Added to cart!"
+    "added": "Added to cart!",
+    "reset": "Reset"
   },
   "payment": {
     "cod": "Cash on Delivery",

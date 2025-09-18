@@ -17,7 +17,13 @@ function toProductsArray(src) {
     return []
 }
 
-export default function ProductPicker({ open, onClose, onAdd, currency }) {
+/**
+ * Props:
+ * - open, onClose, onAdd, currency
+ * - initialSelections?: { [productId]: variantId }  // preselect variant per product (useful when editing)
+ * - editMode?: boolean                               // if true, CTA label becomes "Update"
+ */
+export default function ProductPicker({ open, onClose, onAdd, currency, initialSelections = {}, editMode = false }) {
     const { t, i18n } = useTranslation()
     const lang = normalizeLang(i18n.language)
     const [q, setQ] = useState("")
@@ -54,12 +60,7 @@ export default function ProductPicker({ open, onClose, onAdd, currency }) {
     }
 
     return (
-        <div
-            className="fixed inset-0 z-50"
-            role="dialog"
-            aria-modal="true"
-            onClick={onClose}
-        >
+        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" onClick={onClose}>
             {/* Backdrop */}
             <motion.div
                 className="absolute inset-0 bg-black/40"
@@ -99,19 +100,13 @@ export default function ProductPicker({ open, onClose, onAdd, currency }) {
                                     value={cat}
                                     onChange={setCat}
                                     onClose={() => setFiltersOpen(false)}
-                                    translateCat={(k) =>
-                                        k === "all" ? t("products.all", { defaultValue: "All" }) : k
-                                    }
+                                    translateCat={(k) => (k === "all" ? t("products.all", { defaultValue: "All" }) : k)}
                                 />
                             )}
                         </AnimatePresence>
                     </div>
 
-                    <button
-                        type="button"
-                        className="btn btn-ghost ml-auto"
-                        onClick={onClose}
-                    >
+                    <button type="button" className="btn btn-ghost ml-auto" onClick={onClose}>
                         {t("common.close", { defaultValue: "Close" })}
                     </button>
                 </div>
@@ -125,8 +120,11 @@ export default function ProductPicker({ open, onClose, onAdd, currency }) {
                             lang={lang}
                             currency={currency}
                             onAdd={handleAdd}
+                            initialVariantId={initialSelections?.[p.id]}
+                            ctaLabel={editMode ? t("common.update", { defaultValue: "Update" }) : undefined}
                         />
                     ))}
+
                     {list.length === 0 && (
                         <div className="text-sm text-gray-500 p-6 text-center">
                             {t("products.empty", { defaultValue: "No products found." })}

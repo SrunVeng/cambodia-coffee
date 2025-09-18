@@ -7,14 +7,62 @@ import { tField } from "../utils/i18n-helpers"
 import RatingStars from "../components/RatingStars"
 import { useToast } from "./ui/ToastHub.jsx" // ← adjust path if needed
 
-export default function ProductCard({ p, lang, currency, onAdd }) {
+function VariantSelector({ variants = [], value, onChange, basePrice = 0, currency, t }) {
+    if (!variants.length) return null
+    return (
+        <div className="mt-2">
+            <div className="text-xs uppercase tracking-wide text-[#857567]">
+                {t("products.size", { defaultValue: "Size" })}
+            </div>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {variants.map((v) => {
+                    const disabled = typeof v.stock === "number" && v.stock <= 0
+                    const selected = v.id === value
+                    const delta = Number(v?.delta) || 0
+                    const deltaLabel = delta === 0 ? "" : ` ${delta > 0 ? "+" : "−"}${fmt(Math.abs(delta), currency)}`
+                    return (
+                        <button
+                            key={v.id}
+                            type="button"
+                            disabled={disabled}
+                            aria-pressed={selected}
+                            onClick={() => onChange(v.id)}
+                            className={[
+                                "inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-sm border transition",
+                                disabled
+                                    ? "opacity-50 cursor-not-allowed border-[#e7dbc9] bg-white/50 text-[#a3907f]"
+                                    : selected
+                                        ? "border-[#2d1a14] bg-[#2d1a14] text-white shadow-sm"
+                                        : "border-[#e7dbc9] bg-white/70 text-[#2d1a14] hover:bg-white",
+                            ].join(" ")}
+                            title={disabled ? t("products.soldOut", { defaultValue: "Sold out" }) : v.label}
+                        >
+                            <span className="whitespace-nowrap">{v.label}</span>
+                            {delta !== 0 && <span className="text-[11px] opacity-90">{deltaLabel}</span>}
+                        </button>
+                    )
+                })}
+            </div>
+        </div>
+    )
+}
+
+export default function ProductCard({
+                                        p,
+                                        lang,
+                                        currency,
+                                        onAdd,
+                                        /** Optional: preselect a variant (useful when editing an existing cart line) */
+                                        initialVariantId,
+                                        /** Optional: override action label, e.g., "Update" when editing */
+                                        ctaLabel,
+                                    }) {
     const { t } = useTranslation()
     const toast = useToast()
 
     const localizedTitle = tField(p.title, lang)
-
     const variants = Array.isArray(p.variants) ? p.variants : []
-    const initialId = variants?.[0]?.id ?? "base"
+    const initialId = initialVariantId ?? variants?.[0]?.id ?? "base"
     const [variantId, setVariantId] = useState(initialId)
 
     const currentVariant = useMemo(() => {
@@ -23,7 +71,8 @@ export default function ProductCard({ p, lang, currency, onAdd }) {
         return variants.find((v) => v.id === variantId) ?? variants[0]
     }, [variants, variantId, t])
 
-    const unit = (Number(p.price) || 0) + (Number(currentVariant?.delta) || 0)
+    const basePrice = Number(p.price) || 0
+    const unit = basePrice + (Number(currentVariant?.delta) || 0)
     const cardCurrency = p.currency || currency
 
     const variantStock = typeof currentVariant?.stock === "number" ? currentVariant.stock : undefined
@@ -48,9 +97,7 @@ export default function ProductCard({ p, lang, currency, onAdd }) {
             image: p.images?.[0],
         }
         onAdd?.(payload)
-
-        // Compose a short, localized toast message
-        const addedTxt = t("common.added", { defaultValue: "Added to cart" })
+        const addedTxt = ctaLabel || t("common.added", { defaultValue: "Added to cart" })
         const sizeTxt = currentVariant?.label ? ` • ${currentVariant.label}` : ""
         toast(`${localizedTitle}${sizeTxt} — ${addedTxt}`)
     }
@@ -87,6 +134,7 @@ export default function ProductCard({ p, lang, currency, onAdd }) {
                         <RatingStars value={p.rating} />
                     </div>
 
+                    {/* Tags */}
                     {Array.isArray(p.tags?.[lang]) && (
                         <div className="flex flex-wrap gap-1 mt-2">
                             {p.tags[lang].slice(0, 3).map((tag) => (
@@ -101,6 +149,17 @@ export default function ProductCard({ p, lang, currency, onAdd }) {
                         </div>
                     )}
 
+                    {/* Variant pills */}
+                    <VariantSelector
+                        variants={variants}
+                        value={variantId}
+                        onChange={setVariantId}
+                        basePrice={basePrice}
+                        currency={cardCurrency}
+                        t={t}
+                    />
+
+                    {/* Price + CTA */}
                     <div className="mt-3 flex items-center justify-between">
                         <div>
                             <div className="text-xs uppercase tracking-wide text-[#857567]">
@@ -123,7 +182,7 @@ export default function ProductCard({ p, lang, currency, onAdd }) {
                             ].join(" ")}
                         >
                             <ShoppingCart className="w-4 h-4" />
-                            {t("common.addToCart", { defaultValue: "Add to cart" })}
+                            {ctaLabel || t("common.addToCart", { defaultValue: "Add to cart" })}
                         </motion.button>
                     </div>
                 </div>
