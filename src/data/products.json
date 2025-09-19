@@ -4,7 +4,7 @@
     "code": "BEAN-001",
     "title": {
       "en": "Arabica Blend",
-      "kh": "កាហ្វេប្លេនអារ៉ាបិកា",
+      "kh": "គ្រាប់កាហ្វេប្លេនអារ៉ាបិកា",
       "cn": "阿拉比卡拼配"
     },
     "category": "beans",
@@ -18,13 +18,13 @@
     ],
     "tags": {
       "en": ["medium roast", "balanced", "smooth"],
-      "kh": ["ឆុងមធ្យម", "សមតុល្យ", "រលោង"],
+      "kh": ["កម្រិតលីងមធ្យម", "សមតុល្យ", "ស្រទន់"],
       "cn": ["中度烘焙", "均衡", "顺滑"]
     },
     "desc": {
       "en": "Well-balanced caffeine and aroma with a smooth taste.",
-      "kh": "មានកាហ្វេអ៊ីន និងក្លិនក្រអូបសមតុល្យ រសជាតិស្រទន់់។",
-      "cn": "咖啡因与香气均衡，口感顺滑。"
+      "kh": "កាហ្វេអ៊ីននិងក្លិនក្រអូបសមតុល្យ រសជាតិស្រទន់់ជាប់មាត់់។",
+      "cn": "咖啡因与香气均衡，口感顺滑，余味悠长。"
     }
   },
   {
@@ -32,7 +32,7 @@
     "code": "POW-001",
     "title": {
       "en": "Robusta Harmony",
-      "kh": "កាហ្វេករ៉ូបុយស្តា ហាម៉ូនី",
+      "kh": "ម្សៅកាហ្វេករ៉ូបុយស្តា ហាម៉ូនី",
       "cn": "罗布斯塔和谐"
     },
     "category": "powder",
@@ -42,185 +42,102 @@
     "rating": 5.0,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 120000 }
+      { "id": "1kg", "label": "1kg", "delta": 12000 }
     ],
     "tags": {
       "en": ["medium roast", "bold caffeine", "smooth body"],
-      "kh": ["ឆុងមធ្យម", "កាហ្វេអ៊ីនខ្លាំង", "រាងកាយរលោង"],
+      "kh": ["កម្រិតលីងមធ្យម", "កាហ្វេអ៊ីនខ្លាំង", "ស្រទន់"],
       "cn": ["中度烘焙", "醇厚咖啡因", "顺滑口感"]
     },
     "desc": {
       "en": "A well-balanced cup with bold caffeine for focus, rich aroma, a smooth body, and a long-lasting finish.",
-      "kh": "កាហ្វេសមតុល្យ មានកាហ្វេអ៊ីនខ្លាំងសម្រាប់ផ្តោតអារម្មណ៍ ក្លិនក្រអូប រាងកាយរលោង និងរសជាតិអស់សល់យូរ។",
-      "cn": "均衡之作，醇厚咖啡因助于专注，香气浓郁，口感顺滑，余味悠长。"
+      "kh": "មានកាហ្វេអ៊ីនខ្លាំងសម្រាប់ផ្តោតអារម្មណ៍ ក្លិនឆ្ងុយ រសជាតិស្រទន់់ជាប់មាត់",
+      "cn": "均衡之作，醇厚咖啡因助力专注，香气浓郁，口感顺滑，余味悠长。"
     }
   },
   {
-    "id": "bean-cambodia-mondulkiri",
-    "code": "BEAN-003",
-    "title": {
-      "en": "Mondulkiri Highlands",
-      "kh": "កាហ្វេខ្ពង់អគ្គីសនី មណ្ឌលគីរី",
-      "cn": "蒙多基里高原咖啡"
-    },
-    "category": "beans",
-    "price": 20000,
-    "currency": "KHR",
-    "images": ["/img/mondulkiri.jpg"],
-    "rating": 4.5,
-    "variants": [
-      { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 50000 }
-    ],
-    "tags": {
-      "en": ["local", "earthy"],
-      "kh": ["ក្នុងស្រុក", "ដី"],
-      "cn": ["本地", "泥土味"]
-    },
-    "desc": {
-      "en": "Authentic Cambodian beans with earthy depth and strong aroma.",
-      "kh": "គ្រាប់កាហ្វេកម្ពុជា មានរសជាតិដី និងក្លិនក្រអូបខ្លាំង។",
-      "cn": "柬埔寨本地咖啡豆，泥土般醇厚香气浓郁。"
-    }
-  },
-  {
-    "id": "powder-house",
-    "code": "POW-001",
-    "title": {
-      "en": "House Blend Powder",
-      "kh": "ម្សៅកាហ្វេផ្ទះ",
-      "cn": "招牌拼配咖啡粉"
-    },
-    "category": "powder",
-    "price": 16000,
-    "currency": "KHR",
-    "images": ["/img/house.jpg"],
-    "rating": 4.6,
-    "variants": [
-      { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 12000 }
-    ],
-    "tags": {
-      "en": ["balanced", "daily"],
-      "kh": ["សមធម៌", "ប្រចាំថ្ងៃ"],
-      "cn": ["均衡", "日常"]
-    },
-    "desc": {
-      "en": "Chocolatey, balanced and friendly.",
-      "kh": "រសជាតិសូកូឡា សមធម៌ និងងាយស្រួល។",
-      "cn": "巧克力风味，平衡顺口，适合日常。"
-    }
-  },
-  {
-    "id": "powder-dark-roast",
+    "id": "pow-cambodiaclassic",
     "code": "POW-002",
     "title": {
-      "en": "Dark Roast Powder",
-      "kh": "ម្សៅកាហ្វេឆុងខ្លាំង",
-      "cn": "深烘咖啡粉"
+      "en": "Cambodia Classic",
+      "kh": "ម្សៅកាហ្វេ កម្ពុជា ក្លាស៊ិក",
+      "cn": "柬埔寨经典咖啡"
     },
     "category": "powder",
-    "price": 17000,
+    "price": 11000,
     "currency": "KHR",
-    "images": ["/img/dark.jpg"],
+    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1758250696/Cambodia_Classic_qiqxhy.png"],
     "rating": 4.5,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 15000 }
+      { "id": "1kg", "label": "1kg", "delta": 11000 }
     ],
     "tags": {
-      "en": ["strong", "bitter-sweet"],
-      "kh": ["ខ្លាំង", "ជូរអាមី"],
-      "cn": ["浓烈", "苦甜"]
+      "en": ["medium roast", "balanced caffeine", "aromatic"],
+      "kh": ["កម្រិតលីងមធ្យម", "កាហ្វេអ៊ីនមធ្យម", "ក្លិនឆ្ងុយ"],
+      "cn": ["中度烘焙", "适中咖啡因", "芳香"]
     },
     "desc": {
-      "en": "Bold and intense powder with smoky notes.",
-      "kh": "ម្សៅកាហ្វេខ្លាំង មានរសជាតិក្តៅ និងផ្សែង។",
-      "cn": "浓烈醇厚，带有烟熏风味。"
+      "en": "A balanced cup with medium caffeine—never too strong or too light—aromatic on the nose with a smooth, clean finish.",
+      "kh": "កាហ្វេអ៊ីនមធ្យម—មិនខ្លាំងពេក មិនស្រាលពេក—ក្លិនឆ្ងុយ",
+      "cn": "咖啡因适中——不重不淡——芳香扑鼻"
     }
   },
   {
-    "id": "powder-espresso",
+    "id": "pow-cambodiadaily",
     "code": "POW-003",
     "title": {
-      "en": "Espresso Powder",
-      "kh": "ម្សៅកាហ្វេអេស្ព្រេសសូ",
-      "cn": "浓缩咖啡粉"
+      "en": "Cambodia Daily",
+      "kh": "ម្សៅកាហ្វេកម្ពុជាដេលី",
+      "cn": "柬埔寨每日咖啡粉"
     },
     "category": "powder",
-    "price": 18000,
+    "price": 8000,
     "currency": "KHR",
-    "images": ["/img/espresso-powder.jpg"],
-    "rating": 4.7,
+    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1758250696/Cambodia_Daily_ify17w.png"],
+    "rating": 4.5,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 18000 }
+      { "id": "1kg", "label": "1kg", "delta": 8000 }
     ],
     "tags": {
-      "en": ["espresso", "rich"],
-      "kh": ["អេស្ព្រេសសូ", "ខ្ជិល"],
-      "cn": ["浓缩", "醇厚"]
+      "en": ["light roast", "balanced caffeine", "aromatic", "smooth balance"],
+      "kh": ["កម្រិតលីងស្រាល", "កាហ្វេអ៊ីនសមតុល្យ", "ក្លិនក្រអូប", "ស្រទន់សមតុល្យ"],
+      "cn": ["浅烘焙", "咖啡因均衡", "芳香", "顺滑平衡"]
     },
     "desc": {
-      "en": "Finely ground espresso powder for strong shots.",
-      "kh": "ម្សៅកាហ្វេអេស្ព្រេសសូ សម្រាប់ឆុងកាហ្វេខ្លាំង។",
-      "cn": "细磨浓缩咖啡粉，适合强烈的意式咖啡。"
+      "en": "Light-roasted daily coffee powder with balanced caffeine—aromatic, smooth, and nicely balanced.",
+      "kh": "ម្សៅកាហ្វេឆុងស្រាល សម្រាប់ប្រើប្រចាំថ្ងៃ មានកាហ្វេអ៊ីនសមតុល្យ ក្លិនក្រអូប និងរសជាតិស្រទន់សមតុល្យ។",
+      "cn": "浅烘日常咖啡粉，咖啡因均衡，香气馥郁，口感顺滑且平衡。"
     }
   },
   {
-    "id": "powder-cappuccino",
+    "id": "pow-cambodiabasic",
     "code": "POW-004",
     "title": {
-      "en": "Cappuccino Mix",
-      "kh": "ម្សៅកាហ្វេកាប៊ុយឆីណូ",
-      "cn": "卡布奇诺粉"
+      "en": "Cambodia Basic",
+      "kh": "ម្សៅកាហ្វេ កម្ពុជាបេសិក",
+      "cn": "柬埔寨经典咖啡粉"
     },
     "category": "powder",
-    "price": 19000,
+    "price": 6000,
     "currency": "KHR",
-    "images": ["/img/cappuccino.jpg"],
-    "rating": 4.4,
+    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1758250696/Cambodia_basic_ichdlj.png"],
+    "rating": 4.0,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 19000 }
+      { "id": "1kg", "label": "1kg", "delta": 6000 }
     ],
     "tags": {
-      "en": ["creamy", "sweet"],
-      "kh": ["មានក្រែម", "ផ្អែម"],
-      "cn": ["奶香", "甜"]
+      "en": ["light roast", "easy drink", "everyday"],
+      "kh": ["កម្រិតលីងស្រាល", "ងាយផឹក", "ប្រើប្រចាំថ្ងៃ"],
+      "cn": ["浅烘焙", "易饮", "日常"]
     },
     "desc": {
-      "en": "Instant cappuccino mix with creamy foam.",
-      "kh": "ម្សៅកាហ្វេកាប៊ុយឆីណូមានក្រែម ផ្អែមឆ្ងាញ់។",
-      "cn": "即溶卡布奇诺粉，带有浓郁奶泡。"
-    }
-  },
-  {
-    "id": "powder-iced",
-    "code": "POW-005",
-    "title": {
-      "en": "Iced Coffee Powder",
-      "kh": "ម្សៅកាហ្វេទឹកកក",
-      "cn": "冰咖啡粉"
-    },
-    "category": "powder",
-    "price": 15000,
-    "currency": "KHR",
-    "images": ["/img/iced.jpg"],
-    "rating": 4.3,
-    "variants": [
-      { "id": "200g", "label": "200g", "delta": 0 },
-      { "id": "500g", "label": "500g", "delta": 6000 }
-    ],
-    "tags": {
-      "en": ["refreshing", "summer"],
-      "kh": ["ត្រជាក់", "រដូវក្តៅ"],
-      "cn": ["清爽", "夏日"]
-    },
-    "desc": {
-      "en": "Powder made for iced coffee, refreshing and smooth.",
-      "kh": "ម្សៅសម្រាប់កាហ្វេទឹកកក មានរសជាតិឆ្ងាញ់ត្រជាក់។",
-      "cn": "专为冰咖啡设计，清爽顺滑。"
+      "en": "A simple and easy-drinking Cambodian coffee powder—light roast, smooth taste, perfect for everyday enjoyment.",
+      "kh": "ម្សៅកាហ្វេកម្ពុជា ដែលងាយស្រួលផឹក ឆុងស្រាល រសជាតិស្រទន់ សម្រាប់ប្រើប្រាស់ប្រចាំថ្ងៃ។",
+      "cn": "简洁易饮的柬埔寨咖啡粉，浅度烘焙，口感顺滑，适合每日享用。"
     }
   }
+
 ]
