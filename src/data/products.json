@@ -1,58 +1,58 @@
 [
   {
-    "id": "bean-ethiopia-wash",
+    "id": "bean-arabicablend",
     "code": "BEAN-001",
     "title": {
-      "en": "Ethiopia Washed",
-      "kh": "កាហ្វេអេត្យូពី (លាងស្អាត)",
-      "cn": "埃塞俄比亚水洗"
+      "en": "Arabica Blend",
+      "kh": "កាហ្វេប្លេនអារ៉ាបិកា",
+      "cn": "阿拉比卡拼配"
     },
     "category": "beans",
-    "price": 22000,
+    "price": 30000,
     "currency": "KHR",
-    "images": ["https://scoopwholefoodsshop.com/cdn/shop/files/Scoop-Whole-Bean-Coffee_1200x.jpg?v=1754929794"],
-    "rating": 4.8,
+    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1758250696/Arabica_Blend_jfsopc.png"],
+    "rating": 5.0,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 65000 }
+      { "id": "1kg", "label": "1kg", "delta": 30000 }
     ],
     "tags": {
-      "en": ["light roast", "floral"],
-      "kh": ["ឆុងស្រាល", "ផ្កា"],
-      "cn": ["浅烘焙", "花香"]
+      "en": ["medium roast", "balanced", "smooth"],
+      "kh": ["ឆុងមធ្យម", "សមតុល្យ", "រលោង"],
+      "cn": ["中度烘焙", "均衡", "顺滑"]
     },
     "desc": {
-      "en": "Delicate florals, citrus, tea-like body.",
-      "kh": "ផ្កាក្រអូប ទឹកក្រូច និងរូបរាងដូចតែ។",
-      "cn": "细腻的花香，柑橘味，茶感顺滑。"
+      "en": "Well-balanced caffeine and aroma with a smooth taste.",
+      "kh": "មានកាហ្វេអ៊ីន និងក្លិនក្រអូបសមតុល្យ រសជាតិស្រទន់់។",
+      "cn": "咖啡因与香气均衡，口感顺滑。"
     }
   },
   {
-    "id": "bean-colombia-supremo",
-    "code": "BEAN-002",
+    "id": "pow-robustaharmony",
+    "code": "POW-001",
     "title": {
-      "en": "Colombia Supremo",
-      "kh": "កាហ្វេកូឡុំប៊ីស៊ុផ្រីម",
-      "cn": "哥伦比亚特选"
+      "en": "Robusta Harmony",
+      "kh": "កាហ្វេករ៉ូបុយស្តា ហាម៉ូនី",
+      "cn": "罗布斯塔和谐"
     },
-    "category": "beans",
-    "price": 24000,
+    "category": "powder",
+    "price": 12000,
     "currency": "KHR",
-    "images": ["https://www.ethicalbean.com/cdn/shop/products/ethicalbeancoffeelushwholebean_800x.png?v=1676408213"],
-    "rating": 4.7,
+    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1758250696/Robusta_harmony_g9m7hu.png"],
+    "rating": 5.0,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 60000 }
+      { "id": "1kg", "label": "1kg", "delta": 120000 }
     ],
     "tags": {
-      "en": ["medium roast", "nutty"],
-      "kh": ["ឆុងមធ្យម", "គ្រាប់ធញ្ញជាតិ"],
-      "cn": ["中度烘焙", "坚果味"]
+      "en": ["medium roast", "bold caffeine", "smooth body"],
+      "kh": ["ឆុងមធ្យម", "កាហ្វេអ៊ីនខ្លាំង", "រាងកាយរលោង"],
+      "cn": ["中度烘焙", "醇厚咖啡因", "顺滑口感"]
     },
     "desc": {
-      "en": "Rich aroma, smooth body with nutty notes.",
-      "kh": "ក្លិនក្រអូបខ្លាំង មានរូបរាងទន់ และរសជាតិនុត។",
-      "cn": "浓郁香气，顺滑口感，带坚果风味。"
+      "en": "A well-balanced cup with bold caffeine for focus, rich aroma, a smooth body, and a long-lasting finish.",
+      "kh": "កាហ្វេសមតុល្យ មានកាហ្វេអ៊ីនខ្លាំងសម្រាប់ផ្តោតអារម្មណ៍ ក្លិនក្រអូប រាងកាយរលោង និងរសជាតិអស់សល់យូរ។",
+      "cn": "均衡之作，醇厚咖啡因助于专注，香气浓郁，口感顺滑，余味悠长。"
     }
   },
   {
@@ -66,7 +66,7 @@
     "category": "beans",
     "price": 20000,
     "currency": "KHR",
-    "images": ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwhvSlv-5RUmfWNTmCuJmixSh5zqk7aCo17w&s"],
+    "images": ["/img/mondulkiri.jpg"],
     "rating": 4.5,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -94,7 +94,7 @@
     "category": "powder",
     "price": 16000,
     "currency": "KHR",
-    "images": ["https://cdn.ready-market.com.tw/7afaaa6a/Templates/pic/m/Instant-Coffee-Powder_Arabica-02.jpg?v=27d77f4d"],
+    "images": ["/img/house.jpg"],
     "rating": 4.6,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -122,7 +122,7 @@
     "category": "powder",
     "price": 17000,
     "currency": "KHR",
-    "images": ["https://bonhomiaworld.com/cdn/shop/products/1_c3039941-0d4f-49ff-b63f-3e358472f527.jpg?v=1631007429"],
+    "images": ["/img/dark.jpg"],
     "rating": 4.5,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -150,7 +150,7 @@
     "category": "powder",
     "price": 18000,
     "currency": "KHR",
-    "images": ["https://mir-s3-cdn-cf.behance.net/projects/404/5403ae206347651.Y3JvcCwxNjAxLDEyNTMsOTksMA.png"],
+    "images": ["/img/espresso-powder.jpg"],
     "rating": 4.7,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -178,7 +178,7 @@
     "category": "powder",
     "price": 19000,
     "currency": "KHR",
-    "images": ["https://m.media-amazon.com/images/I/61Yx8o4pDqL._UF894,1000_QL80_.jpg"],
+    "images": ["/img/cappuccino.jpg"],
     "rating": 4.4,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
@@ -206,7 +206,7 @@
     "category": "powder",
     "price": 15000,
     "currency": "KHR",
-    "images": ["https://m.media-amazon.com/images/I/71ZZjhqApzL._UF894,1000_QL80_.jpg"],
+    "images": ["/img/iced.jpg"],
     "rating": 4.3,
     "variants": [
       { "id": "200g", "label": "200g", "delta": 0 },
@@ -222,166 +222,5 @@
       "kh": "ម្សៅសម្រាប់កាហ្វេទឹកកក មានរសជាតិឆ្ងាញ់ត្រជាក់។",
       "cn": "专为冰咖啡设计，清爽顺滑。"
     }
-  },
-
-
-  {
-    "id": "acc-hand-grinder",
-    "code": "ACC-001",
-    "title": {
-      "en": "Hand Coffee Grinder",
-      "kh": "ម៉ាស៊ីនកិនកាហ្វេដៃ",
-      "cn": "手摇磨豆机"
-    },
-    "category": "accessories",
-    "price": 85000,
-    "currency": "KHR",
-    "images": ["https://placehold.co/800x800?text=Hand+Grinder"],
-    "rating": 4.6,
-    "variants": [
-      { "id": "standard", "label": "Standard", "delta": 0 },
-      { "id": "pro", "label": "Pro Burr", "delta": 30000 }
-    ],
-    "tags": {
-      "en": ["manual", "portable", "consistent grind"],
-      "kh": ["ដៃ", "ងាយយក", "កិនស្មើ"],
-      "cn": ["手动", "便携", "均匀研磨"]
-    },
-    "desc": {
-      "en": "Portable hand grinder with adjustable burrs for consistent grind.",
-      "kh": "ម៉ាស៊ីនកិនដៃ មានប៊័រកែតម្រូវ កិនស្មើ និងងាយយកតាមដងផ្លូវ។",
-      "cn": "便携式手摇磨豆机，研磨粗细可调，均匀稳定。"
-    }
-  },
-  {
-    "id": "acc-gooseneck-kettle",
-    "code": "ACC-002",
-    "title": {
-      "en": "Gooseneck Kettle",
-      "kh": "កាដាយទឹក Gooseneck",
-      "cn": "细口手冲壶"
-    },
-    "category": "accessories",
-    "price": 65000,
-    "currency": "KHR",
-    "images": ["https://placehold.co/800x800?text=Gooseneck+Kettle"],
-    "rating": 4.5,
-    "variants": [
-      { "id": "600ml", "label": "600ml", "delta": 0 },
-      { "id": "1l", "label": "1L", "delta": 15000 }
-    ],
-    "tags": {
-      "en": ["pour-over", "precision spout"],
-      "kh": ["hand drip", "លំហូរត្រឹមត្រូវ"],
-      "cn": ["手冲", "控水精准"]
-    },
-    "desc": {
-      "en": "Controlled water flow for smooth pour-over extractions.",
-      "kh": "គ្រប់គ្រងលំហូរទឹកបានត្រឹមត្រូវ សម្រាប់ hand drip ល្អប្រសើរ។",
-      "cn": "精准控水，手冲萃取更稳定。"
-    }
-  },
-  {
-    "id": "acc-v60-filters",
-    "code": "ACC-003",
-    "title": {
-      "en": "V60 Filter Papers",
-      "kh": "ក្រដាសតម្រង V60",
-      "cn": "V60 滤纸"
-    },
-    "category": "accessories",
-    "price": 5000,
-    "currency": "KHR",
-    "images": ["https://placehold.co/800x800?text=V60+Filters"],
-    "rating": 4.4,
-    "variants": [
-      { "id": "40pcs", "label": "40 sheets", "delta": 0 },
-      { "id": "100pcs", "label": "100 sheets", "delta": 4000 }
-    ],
-    "tags": {
-      "en": ["filters", "clean cup"],
-      "kh": ["តម្រង", "ពែងស្អាត"],
-      "cn": ["滤纸", "干净风味"]
-    },
-    "desc": {
-      "en": "Fast-flow filter papers for bright, clean cups.",
-      "kh": "ក្រដាសតម្រងហូរលឿន ផ្តល់ពែងស្អាតពន្លឺ។",
-      "cn": "流速快，风味干净明亮。"
-    }
-  },
-  {
-    "id": "acc-digital-scale",
-    "code": "ACC-004",
-    "title": {
-      "en": "Digital Coffee Scale",
-      "kh": "តុល្យការឌីជីថល",
-      "cn": "咖啡电子秤"
-    },
-    "category": "accessories",
-    "price": 45000,
-    "currency": "KHR",
-    "images": ["https://placehold.co/800x800?text=Digital+Scale"],
-    "rating": 4.6,
-    "variants": [
-      { "id": "basic", "label": "Basic", "delta": 0 },
-      { "id": "timer", "label": "With Timer", "delta": 8000 }
-    ],
-    "tags": {
-      "en": ["precision", "timer"],
-      "kh": ["ត្រឹមត្រូវ", "ម៉ោងកំណត់"],
-      "cn": ["精确", "计时"]
-    },
-    "desc": {
-      "en": "Accurate scale to dial in your brew ratio, optional timer.",
-      "kh": "តុល្យការដែលមានភាពត្រឹមត្រូវ ដាក់សមមូល ក៏អាចមានម៉ោងកំណត់។",
-      "cn": "精准称量冲煮比例，可选计时功能。"
-    }
-  },
-  {
-    "id": "acc-ceramic-mug",
-    "code": "ACC-005",
-    "title": {
-      "en": "Ceramic Coffee Mug",
-      "kh": "កែវកាហ្វេសេរ៉ាមិច",
-      "cn": "陶瓷咖啡杯"
-    },
-    "category": "accessories",
-    "price": 12000,
-    "currency": "KHR",
-    "images": [
-      "https://placehold.co/800x800?text=Ceramic+Mug"
-    ],
-    "rating": 4.5,
-    "variants": [
-      {
-        "id": "300ml",
-        "label": "300ml",
-        "delta": 0
-      },
-      {
-        "id": "400ml",
-        "label": "400ml",
-        "delta": 3000
-      }
-    ],
-    "tags": {
-      "en": [
-        "mug",
-        "heat-retaining"
-      ],
-      "kh": [
-        "កែវ",
-        "រក្សាកម្ដៅ"
-      ],
-      "cn": [
-        "杯子",
-        "保温"
-      ]
-    },
-    "desc": {
-      "en": "Durable ceramic mug that keeps your coffee warm.",
-      "kh": "កែវសេរ៉ាមិចរឹងមាំ រក្សាកាហ្វេឱ្យក្តៅយូរ។",
-      "cn": "耐用陶瓷杯，更好保温。"
-    }
   }
-  ]
+]
