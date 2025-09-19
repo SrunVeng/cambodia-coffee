@@ -1,46 +1,29 @@
-import { useEffect, useMemo, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { translateName } from "../../utils/i18n-helpers"
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { translateName } from "../../utils/i18n-helpers";
+import SearchableSelect from "../../components/ui/SearchableSelect.jsx";
 
 /** Normalize any code to a string so equality checks always work */
-const s = (v) => (v == null ? "" : String(v))
+const s = (v) => (v == null ? "" : String(v));
 
 /** In-memory cache so re-entering the step doesn't re-fetch every time */
-const C = typeof window !== "undefined" ? (window.__ADDR_CACHE__ ||= {}) : {}
-
-function Dropdown({ label, items, value, onSelect, disabled }) {
-    return (
-        <select
-            className="block w-full rounded-xl border border-[#e7dbc9] bg-[#fffaf3] px-3 py-2 text-sm text-[#3b2a1d] placeholder-[#9b8b7c] shadow-sm focus:border-[#c9a44c] focus:ring-2 focus:ring-[#c9a44c] disabled:bg-[#f2ede5] disabled:text-[#9b8b7c]"
-            value={s(value)}
-            onChange={(e) => onSelect(e.target.value)}
-            disabled={disabled}
-        >
-            <option value="">{label}</option>
-            {items.map((item) => (
-                <option key={item.code} value={s(item.code)}>
-                    {item.label}
-                </option>
-            ))}
-        </select>
-    )
-}
+const C = typeof window !== "undefined" ? (window.__ADDR_CACHE__ ||= {}) : {};
 
 export default function AddressSelect({ value, onChange, lang }) {
-    const { i18n, t } = useTranslation()
-    const L = (lang || i18n.language || "en").toLowerCase()
-    const v = value || {}
+    const { i18n, t } = useTranslation();
+    const L = (lang || i18n.language || "en").toLowerCase();
+    const v = value || {};
 
     // Raw datasets (cached across mounts)
-    const [provinces, setProvinces] = useState(C.provinces || [])
-    const [districts, setDistricts] = useState(C.districts || [])
-    const [communes, setCommunes] = useState(C.communes || [])
-    const [villages, setVillages] = useState(C.villages || [])
+    const [provinces, setProvinces] = useState(C.provinces || []);
+    const [districts, setDistricts] = useState(C.districts || []);
+    const [communes, setCommunes] = useState(C.communes || []);
+    const [villages, setVillages] = useState(C.villages || []);
 
     // Fetch once (with cache)
     useEffect(() => {
-        let alive = true
-        ;(async () => {
+        let alive = true;
+        (async () => {
             try {
                 if (!C.provinces) {
                     const [p, d, c, vv] = await Promise.all([
@@ -48,71 +31,82 @@ export default function AddressSelect({ value, onChange, lang }) {
                         fetch("/address/districts.json").then((r) => r.json()),
                         fetch("/address/communes.json").then((r) => r.json()),
                         fetch("/address/villages.json").then((r) => r.json()),
-                    ])
-                    const P = (p.provinces || p).map((x) => ({ ...x, code: s(x.code), province_code: s(x.province_code) }))
-                    const D = (d.districts || d).map((x) => ({
-                        ...x,
-                        code: s(x.code),
-                        province_code: s(x.province_code),
-                    }))
-                    const Cc = (c.communes || c).map((x) => ({
-                        ...x,
-                        code: s(x.code),
-                        district_code: s(x.district_code),
-                    }))
-                    const V = (vv.villages || vv).map((x) => ({ ...x, code: s(x.code), commune_code: s(x.commune_code) }))
-                    C.provinces = P
-                    C.districts = D
-                    C.communes = Cc
-                    C.villages = V
+                    ]);
+                    const P = (p.provinces || p).map((x) => ({ ...x, code: s(x.code), province_code: s(x.province_code) }));
+                    const D = (d.districts || d).map((x) => ({ ...x, code: s(x.code), province_code: s(x.province_code) }));
+                    const Cc = (c.communes || c).map((x) => ({ ...x, code: s(x.code), district_code: s(x.district_code) }));
+                    const V = (vv.villages || vv).map((x) => ({ ...x, code: s(x.code), commune_code: s(x.commune_code) }));
+                    C.provinces = P; C.districts = D; C.communes = Cc; C.villages = V;
                 }
-                if (!alive) return
-                setProvinces(C.provinces)
-                setDistricts(C.districts)
-                setCommunes(C.communes)
-                setVillages(C.villages)
+                if (!alive) return;
+                setProvinces(C.provinces);
+                setDistricts(C.districts);
+                setCommunes(C.communes);
+                setVillages(C.villages);
             } catch (e) {
-                console.error("Address load failed", e)
+                console.error("Address load failed", e);
             }
-        })()
-        return () => {
-            alive = false
-        }
-    }, [])
+        })();
+        return () => { alive = false; };
+    }, []);
 
     // Build localized display lists each render (no stale labels)
-    const labelOf = (obj) => translateName(obj, L)
-    const provincesL = useMemo(() => provinces.map((x) => ({ ...x, label: labelOf(x) })), [provinces, L])
-    const dByProv = useMemo(() => districts.filter((d) => s(d.province_code) === s(v.province)), [districts, v.province])
-    const districtsL = useMemo(() => dByProv.map((x) => ({ ...x, label: labelOf(x) })), [dByProv, L])
-    const cByDist = useMemo(() => communes.filter((c) => s(c.district_code) === s(v.district)), [communes, v.district])
-    const communesL = useMemo(() => cByDist.map((x) => ({ ...x, label: labelOf(x) })), [cByDist, L])
-    const vByComm = useMemo(() => villages.filter((x) => s(x.commune_code) === s(v.commune)), [villages, v.commune])
-    const villagesL = useMemo(() => vByComm.map((x) => ({ ...x, label: labelOf(x) })), [vByComm, L])
+    const labelOf = (obj) => translateName(obj, L);
+    const provincesL = useMemo(
+        () => provinces.map((x) => ({ ...x, label: labelOf(x) })),
+        [provinces, L]
+    );
+
+    const dByProv = useMemo(
+        () => districts.filter((d) => s(d.province_code) === s(v.province)),
+        [districts, v.province]
+    );
+    const districtsL = useMemo(
+        () => dByProv.map((x) => ({ ...x, label: labelOf(x) })),
+        [dByProv, L]
+    );
+
+    const cByDist = useMemo(
+        () => communes.filter((c) => s(c.district_code) === s(v.district)),
+        [communes, v.district]
+    );
+    const communesL = useMemo(
+        () => cByDist.map((x) => ({ ...x, label: labelOf(x) })),
+        [cByDist, L]
+    );
+
+    const vByComm = useMemo(
+        () => villages.filter((x) => s(x.commune_code) === s(v.commune)),
+        [villages, v.commune]
+    );
+    const villagesL = useMemo(
+        () => vByComm.map((x) => ({ ...x, label: labelOf(x) })),
+        [vByComm, L]
+    );
 
     // Keep the stored *Name fields in sync with language (and after returning to this step)
-    const lastSyncRef = useRef("")
+    const lastSyncRef = useRef("");
     useEffect(() => {
-        const key = [L, v.province, v.district, v.commune, v.village].map(s).join("|")
-        if (key === lastSyncRef.current) return
-        lastSyncRef.current = key
+        const key = [L, v.province, v.district, v.commune, v.village].map(s).join("|");
+        if (key === lastSyncRef.current) return;
+        lastSyncRef.current = key;
 
-        const next = { ...v }
+        const next = { ...v };
         if (v.province) {
-            const it = provinces.find((p) => s(p.code) === s(v.province))
-            next.provinceName = it ? labelOf(it) : v.provinceName
+            const it = provinces.find((p) => s(p.code) === s(v.province));
+            next.provinceName = it ? labelOf(it) : v.provinceName;
         }
         if (v.district) {
-            const it = districts.find((d) => s(d.code) === s(v.district))
-            next.districtName = it ? labelOf(it) : v.districtName
+            const it = districts.find((d) => s(d.code) === s(v.district));
+            next.districtName = it ? labelOf(it) : v.districtName;
         }
         if (v.commune) {
-            const it = communes.find((c) => s(c.code) === s(v.commune))
-            next.communeName = it ? labelOf(it) : v.communeName
+            const it = communes.find((c) => s(c.code) === s(v.commune));
+            next.communeName = it ? labelOf(it) : v.communeName;
         }
         if (v.village) {
-            const it = villages.find((x) => s(x.code) === s(v.village))
-            next.villageName = it ? labelOf(it) : v.villageName
+            const it = villages.find((x) => s(x.code) === s(v.village));
+            next.villageName = it ? labelOf(it) : v.villageName;
         }
         if (
             next.provinceName !== v.provinceName ||
@@ -120,76 +114,82 @@ export default function AddressSelect({ value, onChange, lang }) {
             next.communeName !== v.communeName ||
             next.villageName !== v.villageName
         ) {
-            onChange?.(next)
+            onChange?.(next);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [L, provinces, districts, communes, villages, v.province, v.district, v.commune, v.village])
+    }, [L, provinces, districts, communes, villages, v.province, v.district, v.commune, v.village]);
 
     const setLevel = (level, code) => {
-        const next = { ...v }
+        const next = { ...v };
         if (level === "province") {
-            const item = provinces.find((p) => s(p.code) === s(code))
-            next.province = s(code) || undefined
-            next.provinceName = item ? labelOf(item) : undefined
-            next.district = next.districtName = undefined
-            next.commune = next.communeName = undefined
-            next.village = next.villageName = undefined
+            const item = provinces.find((p) => s(p.code) === s(code));
+            next.province = s(code) || undefined;
+            next.provinceName = item ? labelOf(item) : undefined;
+            next.district = next.districtName = undefined;
+            next.commune = next.communeName = undefined;
+            next.village = next.villageName = undefined;
         } else if (level === "district") {
-            const item = dByProv.find((d) => s(d.code) === s(code))
-            next.district = s(code) || undefined
-            next.districtName = item ? labelOf(item) : undefined
-            next.commune = next.communeName = undefined
-            next.village = next.villageName = undefined
+            const item = dByProv.find((d) => s(d.code) === s(code));
+            next.district = s(code) || undefined;
+            next.districtName = item ? labelOf(item) : undefined;
+            next.commune = next.communeName = undefined;
+            next.village = next.villageName = undefined;
         } else if (level === "commune") {
-            const item = cByDist.find((c) => s(c.code) === s(code))
-            next.commune = s(code) || undefined
-            next.communeName = item ? labelOf(item) : undefined
-            next.village = next.villageName = undefined
+            const item = cByDist.find((c) => s(c.code) === s(code));
+            next.commune = s(code) || undefined;
+            next.communeName = item ? labelOf(item) : undefined;
+            next.village = next.villageName = undefined;
         } else if (level === "village") {
-            const item = vByComm.find((x) => s(x.code) === s(code))
-            next.village = s(code) || undefined
-            next.villageName = item ? labelOf(item) : undefined
+            const item = vByComm.find((x) => s(x.code) === s(code));
+            next.village = s(code) || undefined;
+            next.villageName = item ? labelOf(item) : undefined;
         }
-        onChange?.(next)
-    }
+        onChange?.(next);
+    };
+
+    // Convert to the generic item shape { value, label }
+    const asItems = (arr) => arr.map((x) => ({ value: s(x.code), label: x.label }));
 
     return (
         <div className="grid gap-3 md:grid-cols-4">
             {/* Province */}
-            <Dropdown
-                label={t("order.province", { defaultValue: "Province" })}
-                items={provincesL}
+            <SearchableSelect
+                placeholder={t("order.province", { defaultValue: "Province" })}
+                items={asItems(provincesL)}
                 value={v.province}
-                onSelect={(code) => setLevel("province", code)}
-                disabled={false}
+                onChange={(code) => setLevel("province", code)}
+                clearable
             />
 
             {/* District */}
-            <Dropdown
-                label={t("order.district", { defaultValue: "District" })}
-                items={districtsL}
+            <SearchableSelect
+                placeholder={t("order.district", { defaultValue: "District" })}
+                items={asItems(districtsL)}
                 value={v.district}
-                onSelect={(code) => setLevel("district", code)}
+                onChange={(code) => setLevel("district", code)}
                 disabled={!v.province}
+                clearable
             />
 
             {/* Commune */}
-            <Dropdown
-                label={t("order.commune", { defaultValue: "Commune" })}
-                items={communesL}
+            <SearchableSelect
+                placeholder={t("order.commune", { defaultValue: "Commune" })}
+                items={asItems(communesL)}
                 value={v.commune}
-                onSelect={(code) => setLevel("commune", code)}
+                onChange={(code) => setLevel("commune", code)}
                 disabled={!v.district}
+                clearable
             />
 
             {/* Village */}
-            <Dropdown
-                label={t("order.village", { defaultValue: "Village" })}
-                items={villagesL}
+            <SearchableSelect
+                placeholder={t("order.village", { defaultValue: "Village" })}
+                items={asItems(villagesL)}
                 value={v.village}
-                onSelect={(code) => setLevel("village", code)}
+                onChange={(code) => setLevel("village", code)}
                 disabled={!v.commune}
+                clearable
             />
         </div>
-    )
+    );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { buildOrderPayload } from "../../../utils/orderPayload";
 import { normalizeLang } from "../../../utils/i18n-helpers";
@@ -27,8 +27,7 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
 
     const currency = summary.currency || "KHR";
     const locale = i18n.language || "en";
-    const money = (v) =>
-        new Intl.NumberFormat(locale, { style: "currency", currency }).format(Number(v || 0));
+    const money = (v) => new Intl.NumberFormat(locale, { style: "currency", currency }).format(Number(v || 0));
 
     const items = useMemo(() => {
         if (Array.isArray(summary.items) && summary.items.length) return summary.items;
@@ -46,39 +45,28 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
                 name = it.title || it.name || it.label;
             }
             if (!name) {
-                name =
-                    t("review.item", { defaultValue: "Item" }) + " " + (i + 1);
+                name = t("review.item", { defaultValue: "Item" }) + " " + (i + 1);
             }
 
             const qty = Number(it.qty ?? it.quantity ?? it.count ?? 1);
             const unitPrice = Number(it.unitPrice ?? it.price ?? it.amount ?? 0);
             const lineTotal = Number(it.total ?? qty * unitPrice);
 
-            return {
-                name,
-                qty,
-                unitPrice,
-                lineTotal,
-                sku: it.sku || it.code || it.id || null,
-                raw: it,
-            };
+            return { name, qty, unitPrice, lineTotal, sku: it.sku || it.code || it.id || null, raw: it };
         });
     }, [items, i18n.language, t]);
 
-    const subtotal =
-        summary.subtotal ??
-        safeItems.reduce((s, x) => s + Number(x.lineTotal || 0), 0);
+    const subtotal = summary.subtotal ?? safeItems.reduce((s, x) => s + Number(x.lineTotal || 0), 0);
     const deliveryFee = summary.deliveryFee ?? 0;
-    const total =
-        summary.total ?? subtotal + Number(deliveryFee || 0);
+    const total = summary.total ?? subtotal + Number(deliveryFee || 0);
+
+    // NEW: customer remark (note to seller/rider)
+    const [remark, setRemark] = useState(summary.remark || "");
+    const maxRemark = 300;
 
     const payload = useMemo(() => {
         return buildOrderPayload({
-            customer: {
-                name: info.name || "",
-                phone: info.phone || "",
-                email: info.email || "",
-            },
+            customer: { name: info.name || "", phone: info.phone || "", email: info.email || "" },
             address: {
                 provinceName: provinceName || "",
                 districtName: districtName || "",
@@ -94,7 +82,8 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
             currency,
             deliveryFee,
             locale,
-            meta: { source: "web" },
+            // include remark in meta so it arrives with the order
+            meta: { source: "web", remark: remark || "" },
         });
     }, [
         info.name,
@@ -113,6 +102,7 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
         currency,
         deliveryFee,
         locale,
+        remark,
     ]);
 
     useEffect(() => {
@@ -121,18 +111,16 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
             localStorage.setItem("info", JSON.stringify(info || {}));
             localStorage.setItem(
                 "summary",
-                JSON.stringify({ currency, items, subtotal, deliveryFee, total })
+                JSON.stringify({ currency, items, subtotal, deliveryFee, total, remark })
             );
         } catch {}
-    }, [payload, info, currency, items, subtotal, deliveryFee, total]);
+    }, [payload, info, currency, items, subtotal, deliveryFee, total, remark]);
 
     return (
         <div className="space-y-5">
             {/* Customer */}
             <div className="card p-4 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]">
-                <div className="font-semibold text-[#3b2a1d] mb-2">
-                    {t("review.customer", { defaultValue: "Customer" })}
-                </div>
+                <div className="font-semibold text-[#3b2a1d] mb-2">{t("review.customer", { defaultValue: "Customer" })}</div>
                 <div className="text-sm text-[#3b2a1d]/90">
                     <span className="font-medium">{info.name || "—"}</span>
                     <span className="mx-2">•</span>
@@ -148,74 +136,69 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
 
             {/* Address */}
             <div className="card p-4 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]">
-                <div className="font-semibold text-[#3b2a1d] mb-2">
-                    {t("review.address", { defaultValue: "Address" })}
-                </div>
-                <div className="text-sm text-[#3b2a1d]/90">
-                    {addressLine ||
-                        t("review.no_address", { defaultValue: "—" })}
-                </div>
+                <div className="font-semibold text-[#3b2a1d] mb-2">{t("review.address", { defaultValue: "Address" })}</div>
+                <div className="text-sm text-[#3b2a1d]/90">{addressLine || t("review.no_address", { defaultValue: "—" })}</div>
             </div>
 
             {/* Items */}
             <div className="card p-4 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]">
-                <div className="font-semibold text-[#3b2a1d] mb-3">
-                    {t("review.order_items", { defaultValue: "Order Items" })}
-                </div>
+                <div className="font-semibold text-[#3b2a1d] mb-3">{t("review.order_items", { defaultValue: "Order Items" })}</div>
                 {safeItems.length ? (
                     <div className="space-y-2">
                         {safeItems.map((it, i) => (
-                            <div
-                                key={`${it.sku || it.name}-${i}`}
-                                className="flex items-center justify-between text-sm"
-                            >
+                            <div key={`${it.sku || it.name}-${i}`} className="flex items-center justify-between text-sm">
                                 <div className="min-w-0">
-                                    <div className="truncate text-[#3b2a1d]">
-                                        {it.name}
-                                    </div>
+                                    <div className="truncate text-[#3b2a1d]">{it.name}</div>
                                     <div className="text-xs text-[#857567]">
-                                        {t("review.qty", { defaultValue: "Qty" })}:{" "}
-                                        {it.qty}
+                                        {t("review.qty", { defaultValue: "Qty" })}: {it.qty}
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <div className="text-[#3b2a1d]">
-                                        {money(it.lineTotal)}
-                                    </div>
+                                    <div className="text-[#3b2a1d]">{money(it.lineTotal)}</div>
                                     <div className="text-xs text-[#857567]">
-                                        {money(it.unitPrice)}{" "}
-                                        {t("review.each", { defaultValue: "ea" })}
+                                        {money(it.unitPrice)} {t("review.each", { defaultValue: "ea" })}
                                     </div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <div className="text-sm text-[#857567]">
-                        {t("review.no_items", { defaultValue: "No items." })}
-                    </div>
+                    <div className="text-sm text-[#857567]">{t("review.no_items", { defaultValue: "No items." })}</div>
                 )}
 
                 <div className="mt-4 border-t border-[#e7dbc9] pt-3 space-y-1 text-sm">
                     <div className="flex justify-between">
-            <span className="text-[#6b5545]">
-              {t("review.subtotal", { defaultValue: "Subtotal" })}
-            </span>
+                        <span className="text-[#6b5545]">{t("review.subtotal", { defaultValue: "Subtotal" })}</span>
                         <span className="text-[#3b2a1d]">{money(subtotal)}</span>
                     </div>
                     <div className="flex justify-between">
-            <span className="text-[#6b5545]">
-              {t("review.delivery", { defaultValue: "Delivery" })}
-            </span>
+                        <span className="text-[#6b5545]">{t("review.delivery", { defaultValue: "Delivery" })}</span>
                         <span className="text-[#3b2a1d]">{money(deliveryFee)}</span>
                     </div>
                     <div className="flex justify-between text-base font-semibold pt-1">
-            <span className="text-[#3b2a1d]">
-              {t("review.total", { defaultValue: "Total" })}
-            </span>
+                        <span className="text-[#3b2a1d]">{t("review.total", { defaultValue: "Total" })}</span>
                         <span className="text-[#3b2a1d]">{money(total)}</span>
                     </div>
                 </div>
+            </div>
+
+            {/* Remark / Note to seller */}
+            <div className="card p-4 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]">
+                <div className="mb-2 flex items-center justify-between">
+                    <div className="font-semibold text-[#3b2a1d]">{t("review.remark", { defaultValue: "Remark / Note" })}</div>
+                    <div className="text-[11px] text-[#857567]">{remark.length}/{maxRemark}</div>
+                </div>
+                <textarea
+                    value={remark}
+                    onChange={(e) => setRemark(e.target.value.slice(0, maxRemark))}
+                    maxLength={maxRemark}
+                    rows={3}
+                    placeholder={t("review.remark_placeholder", { defaultValue: "E.g., call when arriving, leave at the gate, no sugar, etc." })}
+                    className="block w-full resize-y rounded-xl border border-[#e7dbc9] bg-[#fffaf3] px-4 py-3 text-sm text-[#3b2a1d] placeholder-[#9b8b7c] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#c9a44c]"
+                />
+                <p className="mt-1 text-[11px] text-[#857567]">
+                    {t("review.remark_hint", { defaultValue: "Optional. This will be sent with your order." })}
+                </p>
             </div>
 
             {/* Actions */}
@@ -228,7 +211,7 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
                     onClick={() =>
                         onNext?.({
                             info,
-                            summary: { currency, items, subtotal, deliveryFee, total },
+                            summary: { currency, items, subtotal, deliveryFee, total, remark },
                         })
                     }
                 >
