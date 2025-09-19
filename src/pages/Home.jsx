@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import data from "../data/data.json";
 import ScrollSection from "../components/ui/ScrollSection.jsx";
@@ -12,10 +12,24 @@ export default function Home() {
     const { scrollYProgress } = useScroll();
     const yBg = useTransform(scrollYProgress, [0, 1], [0, -80]); // subtle lift on scroll
 
-    const fadeInUp = {
-        initial: { opacity: 0, y: 20, filter: "blur(6px)" },
-        animate: { opacity: 1, y: 0, filter: "blur(0px)" },
-        transition: { duration: 0.8, ease: "easeOut" },
+    // Motion settings
+    const prefersReducedMotion = useReducedMotion();
+    const baseSpring = prefersReducedMotion
+        ? { duration: 0 }
+        : { type: "spring", stiffness: 260, damping: 26, mass: 0.8 };
+
+    const fadeInUp = prefersReducedMotion
+        ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0 } }
+        : { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, ease: "easeOut" } };
+
+    // Stagger containers/items for smoothness
+    const containerStagger = {
+        hidden: {},
+        visible: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+    };
+    const itemRise = {
+        hidden: { opacity: 0, y: 16 },
+        visible: { opacity: 1, y: 0, transition: baseSpring },
     };
 
     return (
@@ -25,7 +39,7 @@ export default function Home() {
                 {/* Parallax image */}
                 <motion.div
                     style={{ y: yBg, backgroundImage: `url(${HOME_IMAGES.hero})` }}
-                    className="absolute inset-0 bg-cover bg-center scale-110"
+                    className="absolute inset-0 bg-cover bg-center scale-110 transform-gpu will-change-transform"
                     aria-hidden
                 />
 
@@ -55,7 +69,9 @@ export default function Home() {
 
                 {/* Content */}
                 <motion.div
-                    {...fadeInUp}
+                    initial={fadeInUp.initial}
+                    animate={fadeInUp.animate}
+                    transition={fadeInUp.transition}
                     className="relative z-10 px-6 text-center max-w-3xl"
                 >
                     <h1 className="text-white text-4xl md:text-6xl font-extrabold leading-tight drop-shadow-sm">
@@ -77,7 +93,7 @@ export default function Home() {
                             className="
                 inline-flex items-center justify-center rounded-xl
                 bg-[var(--brand-accent)] px-6 py-3 text-white font-semibold
-                shadow-lg shadow-black/20 transition-transform hover:scale-[1.03] active:scale-[0.98]
+                shadow-lg shadow-black/20 transition-transform transform-gpu hover:scale-[1.03] active:scale-[0.98]
                 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black/20
               "
                         >
@@ -101,7 +117,13 @@ export default function Home() {
 
             {/* VALUE CARDS */}
             <section className="relative -mt-10 md:-mt-14 z-10 px-4">
-                <div className="mx-auto max-w-6xl grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                <motion.div
+                    variants={containerStagger}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.25 }}
+                    className="mx-auto max-w-6xl grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4"
+                >
                     {[
                         {
                             title: t("home.cards.fresh.title", { defaultValue: "Fresh Roast" }),
@@ -121,28 +143,34 @@ export default function Home() {
                                 defaultValue: "Same-day options in town and reliable shipping nationwide.",
                             }),
                         },
-                    ].map((c, i) => (
-                        <motion.div
+                    ].map((c) => (
+                        <motion.article
                             key={c.title}
-                            initial={{ opacity: 0, y: 18 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "-80px" }}
-                            transition={{ duration: 0.5, delay: i * 0.05 }}
+                            variants={itemRise}
                             className="
                 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]
-                p-5 shadow-sm hover:shadow-md transition
+                p-5 shadow-sm transition-transform transform-gpu
+                will-change-transform will-change-opacity
+                hover:-translate-y-0.5
               "
+                            style={{ contain: "content" }}
                         >
                             <h3 className="font-semibold text-[#2d1a14]">{c.title}</h3>
                             <p className="mt-1.5 text-sm text-[#6b5545]">{c.text}</p>
-                        </motion.div>
+                        </motion.article>
                     ))}
-                </div>
+                </motion.div>
             </section>
 
             {/* STATS STRIP */}
             <section className="px-4 mt-10">
-                <div className="mx-auto max-w-6xl rounded-2xl border border-[#e7dbc9] bg-white/70 p-5">
+                <motion.div
+                    variants={containerStagger}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.3 }}
+                    className="mx-auto max-w-6xl rounded-2xl border border-[#e7dbc9] bg-white/70 p-5"
+                >
                     <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[#e7dbc9] text-center">
                         {[
                             {
@@ -160,13 +188,10 @@ export default function Home() {
                                 n: "4.9★",
                                 label: t("home.stats.rating", { defaultValue: "Average rating" }),
                             },
-                        ].map((s, i) => (
+                        ].map((s) => (
                             <motion.div
                                 key={s.k}
-                                initial={{ opacity: 0, y: 10 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.45, delay: i * 0.05 }}
+                                variants={itemRise}
                                 className="py-4"
                             >
                                 <div className="text-2xl font-extrabold text-[#2d1a14]">{s.n}</div>
@@ -176,23 +201,21 @@ export default function Home() {
                             </motion.div>
                         ))}
                     </div>
-                </div>
+                </motion.div>
             </section>
 
-            {/* Your existing scrolly sections (kept, so nothing breaks) */}
+            {/* Your existing scrolly sections */}
             <ScrollSection
                 title={t("home.sections.farm.title", { defaultValue: "From the Farm" })}
                 subtitle={t("home.sections.farm.subtitle", {
-                    defaultValue:
-                        "We partner directly with growers to ensure fair pricing and consistent quality.",
+                    defaultValue: "We partner directly with growers to ensure fair pricing and consistent quality.",
                 })}
                 image={HOME_IMAGES.farm}
             />
             <ScrollSection
                 title={t("home.sections.brew.title", { defaultValue: "Brew Your Best" })}
                 subtitle={t("home.sections.brew.subtitle", {
-                    defaultValue:
-                        "Dial in your cup with our brew guides—pour-over, espresso, cold brew and more.",
+                    defaultValue: "Dial in your cup with our brew guides—pour-over, espresso, cold brew and more.",
                 })}
                 image={HOME_IMAGES.brew}
                 reverse
@@ -200,8 +223,7 @@ export default function Home() {
             <ScrollSection
                 title={t("home.sections.featured.title", { defaultValue: "Featured Beans" })}
                 subtitle={t("home.sections.featured.subtitle", {
-                    defaultValue:
-                        "Seasonal lots and community favorites, roasted to highlight origin character.",
+                    defaultValue: "Seasonal lots and community favorites, roasted to highlight origin character.",
                 })}
                 image={HOME_IMAGES.featured}
                 cta={{ to: "/products", label: t("home.cta", { defaultValue: "Shop Coffee" }) }}
@@ -213,7 +235,7 @@ export default function Home() {
                     initial={{ opacity: 0, y: 24 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
+                    transition={{ duration: prefersReducedMotion ? 0 : 0.6 }}
                     className="
             mx-auto max-w-6xl rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]
             p-6 md:p-8 text-center shadow-sm
@@ -233,7 +255,7 @@ export default function Home() {
                             className="
                 inline-flex items-center justify-center rounded-xl
                 bg-[var(--brand-accent)] px-6 py-3 text-white font-semibold
-                shadow-md transition-transform hover:scale-[1.03] active:scale-[0.98]
+                shadow-md transition-transform transform-gpu hover:scale-[1.03] active:scale-[0.98]
                 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a44c] focus-visible:ring-offset-2
               "
                         >

@@ -1,68 +1,85 @@
-import { useTranslation } from "react-i18next"
+import { memo, useDeferredValue, useMemo, useState, useCallback } from "react"
 import products from "../../data/products.json"
 import ProductCard from "./ProductCard"
 import ProductDetails from "./ProductDetails"
-import { useState } from "react"
 
-export default function ProductGrid({ filter }) {
-    const { i18n } = useTranslation()
+// Precompute a lowercase search index once per product
+const ENRICHED_PRODUCTS = (products || []).map((p) => {
+    const title = Object.values(p.title || {}).join(" ")
+    const tags = Object.values(p.tags || {}).flat().join(" ")
+    const code = p.code || ""
+    return {
+        ...p,
+        __searchIndex: `${title} ${tags} ${code}`.toLowerCase(),
+    }
+})
+
+function ProductGrid({ filter }) {
     const [selected, setSelected] = useState(null)
 
-    let list = [...products]
+    // Defer filter so keystrokes remain responsive
+    const deferredFilter = useDeferredValue(filter)
 
-    // Filter by category
-    if (filter.category !== "all") {
-        list = list.filter((p) => p.category === filter.category)
-    }
+    const list = useMemo(() => {
+        const { category, sort, search } = deferredFilter
+        let out = ENRICHED_PRODUCTS
 
-    // 🔍 Search across all translations + code
-    if (filter.search?.trim()) {
-        const q = filter.search.toLowerCase()
+        // Category filter
+        if (category && category !== "all") {
+            out = out.filter((p) => p.category === category)
+        }
 
-        list = list.filter((p) => {
-            // title (all langs)
-            const titleMatch = Object.values(p.title || {})
-                .join(" ")
-                .toLowerCase()
-                .includes(q)
+        // Search (pre-indexed)
+        const q = (search || "").trim().toLowerCase()
+        if (q) {
+            out = out.filter((p) => p.__searchIndex.includes(q))
+        }
 
-            // tags (all langs)
-            const tagsMatch = Object.values(p.tags || {})
-                .flat()
-                .join(" ")
-                .toLowerCase()
-                .includes(q)
+        // Sorting (never mutate original)
+        if (sort === "price-asc") {
+            out = [...out].sort((a, b) => (a.price ?? 0) - (b.price ?? 0))
+        } else if (sort === "price-desc") {
+            out = [...out].sort((a, b) => (b.price ?? 0) - (a.price ?? 0))
+        } else if (sort === "newest") {
+            out = [...out].sort((a, b) => {
+                const ta = a.createdAt ? Date.parse(a.createdAt) : null
+                const tb = b.createdAt ? Date.parse(b.createdAt) : null
+                if (tb && ta) return tb - ta
+                if (tb && !ta) return -1
+                if (!tb && ta) return 1
+                const ai = Number(a.id), bi = Number(b.id)
+                if (!Number.isNaN(ai) && !Number.isNaN(bi)) return bi - ai
+                return String(b.id).localeCompare(String(a.id))
+            })
+        } else {
+            // "popular" default
+            out = [...out].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+        }
 
-            // code
-            const codeMatch = (p.code || "").toLowerCase().includes(q)
+        return out
+    }, [deferredFilter])
 
-            return titleMatch || tagsMatch || codeMatch
-        })
-    }
-
-    // Sorting
-    if (filter.sort === "price-asc") {
-        list.sort((a, b) => a.price - b.price)
-    } else if (filter.sort === "price-desc") {
-        list.sort((a, b) => b.price - a.price)
-    } else if (filter.sort === "newest") {
-        list.sort((a, b) => (a.id > b.id ? -1 : 1)) // simple newest
-    } else if (filter.sort === "popular") {
-        list.sort((a, b) => (b.rating || 0) - (a.rating || 0))
-    }
+    const handleOpen = useCallback((p) => setSelected(p), [])
+    const handleClose = useCallback(() => setSelected(null), [])
 
     return (
         <>
-            {/* 📱 Default: 2 cols on mobile, then scale up */}
+            {/* Tip: ensure animated wrappers use transform/opacity; avoid animating box-shadow */}
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {list.map((p) => (
-                    <ProductCard key={p.id} p={p} onClick={() => setSelected(p)} />
+                    <ProductCard
+                        key={p.id}
+                        p={p}
+                        onClick={() => handleOpen(p)}
+                    />
                 ))}
             </div>
 
             {selected && (
-                <ProductDetails product={selected} onClose={() => setSelected(null)} />
+                <ProductDetails product={selected} onClose={handleClose} />
             )}
         </>
     )
 }
+
+export default memo(ProductGrid)

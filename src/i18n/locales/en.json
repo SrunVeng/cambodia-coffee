@@ -78,10 +78,6 @@
       "done": "បានកំណត់ការបញ្ជាទិញឡើងវិញ។"
     }
   },
-  "about": {
-    "title": "About Us",
-    "story": "We roast coffee with calm, clarity and care. From farm to cup, we bring you a warm and minimal experience — where design is simple, but taste is deep."
-  },
   "common": {
     "back": "Back",
     "next": "Next",
@@ -148,10 +144,10 @@
     "telegram": "Telegram"
   },
   "items": {
-  "title": "Your Cart",
-  "addMore": "Add more products",
-  "clear": "Clear cart",
-  "empty": "No items in cart.",
+    "title": "Your Cart",
+    "addMore": "Add more products",
+    "clear": "Clear cart",
+    "empty": "No items in cart.",
     "clearTitle": "Clear your cart?",
     "clearHint": "This will remove all items from your cart. This action cannot be undone."
   },
@@ -165,5 +161,81 @@
     "decrease": "Decrease",
     "increase": "Increase",
     "quantity": "Quantity"
+  },
+  "about": {
+    "title": "About Us",
+    "contact_label": "Contact us",
+    "contact_href": "/contact",
+    "tagline": "Heritage coffee",
+    "slogan_primary": "By Cambodians, for Cambodians — and the world.",
+    "slogans_alt": [
+      "By Cambodians, for Cambodians — and the world.",
+      "Proudly Cambodian — from our roaster to the world.",
+      "Crafted by Cambodians, enjoyed worldwide.",
+      "Cambodia to the world."
+    ],
+    "story": "We honor our grandfather’s heritage—sharing affordable, high-quality coffee with every Cambodian.",
+    "mission": "Honor our heritage, promote local products, and provide high-quality coffee at an affordable price for all Cambodians.",
+    "heritage": {
+      "title": "Heritage",
+      "body": "Our story begins with our grandfather roasting coffee over simple heat. His careful hands and patient timing taught us to respect the bean — to bring sweetness and clarity without shortcuts. Today, we keep his spirit alive with clean, small-batch roasts and transparent dates on every bag.",
+      "note": "Grandfather: Take it slow — the bean will tell you when it’s ready."
+    },
+    "core": [
+      "Fair prices without compromise",
+      "Quality comparable to leading foreign brands",
+      "Local pride — Made in Cambodia",
+      "Fresh, roast-to-order logistics"
+    ],
+    "values": [
+      { "title": "Freshness First", "body": "Roast-to-order with fast routes; most bags reach shelves in 3–4 days." },
+      { "title": "Farmer Friendly", "body": "Recent-crop sourcing and fair pay for partners across origins." },
+      { "title": "Lean Inventory", "body": "About two months of green beans on hand for peak flavor and turnover." },
+      { "title": "Transparent Dates", "body": "Roast dates on every bag — you always know when it was roasted." },
+      { "title": "Local & Proud", "body": "Roasted and packed in Cambodia — supporting local jobs." },
+      { "title": "Real Value", "body": "Premium taste at a fair price — no heavy marketing markup." }
+    ],
+    "roast": {
+      "title": "Our Roast",
+      "intro": "We tune each batch for sweetness, clarity, and body using a clean, dry-roast approach.",
+      "highlights": [
+        "Dry roast — preserves essential oils; no quench water.",
+        "Signature finish — a brief smoke-lock for deeper aromatics.",
+        "Consistent profiles across blends and single origins."
+      ]
+    },
+    "process": [
+      { "title": "Order Arrives", "body": "We schedule your batch — no bags sitting in warehouses." },
+      { "title": "Small-Batch Roast", "body": "Dialed profiles for balance and sweetness." },
+      { "title": "Pack & Seal", "body": "Roast date on pack for full transparency." },
+      { "title": "Direct to Shelf", "body": "3–4 days to most stores — fresh by design." }
+    ],
+    "stats": { "years": 23, "team": 12, "days_to_shelf": 4, "inventory": 2 },
+    "gallery_title": "Gallery",
+    "gallery_alt": "Roastery & café gallery image",
+    "gallery_open": "Open image",
+    "faq": [
+      { "q": "How fresh is your coffee?", "a": "We roast to order. Most bags reach shelves within 3–4 days of the roast date." },
+      { "q": "Do you offer wholesale?", "a": "Yes. Cafés and grocers can contact us for weekly roasting slots and pricing." },
+      { "q": "Which grind size should I choose?", "a": "We can grind at checkout, but a burr grinder at home gives the best results." }
+    ],
+    "labels": {
+      "mission": "Mission",
+      "core": "Core",
+      "values": "Values",
+      "roast": "Roast",
+      "process": "Process",
+      "gallery": "Gallery",
+      "faq": "FAQs",
+      "sourcing": "Sourcing",
+      "heritage": "Years Roasting",
+      "team": "Team Members",
+      "freshness": "Days to Shelf",
+      "inventory": "Months of Green",
+      "heritage_block": "Our Heritage"
+    },
+    "cta_sr_hint": "Go to contact page",
+    "logo_alt": "Cambodia Coffee Logo"
   }
+
 }
