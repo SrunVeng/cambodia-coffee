@@ -72,10 +72,10 @@
     "address":"Address","province":"Province","district":"District","commune":"Commune","village":"Village",
     "deliveryFee":"Delivery Fee","subtotal":"Subtotal","total":"Total",
     "reset": {
-      "title": "ចាប់ផ្តើមការបញ្ជាទិញម្ដងទៀត?",
-      "hint": "វានឹងលុបព័ត៌មានទំនាក់ទាក់ អាសយដ្ឋាន ទំនិញ និងតម្លៃសរុប។",
-      "hintShort": "ចង់ចាប់ផ្តើមសូន្យ?",
-      "done": "បានកំណត់ការបញ្ជាទិញឡើងវិញ។"
+      "title": "Start the order over?",
+      "hint": "This will delete contact info, address, items, and the total.",
+      "hintShort": "Start from scratch?",
+      "done": "Order has been reset."
     }
   },
   "common": {
