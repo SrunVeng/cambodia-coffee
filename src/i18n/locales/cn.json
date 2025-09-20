@@ -89,7 +89,9 @@
     "added": "已加入购物车！",
     "confirm": "确认",
     "cancel": "取消",
-    "reset": "重置"
+    "reset": "重置",
+    "tapToSelect": "点击规格以添加",
+    "close": "关闭"
   },
   "payment": {
     "cod": "货到付款",
@@ -238,5 +240,8 @@
     },
     "cta_sr_hint": "前往联系页面",
     "logo_alt": "柬埔寨咖啡标志"
+  },
+  "units": {
+    "years_other": "{{count}} 年"
   }
 }

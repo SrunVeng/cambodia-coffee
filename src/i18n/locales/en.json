@@ -87,7 +87,9 @@
     "cancel": "Cancel",
     "optional": "(Optional)",
     "added": "Added to cart!",
-    "reset": "Reset"
+    "reset": "Reset",
+    "tapToSelect": "Tap a variant to add",
+    "close": "Close"
   },
   "payment": {
     "cod": "Cash on Delivery",
@@ -228,7 +230,7 @@
       "gallery": "Gallery",
       "faq": "FAQs",
       "sourcing": "Sourcing",
-      "heritage": "Years Roasting",
+      "heritage": "heritage",
       "team": "Team Members",
       "freshness": "Days to Shelf",
       "inventory": "Months of Green",
@@ -236,6 +238,10 @@
     },
     "cta_sr_hint": "Go to contact page",
     "logo_alt": "Cambodia Coffee Logo"
+  },
+  "units": {
+    "years_one": "{{count}} year",
+    "years_other": "{{count}} years"
   }
 
 }
