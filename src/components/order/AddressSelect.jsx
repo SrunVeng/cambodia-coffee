@@ -3,10 +3,7 @@ import { useTranslation } from "react-i18next";
 import { translateName } from "../../utils/i18n-helpers";
 import SearchableSelect from "../../components/ui/SearchableSelect.jsx";
 
-/** Normalize any code to a string so equality checks always work */
 const s = (v) => (v == null ? "" : String(v));
-
-/** In-memory cache so re-entering the step doesn't re-fetch every time */
 const C = typeof window !== "undefined" ? (window.__ADDR_CACHE__ ||= {}) : {};
 
 export default function AddressSelect({ value, onChange, lang }) {
@@ -14,13 +11,11 @@ export default function AddressSelect({ value, onChange, lang }) {
     const L = (lang || i18n.language || "en").toLowerCase();
     const v = value || {};
 
-    // Raw datasets (cached across mounts)
     const [provinces, setProvinces] = useState(C.provinces || []);
     const [districts, setDistricts] = useState(C.districts || []);
     const [communes, setCommunes] = useState(C.communes || []);
     const [villages, setVillages] = useState(C.villages || []);
 
-    // Fetch once (with cache)
     useEffect(() => {
         let alive = true;
         (async () => {
@@ -50,8 +45,8 @@ export default function AddressSelect({ value, onChange, lang }) {
         return () => { alive = false; };
     }, []);
 
-    // Build localized display lists each render (no stale labels)
     const labelOf = (obj) => translateName(obj, L);
+
     const provincesL = useMemo(
         () => provinces.map((x) => ({ ...x, label: labelOf(x) })),
         [provinces, L]
@@ -84,7 +79,7 @@ export default function AddressSelect({ value, onChange, lang }) {
         [vByComm, L]
     );
 
-    // Keep the stored *Name fields in sync with language
+    // 🔒 Keep *Name fields in sync with language (same as before)
     const lastSyncRef = useRef("");
     useEffect(() => {
         const key = [L, v.province, v.district, v.commune, v.village].map(s).join("|");
@@ -147,48 +142,75 @@ export default function AddressSelect({ value, onChange, lang }) {
         onChange?.(next);
     };
 
+    // ✅ Stable items to prevent dropdown from closing on every keystroke
     const asItems = (arr) => arr.map((x) => ({ value: s(x.code), label: x.label }));
+    const provinceItems  = useMemo(() => asItems(provincesL), [provincesL]);
+    const districtItems  = useMemo(() => asItems(districtsL), [districtsL]);
+    const communeItems   = useMemo(() => asItems(communesL), [communesL]);
+    const villageItems   = useMemo(() => asItems(villagesL), [villagesL]);
+
+    // Loading hint (optional)
+    const loading = !provinces.length;
 
     return (
         <div className="grid gap-3 md:grid-cols-4">
-            {/* Wrap selects so their menus stack above the map */}
-            <div className="relative z-50">
+            {/* Use portal to body + high z-index so menus always overlay the map */}
+            <div className="relative z-[9999]">
                 <SearchableSelect
                     placeholder={t("order.province", { defaultValue: "Province" })}
-                    items={asItems(provincesL)}
-                    value={v.province}
+                    items={provinceItems}
+                    value={v.province || ""}
                     onChange={(code) => setLevel("province", code)}
                     clearable
+                    loading={loading}
+                    /* If your SearchableSelect wraps react-select: */
+                    menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+                    menuPosition="fixed"
+                    menuZIndex={9999}
+                    /* If it’s your own component, implement a similar portal prop and pass it: portalToBody */
+                    portalToBody
                 />
             </div>
-            <div className="relative z-50">
+            <div className="relative z-[9999]">
                 <SearchableSelect
                     placeholder={t("order.district", { defaultValue: "District" })}
-                    items={asItems(districtsL)}
-                    value={v.district}
+                    items={districtItems}
+                    value={v.district || ""}
                     onChange={(code) => setLevel("district", code)}
                     disabled={!v.province}
                     clearable
+                    menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+                    menuPosition="fixed"
+                    menuZIndex={9999}
+                    portalToBody
                 />
             </div>
-            <div className="relative z-50">
+            <div className="relative z-[9999]">
                 <SearchableSelect
                     placeholder={t("order.commune", { defaultValue: "Commune" })}
-                    items={asItems(communesL)}
-                    value={v.commune}
+                    items={communeItems}
+                    value={v.commune || ""}
                     onChange={(code) => setLevel("commune", code)}
                     disabled={!v.district}
                     clearable
+                    menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+                    menuPosition="fixed"
+                    menuZIndex={9999}
+                    portalToBody
                 />
             </div>
-            <div className="relative z-50">
+            <div className="relative z-[9999]">
                 <SearchableSelect
                     placeholder={t("order.village", { defaultValue: "Village" })}
-                    items={asItems(villagesL)}
-                    value={v.village}
+                    items={villageItems}
+                    value={v.village || ""}
                     onChange={(code) => setLevel("village", code)}
                     disabled={!v.commune}
                     clearable
+                    menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+                    menuPosition="fixed"
+                    menuZIndex={9999}
+                    portalToBody
                 />
             </div>
         </div>
