@@ -1,6 +1,7 @@
 // src/pages/About.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom"
 import { motion, useReducedMotion } from "framer-motion";
 import data from "../data/data.json";
 
@@ -664,12 +665,12 @@ export default function About() {
                 {/* CTA */}
                 <Divider />
                 <FadeIn className="text-center">
-                    <a
-                        href={contactHref}
+                    <Link
+                        to={contactHref}
                         className="inline-block rounded-xl px-6 py-3 font-semibold bg-[var(--brand-ink)] text-[var(--brand-bg)] hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--brand-ink)] focus-visible:ring-offset-[var(--brand-bg)]"
                     >
                         {contactLabel}
-                    </a>
+                    </Link>
                     <p className="sr-only">
                         {t("about.cta_sr_hint", { defaultValue: "Go to contact page" })}
                     </p>

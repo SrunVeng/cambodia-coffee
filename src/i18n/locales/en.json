@@ -242,6 +242,32 @@
   "units": {
     "years_one": "{{count}} year",
     "years_other": "{{count}} years"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Reach us any time via phone, email, or Telegram.",
+    "info": {
+      "address": "Phnom Penh, Cambodia",
+      "phone": "+855 12 345 678",
+      "email": "hello@example.com",
+      "hours": "Mon–Sat, 8:00–18:00"
+    },
+    "labels": {
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Hours",
+      "quick": "Quick actions",
+      "scan_to_chat": "Scan to chat on Telegram",
+      "open_telegram": "Open Telegram",
+      "call_now": "Call now",
+      "email_us": "Email us"
+    },
+    "map_title": "Our Location",
+    "logo_alt": "Brand logo",
+    "qr_alt": "Telegram QR code",
+    "telegram_url": "https://t.me/your_channel_or_bot",
+    "telegram_qr": ""
   }
 
 }

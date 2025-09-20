@@ -243,5 +243,31 @@
   },
   "units": {
     "years_other": "{{count}} 年"
+  },
+  "contact": {
+    "title": "联系我们",
+    "subtitle": "通过电话、邮箱或 Telegram 随时联系到我们。",
+    "info": {
+      "address": "柬埔寨 金边",
+      "phone": "+855 12 345 678",
+      "email": "hello@example.com",
+      "hours": "周一至周六，8:00–18:00"
+    },
+    "labels": {
+      "address": "地址",
+      "phone": "电话",
+      "email": "邮箱",
+      "hours": "营业时间",
+      "quick": "快捷操作",
+      "scan_to_chat": "扫码通过 Telegram 聊天",
+      "open_telegram": "打开 Telegram",
+      "call_now": "立即拨打",
+      "email_us": "发送邮件"
+    },
+    "map_title": "我们的地址",
+    "logo_alt": "品牌标识",
+    "qr_alt": "Telegram 二维码",
+    "telegram_url": "https://t.me/your_channel_or_bot",
+    "telegram_qr": ""
   }
 }

@@ -241,5 +241,31 @@
   },
   "units": {
     "years_other": "{{count}} ឆ្នាំ"
+  },
+  "contact": {
+    "title": "ទំនាក់ទំនង",
+    "subtitle": "អាចទាក់ទងពួកយើងគ្រប់ពេលតាមទូរស័ព្ទ អ៊ីមែល ឬ Telegram។",
+    "info": {
+      "address": "ភ្នំពេញ កម្ពុជា",
+      "phone": "+855 12 345 678",
+      "email": "hello@example.com",
+      "hours": "ចន្ទ–សៅរ៍, 8:00–18:00"
+    },
+    "labels": {
+      "address": "អាសយដ្ឋាន",
+      "phone": "ទូរស័ព្ទ",
+      "email": "អ៊ីមែល",
+      "hours": "ម៉ោងធ្វើការ",
+      "quick": "សកម្មភាពលឿន",
+      "scan_to_chat": "ស្កេនដើម្បីជជែកតាម Telegram",
+      "open_telegram": "បើក Telegram",
+      "call_now": "ហៅឥឡូវនេះ",
+      "email_us": "ផ្ញើអ៊ីមែល"
+    },
+    "map_title": "ទីតាំងរបស់ពួកយើង",
+    "logo_alt": "រូបសញ្ញា​ម៉ាក",
+    "qr_alt": "QR Telegram",
+    "telegram_url": "https://t.me/your_channel_or_bot",
+    "telegram_qr": ""
   }
 }
