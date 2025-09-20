@@ -18,7 +18,7 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
     const { t, i18n } = useTranslation();
 
     const address = info.address || {};
-    const { provinceName, districtName, communeName, villageName, street } = address;
+    const { provinceName, districtName, communeName, villageName, street, geo } = address;
 
     const addressLine = useMemo(() => {
         const parts = [villageName, communeName, districtName, provinceName].filter(Boolean);
@@ -37,16 +37,13 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
     const safeItems = useMemo(() => {
         const lang = normalizeLang(i18n.language);
         return items.map((it, i) => {
-            // 🔑 Resolve product name per active language
             let name;
             if (typeof it.title === "object") {
                 name = it.title[lang] || it.title.en || Object.values(it.title)[0];
             } else {
                 name = it.title || it.name || it.label;
             }
-            if (!name) {
-                name = t("review.item", { defaultValue: "Item" }) + " " + (i + 1);
-            }
+            if (!name) name = t("review.item", { defaultValue: "Item" }) + " " + (i + 1);
 
             const qty = Number(it.qty ?? it.quantity ?? it.count ?? 1);
             const unitPrice = Number(it.unitPrice ?? it.price ?? it.amount ?? 0);
@@ -60,9 +57,20 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
     const deliveryFee = summary.deliveryFee ?? 0;
     const total = summary.total ?? subtotal + Number(deliveryFee || 0);
 
-    // NEW: customer remark (note to seller/rider)
+    // Remark / Note
     const [remark, setRemark] = useState(summary.remark || "");
     const maxRemark = 300;
+
+    // ---- Build Google Maps URLs from geo ----
+    const lat = geo?.lat;
+    const lng = geo?.lng;
+
+    // Visible iframe for user preview
+    const gmapsEmbed = lat && lng ? `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed` : null;
+
+    // Backend-ready links (NOT rendered)
+    const gmapsSearch = lat && lng ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}` : null;
+    const gmapsDirections = lat && lng ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}` : null;
 
     const payload = useMemo(() => {
         return buildOrderPayload({
@@ -77,42 +85,35 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
                 district: address.district || null,
                 commune: address.commune || null,
                 village: address.village || null,
+                geo: geo || null,
             },
             items,
             currency,
             deliveryFee,
             locale,
-            // include remark in meta so it arrives with the order
-            meta: { source: "web", remark: remark || "" },
+            // ⬇️ Include prebuilt Google URLs for backend (do not render)
+            meta: {
+                source: "web",
+                remark: remark || "",
+                geo: geo || null,
+                gmaps_search: gmapsSearch || null,
+                gmaps_directions: gmapsDirections || null,
+                gmaps_embed: gmapsEmbed || null,
+            },
         });
     }, [
-        info.name,
-        info.phone,
-        info.email,
-        provinceName,
-        districtName,
-        communeName,
-        villageName,
-        street,
-        address.province,
-        address.district,
-        address.commune,
-        address.village,
-        items,
-        currency,
-        deliveryFee,
-        locale,
-        remark,
+        info.name, info.phone, info.email,
+        provinceName, districtName, communeName, villageName, street,
+        address.province, address.district, address.commune, address.village,
+        geo, items, currency, deliveryFee, locale, remark,
+        gmapsSearch, gmapsDirections, gmapsEmbed,
     ]);
 
     useEffect(() => {
         try {
             localStorage.setItem("order_payload", JSON.stringify(payload));
             localStorage.setItem("info", JSON.stringify(info || {}));
-            localStorage.setItem(
-                "summary",
-                JSON.stringify({ currency, items, subtotal, deliveryFee, total, remark })
-            );
+            localStorage.setItem("summary", JSON.stringify({ currency, items, subtotal, deliveryFee, total, remark }));
         } catch {}
     }, [payload, info, currency, items, subtotal, deliveryFee, total, remark]);
 
@@ -134,10 +135,25 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
                 </div>
             </div>
 
-            {/* Address */}
+            {/* Address + Google Map preview (iframe only) */}
             <div className="card p-4 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]">
                 <div className="font-semibold text-[#3b2a1d] mb-2">{t("review.address", { defaultValue: "Address" })}</div>
                 <div className="text-sm text-[#3b2a1d]/90">{addressLine || t("review.no_address", { defaultValue: "—" })}</div>
+
+                {gmapsEmbed && (
+                    <div className="mt-3 rounded-xl overflow-hidden border border-[#e7dbc9]">
+                        <iframe
+                            title="Delivery location"
+                            src={gmapsEmbed}
+                            width="100%"
+                            height="260"
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            style={{ border: 0, display: "block" }}
+                        />
+                    </div>
+                )}
+                {/* NOTE: No visible "Open in Google Maps" link; backend URLs are in payload.meta */}
             </div>
 
             {/* Items */}
@@ -182,7 +198,7 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
                 </div>
             </div>
 
-            {/* Remark / Note to seller */}
+            {/* Remark / Note */}
             <div className="card p-4 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]">
                 <div className="mb-2 flex items-center justify-between">
                     <div className="font-semibold text-[#3b2a1d]">{t("review.remark", { defaultValue: "Remark / Note" })}</div>

@@ -1,8 +1,9 @@
+import React, { useEffect, useMemo, useState, useCallback, useRef } from "react"
 import { useForm } from "react-hook-form"
-import AddressSelect from "../AddressSelect"
-import { useEffect, useMemo, useState, useCallback, useRef } from "react"
 import { useTranslation } from "react-i18next"
+import AddressSelect from "../AddressSelect"
 
+// ---------- language helper ----------
 const normalizeLang = (L) => {
     const x = String(L || "en").toLowerCase()
     if (x === "km" || x.startsWith("km-") || x === "kh" || x.startsWith("kh-")) return "kh"
@@ -19,7 +20,7 @@ const ERR_DEFAULTS = {
     "errors.phone_invalid": "Use a valid phone number.",
 }
 
-// ---------- small UI helpers ----------
+// ---------- icons ----------
 const Icon = {
     User: (p) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
@@ -57,6 +58,7 @@ const Icon = {
     ),
 }
 
+// ---------- field wrapper ----------
 function Field({ id, label, required, error, hint, leadingIcon, children }) {
     return (
         <div className="space-y-1.5">
@@ -77,6 +79,171 @@ function Field({ id, label, required, error, hint, leadingIcon, children }) {
     )
 }
 
+// ---------- Leaflet loader ----------
+function ensureLeaflet() {
+    return new Promise((resolve, reject) => {
+        if (typeof window === "undefined") return resolve(null)
+        if (window.L) return resolve(window.L)
+
+        // CSS
+        const linkId = "leaflet-css"
+        if (!document.getElementById(linkId)) {
+            const link = document.createElement("link")
+            link.id = linkId
+            link.rel = "stylesheet"
+            link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            document.head.appendChild(link)
+        }
+
+        // JS
+        const scriptId = "leaflet-js"
+        const existing = document.getElementById(scriptId)
+        if (existing) {
+            existing.addEventListener("load", () => resolve(window.L))
+            existing.addEventListener("error", reject)
+            return
+        }
+        const script = document.createElement("script")
+        script.id = scriptId
+        script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        script.async = true
+        script.onload = () => resolve(window.L)
+        script.onerror = reject
+        document.body.appendChild(script)
+    })
+}
+
+// ---------- Mini map picker (single marker + full cleanup + map under dropdowns) ----------
+function MiniMapPicker({ value, onChange, height = 240, autoOpenOnGeo = false }) {
+    const containerId = React.useMemo(() => "leaflet-picker-" + Math.random().toString(36).slice(2), []);
+    const [open, setOpen] = useState(false);
+    const [ready, setReady] = useState(false);
+    const mapRef = useRef(null);
+    const markerRef = useRef(null);
+    const clickHandlerRef = useRef(null);
+
+    // init map when opened
+    useEffect(() => {
+        if (!open) return;
+
+        let disposed = false;
+
+        ensureLeaflet().then((L) => {
+            if (disposed) return;
+            setReady(true);
+
+            const start = value?.geo?.lat && value?.geo?.lng
+                ? [value.geo.lat, value.geo.lng]
+                : [11.5564, 104.9282]; // Phnom Penh default
+
+            const map = L.map(containerId, { zoomControl: true }).setView(start, value?.geo ? 16 : 12);
+            mapRef.current = map;
+
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+                maxZoom: 19
+            }).addTo(map);
+
+            // single reusable marker
+            if (value?.geo?.lat && value?.geo?.lng) {
+                markerRef.current = L.marker([value.geo.lat, value.geo.lng]).addTo(map);
+            } else {
+                markerRef.current = L.marker(start);
+                // not added to map until first set
+            }
+
+            // click handler (stored for cleanup)
+            clickHandlerRef.current = (e) => {
+                const { lat, lng } = e.latlng;
+                if (!map.hasLayer(markerRef.current)) markerRef.current.addTo(map);
+                markerRef.current.setLatLng([lat, lng]);
+                onChange?.((a) => ({ ...(a || {}), geo: { lat, lng }, geoSrc: "manual", geoAcc: undefined }));
+            };
+            map.on("click", clickHandlerRef.current);
+        });
+
+        // CLEANUP: remove handlers, layers and map instance
+        return () => {
+            disposed = true;
+            if (mapRef.current) {
+                if (clickHandlerRef.current) {
+                    mapRef.current.off("click", clickHandlerRef.current);
+                    clickHandlerRef.current = null;
+                }
+                try { mapRef.current.remove(); } catch {}
+            }
+            mapRef.current = null;
+            markerRef.current = null;
+        };
+    }, [open, containerId, onChange]);
+
+    // react to external geo changes (Use current location)
+    useEffect(() => {
+        const { lat, lng } = value?.geo || {};
+        if (!lat || !lng) {
+            if (autoOpenOnGeo && !open) setOpen(true);
+            return;
+        }
+        if (autoOpenOnGeo && !open) {
+            setOpen(true);
+            return;
+        }
+        const map = mapRef.current;
+        if (!map || !markerRef.current) return;
+        if (!map.hasLayer(markerRef.current)) markerRef.current.addTo(map);
+        map.setView([lat, lng], 17, { animate: true });
+        markerRef.current.setLatLng([lat, lng]);
+    }, [value?.geo, autoOpenOnGeo, open]);
+
+    return (
+        <div className="space-y-2">
+            <div className="flex gap-2">
+                <button
+                    type="button"
+                    onClick={() => setOpen((x) => !x)}
+                    className="inline-flex items-center gap-2 rounded-lg border border-[#e7dbc9] bg-white/70 px-3 py-1.5 text-xs font-medium text-[#3b2a1d] shadow-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c]"
+                >
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none">
+                        <path d="M3 7l9-4 9 4-9 4-9-4z" strokeWidth="1.5" />
+                        <path d="M3 17l9-4 9 4" strokeWidth="1.5" />
+                        <path d="M3 12l9 4 9-4" strokeWidth="1.5" />
+                    </svg>
+                    {open ? "Hide map" : "Pick on map"}
+                </button>
+
+                {open && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (!mapRef.current) return;
+                            mapRef.current.locate({ setView: true, maxZoom: 17, enableHighAccuracy: true });
+                            mapRef.current.once("locationfound", (e) => {
+                                const { lat, lng } = e.latlng;
+                                if (!mapRef.current.hasLayer(markerRef.current)) markerRef.current.addTo(mapRef.current);
+                                markerRef.current.setLatLng([lat, lng]);
+                                onChange?.((a) => ({ ...(a || {}), geo: { lat, lng }, geoSrc: "gps-map", geoAcc: undefined }));
+                            });
+                        }}
+                        className="inline-flex items-center gap-1 rounded-md border border-[#e7dbc9] px-2 py-1 text-[11px] text-[#3b2a1d]"
+                    >
+                        Locate on map
+                    </button>
+                )}
+            </div>
+
+            {open && (
+                <div
+                    id={containerId}
+                    style={{ height }}
+                    className="rounded-xl border border-[#e7dbc9] overflow-hidden z-0" /* keep map behind dropdowns */
+                    aria-busy={!ready}
+                />
+            )}
+        </div>
+    );
+}
+
+// ---------- main form ----------
 export default function Info({ data, onNext, onResetClick }) {
     const { t, i18n } = useTranslation()
     const {
@@ -93,6 +260,11 @@ export default function Info({ data, onNext, onResetClick }) {
 
     const [addr, setAddr] = useState(data?.address || {})
     const [geoBusy, setGeoBusy] = useState(false)
+    const [geoError, setGeoError] = useState("")
+    const [openMapOnGeo, setOpenMapOnGeo] = useState(false)
+    const watchIdRef = useRef(null)
+    const watchTimerRef = useRef(null)
+
     const L = normalizeLang(i18n.language)
     const toErr = (key) => t(key, { defaultValue: ERR_DEFAULTS[key] || "Invalid value." })
 
@@ -139,28 +311,112 @@ export default function Info({ data, onNext, onResetClick }) {
         "block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2"
     const okRing = "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"
     const errRing = "border-red-300 focus:border-red-400 focus:ring-red-300"
+    const focusRing = "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c]"
 
-    // gently try to get geolocation and store in addr.geo
-    const handleUseLocation = () => {
-        if (!navigator?.geolocation) return
+    // ---- Region guard (Cambodia bbox – adjust if needed) ----
+    const inCambodiaBBox = ({ lat, lng }) => lat >= 9.5 && lat <= 14.8 && lng >= 102.0 && lng <= 107.8
+
+    // ---- Geolocation helpers ----
+    const stopWatch = () => {
+        if (watchIdRef.current != null && navigator.geolocation?.clearWatch) {
+            navigator.geolocation.clearWatch(watchIdRef.current)
+        }
+        watchIdRef.current = null
+        if (watchTimerRef.current) {
+            clearTimeout(watchTimerRef.current)
+            watchTimerRef.current = null
+        }
+    }
+
+    const isGoodFix = (coords) => {
+        const acc = coords?.accuracy ?? 99999
+        if (!Number.isFinite(acc)) return false
+        if (acc > 1000) return false // reject IP-level coarse fixes
+        const { latitude: lat, longitude: lng } = coords || {}
+        if (typeof lat === "number" && typeof lng === "number") {
+            if (!inCambodiaBBox({ lat, lng })) return false
+        }
+        return true
+    }
+
+    const applyPosition = (coords, sourceLabel = "gps") => {
+        const { latitude, longitude, accuracy } = coords || {}
+        if (typeof latitude !== "number" || typeof longitude !== "number") return false
+
+        if (!isGoodFix(coords)) {
+            setGeoError("We couldn’t get your exact location. Please pick your spot on the map.")
+            // Center map to let user adjust, but do NOT set final geo
+            setAddr(a => ({ ...(a || {}), geoPreview: { lat: latitude, lng: longitude }, geoAcc: accuracy, geoSrc: sourceLabel }))
+            setOpenMapOnGeo(true)
+            return false
+        }
+
+        setAddr(a => ({ ...(a || {}), geo: { lat: latitude, lng: longitude }, geoAcc: accuracy, geoSrc: sourceLabel, geoPreview: undefined }))
+        setOpenMapOnGeo(true)
+        return true
+    }
+
+    const handleUseLocation = async () => {
+        setGeoError("")
+        stopWatch()
+
+        const isSecure = window.location.protocol === "https:" || window.location.hostname === "localhost"
+        if (!isSecure) {
+            setGeoError("Location needs HTTPS (or localhost). Open the site via https://")
+            return
+        }
+        if (!("geolocation" in navigator)) {
+            setGeoError("Geolocation not supported in this browser.")
+            return
+        }
+        try {
+            if (navigator.permissions?.query) {
+                const p = await navigator.permissions.query({ name: "geolocation" })
+                if (p.state === "denied") {
+                    setGeoError("Location permission is blocked. Enable it in your browser settings.")
+                    return
+                }
+            }
+        } catch {}
+
         setGeoBusy(true)
+
         navigator.geolocation.getCurrentPosition(
             (pos) => {
-                const { latitude, longitude } = pos.coords || {}
-                setAddr((a) => ({ ...a, geo: { lat: latitude, lng: longitude } }))
+                const accepted = applyPosition(pos.coords, "gps-instant")
+                const acc = pos.coords?.accuracy ?? 99999
+
+                if ((!accepted || acc > 60) && navigator.geolocation.watchPosition) {
+                    watchIdRef.current = navigator.geolocation.watchPosition(
+                        (p) => {
+                            const ok = applyPosition(p.coords, "gps-watch")
+                            const a = p.coords?.accuracy ?? 99999
+                            if (ok && a <= 30) stopWatch()
+                        },
+                        () => {},
+                        { enableHighAccuracy: true, maximumAge: 0, timeout: 12000 }
+                    )
+                    watchTimerRef.current = setTimeout(stopWatch, 12000)
+                }
                 setGeoBusy(false)
             },
-            () => setGeoBusy(false),
-            { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+            (err) => {
+                const msg = ({
+                    1: "Permission denied. Please allow location access.",
+                    2: "Position unavailable. Please try again outdoors.",
+                    3: "Request timed out. Tap again.",
+                })[err?.code] || "Failed to get current location."
+                setGeoError(msg)
+                setGeoBusy(false)
+            },
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
         )
     }
 
-    // focus ring helper for card actions
-    const focusRing = "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c]"
+    useEffect(() => stopWatch, [])
 
     return (
         <form onSubmit={handleSubmit(submit)} className="space-y-6">
-            {/* Card shell with subtle vintage gradient border */}
             <div className="rounded-2xl bg-gradient-to-br from-[#efe6d6] to-[#f7efe3] p-[1px] shadow-md">
                 <div className="rounded-2xl bg-[#fffbf3] p-6 sm:p-8">
                     {/* Header */}
@@ -180,7 +436,7 @@ export default function Info({ data, onNext, onResetClick }) {
                             label={t("order.name", { defaultValue: "Full Name" })}
                             required
                             leadingIcon={<Icon.User className="text-[#6b5545]" />}
-                            error={errors.name && toErr(errors.name.message)}
+                            error={errors.name && t(errors.name.message, { defaultValue: ERR_DEFAULTS[errors.name.message] })}
                         >
                             <input
                                 id="name"
@@ -191,7 +447,7 @@ export default function Info({ data, onNext, onResetClick }) {
                                     required: "errors.name_required",
                                     minLength: { value: 2, message: "errors.name_short" },
                                 })}
-                                className={`${inputBase} ${errors.name ? errRing : okRing}`}
+                                className={`block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2 ${errors.name ? "border-red-300 focus:border-red-400 focus:ring-red-300" : "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"}`}
                             />
                         </Field>
 
@@ -200,7 +456,7 @@ export default function Info({ data, onNext, onResetClick }) {
                             label={t("order.email", { defaultValue: "Email" })}
                             hint={t("common.optional", { defaultValue: "(optional)" })}
                             leadingIcon={<Icon.Mail className="text-[#6b5545]" />}
-                            error={errors.email && toErr(errors.email.message)}
+                            error={errors.email && t(errors.email.message, { defaultValue: ERR_DEFAULTS[errors.email.message] })}
                         >
                             <input
                                 id="email"
@@ -210,7 +466,7 @@ export default function Info({ data, onNext, onResetClick }) {
                                 {...register("email", {
                                     validate: (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "errors.email_invalid",
                                 })}
-                                className={`${inputBase} ${errors.email ? errRing : okRing}`}
+                                className={`block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2 ${errors.email ? "border-red-300 focus:border-red-400 focus:ring-red-300" : "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"}`}
                             />
                         </Field>
 
@@ -219,7 +475,7 @@ export default function Info({ data, onNext, onResetClick }) {
                             label={t("order.phone", { defaultValue: "Phone" })}
                             required
                             leadingIcon={<Icon.Phone className="text-[#6b5545]" />}
-                            error={errors.phone && toErr(errors.phone.message)}
+                            error={errors.phone && t(errors.phone.message, { defaultValue: ERR_DEFAULTS[errors.phone.message] })}
                         >
                             <input
                                 id="phone"
@@ -231,23 +487,7 @@ export default function Info({ data, onNext, onResetClick }) {
                                     required: "errors.phone_required",
                                     pattern: { value: /^[+0-9()\-\s]{6,20}$/, message: "errors.phone_invalid" },
                                 })}
-                                className={`${inputBase} ${errors.phone ? errRing : okRing}`}
-                            />
-                        </Field>
-
-                        {/* Street / house (optional, kept outside AddressSelect so you can capture precise directions) */}
-                        <Field
-                            id="street"
-                            label={t("order.street", { defaultValue: "Street, house no. (optional)" })}
-                            hint={t("order.street_hint", { defaultValue: "Add nearby landmark or apartment, if helpful." })}
-                        >
-                            <input
-                                id="street"
-                                type="text"
-                                placeholder={t("order.street_placeholder", { defaultValue: "Street 123, House 45, near market" })}
-                                value={addr?.street || ""}
-                                onChange={(e) => setAddr((a) => ({ ...(a || {}), street: e.target.value }))}
-                                className={`${inputBase} ${okRing}`}
+                                className={`block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2 ${errors.phone ? "border-red-300 focus:border-red-400 focus:ring-red-300" : "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"}`}
                             />
                         </Field>
                     </div>
@@ -265,32 +505,67 @@ export default function Info({ data, onNext, onResetClick }) {
                         <div className={`rounded-xl border ${errors.address ? "border-red-300" : "border-[#e7dbc9]"} bg-[#fffaf3] p-3 shadow-sm`}>
                             <AddressSelect value={addr} onChange={setAddr} lang={L} />
 
+                            {/* Street inside Address block */}
+                            <div className="mt-3">
+                                <label htmlFor="street" className="block text-xs font-medium text-[#3b2a1d] mb-1">
+                                    {t("order.street", { defaultValue: "Street / House / Landmark" })}
+                                </label>
+                                <input
+                                    id="street"
+                                    type="text"
+                                    placeholder={t("order.street_placeholder", { defaultValue: "Street 123, House 45, near market" })}
+                                    value={addr?.street || ""}
+                                    onChange={(e) => setAddr((a) => ({ ...(a || {}), street: e.target.value }))}
+                                    className="block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2 border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"
+                                />
+                                <p className="mt-1 text-[11px] text-[#857567]">
+                                    {t("order.street_hint", { defaultValue: "Add nearest landmark or apartment for easier delivery." })}
+                                </p>
+                            </div>
+
+                            {/* Helper row */}
                             <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 {(addr.province || addr.provinceName) ? (
                                     <p className="text-xs text-[#6b5545]">
                                         {t("address.selected", { defaultValue: "Selected" })}: {selectedParts || "—"}
                                     </p>
                                 ) : (
-                                    <p className="text-xs text-[#6b5545]">{t("address.choose_hint", { defaultValue: "Choose province → district → commune → village." })}</p>
+                                    <p className="text-xs text-[#6b5545]">
+                                        {t("address.choose_hint", { defaultValue: "Choose province → district → commune → village." })}
+                                    </p>
                                 )}
 
-                                {/* Use current location (optional) */}
                                 <button
                                     type="button"
                                     onClick={handleUseLocation}
                                     disabled={geoBusy}
-                                    className={`inline-flex items-center gap-2 self-start rounded-lg border border-[#e7dbc9] bg-white/70 px-3 py-1.5 text-xs font-medium text-[#3b2a1d] shadow-sm transition hover:bg-white ${focusRing} disabled:cursor-not-allowed disabled:opacity-60`}
+                                    className={`inline-flex items-center gap-2 self-start rounded-lg border border-[#e7dbc9] bg-white/70 px-3 py-1.5 text-xs font-medium text-[#3b2a1d] shadow-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c] disabled:cursor-not-allowed disabled:opacity-60`}
                                 >
                                     <Icon.MapPin />
                                     {geoBusy ? t("address.locating", { defaultValue: "Locating…" }) : t("address.use_current", { defaultValue: "Use current location" })}
                                 </button>
                             </div>
+
+                            {/* Leaflet picker */}
+                            <div className="mt-2">
+                                <MiniMapPicker value={addr} onChange={setAddr} autoOpenOnGeo={openMapOnGeo} />
+                            </div>
                         </div>
 
                         {addr?.geo?.lat && addr?.geo?.lng && (
-                            <p className="text-[11px] text-[#857567]">{t("address.pinned", { defaultValue: "Pinned" })}: {addr.geo.lat.toFixed(5)}, {addr.geo.lng.toFixed(5)}</p>
+                            <p className="text-[11px] text-[#857567]">
+                                {t("address.pinned", { defaultValue: "Pinned" })}: {addr.geo.lat.toFixed(5)}, {addr.geo.lng.toFixed(5)}
+                                {typeof addr.geoAcc === "number" && <> • ±{Math.round(addr.geoAcc)}m</>}
+                                {addr.geoSrc && <> • {addr.geoSrc}</>}
+                            </p>
+                        )}
+                        {addr?.geoPreview && !addr?.geo && (
+                            <p className="text-[11px] text-[#b56b00]">
+                                This location may be off. Please place the pin on your address.
+                            </p>
                         )}
 
+                        {geoError && <p className="mt-1 text-xs text-red-600" role="alert">{geoError}</p>}
                         {errors.address && <p className="text-xs text-red-600" role="alert">{toErr(errors.address.message)}</p>}
                     </div>
 
@@ -299,7 +574,7 @@ export default function Info({ data, onNext, onResetClick }) {
                         <button
                             type="button"
                             onClick={handleResetPress}
-                            className={`inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-red-600 to-red-700 px-5 py-3 font-medium text-white shadow-md transition ${focusRing}`}
+                            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-red-600 to-red-700 px-5 py-3 font-medium text-white shadow-md transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c]"
                         >
                             <Icon.RotateCcw /> {t("common.reset", { defaultValue: "Reset" })}
                         </button>
@@ -308,14 +583,16 @@ export default function Info({ data, onNext, onResetClick }) {
                             type="submit"
                             disabled={!canSubmit}
                             aria-disabled={!canSubmit}
-                            className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 font-medium transition ${focusRing} ${
+                            className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c] ${
                                 canSubmit
                                     ? "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white shadow-md"
                                     : "bg-[#e8dfd0] text-[#9b8b7c] cursor-not-allowed"
                             }`}
                         >
-                            {isSubmitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/60 border-t-transparent" />}
-                            {!isSubmitting && <Icon.ArrowRight />}
+                            {isSubmitting
+                                ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/60 border-t-transparent" />
+                                : <Icon.ArrowRight />
+                            }
                             {t("common.next", { defaultValue: "Next" })}
                         </button>
                     </div>

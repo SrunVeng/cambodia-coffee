@@ -84,7 +84,7 @@ export default function AddressSelect({ value, onChange, lang }) {
         [vByComm, L]
     );
 
-    // Keep the stored *Name fields in sync with language (and after returning to this step)
+    // Keep the stored *Name fields in sync with language
     const lastSyncRef = useRef("");
     useEffect(() => {
         const key = [L, v.province, v.district, v.commune, v.village].map(s).join("|");
@@ -147,49 +147,50 @@ export default function AddressSelect({ value, onChange, lang }) {
         onChange?.(next);
     };
 
-    // Convert to the generic item shape { value, label }
     const asItems = (arr) => arr.map((x) => ({ value: s(x.code), label: x.label }));
 
     return (
         <div className="grid gap-3 md:grid-cols-4">
-            {/* Province */}
-            <SearchableSelect
-                placeholder={t("order.province", { defaultValue: "Province" })}
-                items={asItems(provincesL)}
-                value={v.province}
-                onChange={(code) => setLevel("province", code)}
-                clearable
-            />
-
-            {/* District */}
-            <SearchableSelect
-                placeholder={t("order.district", { defaultValue: "District" })}
-                items={asItems(districtsL)}
-                value={v.district}
-                onChange={(code) => setLevel("district", code)}
-                disabled={!v.province}
-                clearable
-            />
-
-            {/* Commune */}
-            <SearchableSelect
-                placeholder={t("order.commune", { defaultValue: "Commune" })}
-                items={asItems(communesL)}
-                value={v.commune}
-                onChange={(code) => setLevel("commune", code)}
-                disabled={!v.district}
-                clearable
-            />
-
-            {/* Village */}
-            <SearchableSelect
-                placeholder={t("order.village", { defaultValue: "Village" })}
-                items={asItems(villagesL)}
-                value={v.village}
-                onChange={(code) => setLevel("village", code)}
-                disabled={!v.commune}
-                clearable
-            />
+            {/* Wrap selects so their menus stack above the map */}
+            <div className="relative z-50">
+                <SearchableSelect
+                    placeholder={t("order.province", { defaultValue: "Province" })}
+                    items={asItems(provincesL)}
+                    value={v.province}
+                    onChange={(code) => setLevel("province", code)}
+                    clearable
+                />
+            </div>
+            <div className="relative z-50">
+                <SearchableSelect
+                    placeholder={t("order.district", { defaultValue: "District" })}
+                    items={asItems(districtsL)}
+                    value={v.district}
+                    onChange={(code) => setLevel("district", code)}
+                    disabled={!v.province}
+                    clearable
+                />
+            </div>
+            <div className="relative z-50">
+                <SearchableSelect
+                    placeholder={t("order.commune", { defaultValue: "Commune" })}
+                    items={asItems(communesL)}
+                    value={v.commune}
+                    onChange={(code) => setLevel("commune", code)}
+                    disabled={!v.district}
+                    clearable
+                />
+            </div>
+            <div className="relative z-50">
+                <SearchableSelect
+                    placeholder={t("order.village", { defaultValue: "Village" })}
+                    items={asItems(villagesL)}
+                    value={v.village}
+                    onChange={(code) => setLevel("village", code)}
+                    disabled={!v.commune}
+                    clearable
+                />
+            </div>
         </div>
     );
 }
