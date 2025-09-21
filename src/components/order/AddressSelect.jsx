@@ -102,8 +102,8 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
             next.province = s(code) || undefined;
             next.provinceName = item ? labelOf(item) : undefined;
             next.district = next.districtName = undefined;
-            next.commune = next.communeName = undefined;
-            next.village = next.villageName = undefined;
+            next.commune  = next.communeName  = undefined;
+            next.village  = next.villageName  = undefined;
         } else if (level === "district") {
             const item = dByProv.find((d) => s(d.code) === s(code));
             next.district = s(code) || undefined;
@@ -133,58 +133,53 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
 
     return (
         <div className="grid gap-3 md:grid-cols-4">
-            <div className="relative z-[3000]">
-                <SearchableSelect
-                    placeholder={t("order.province", { defaultValue: "Province" })}
-                    items={provinceItems}
-                    value={v.province || ""}
-                    onChange={(code) => setLevel("province", code)}
-                    clearable
-                    loading={loading}
-                    portalToBody
-                    menuZIndex={4000}
-                    closeSignal={closeMenus}
-                />
-            </div>
-            <div className="relative z-[3000]">
-                <SearchableSelect
-                    placeholder={t("order.district", { defaultValue: "District" })}
-                    items={districtItems}
-                    value={v.district || ""}
-                    onChange={(code) => setLevel("district", code)}
-                    disabled={!v.province}
-                    clearable
-                    portalToBody
-                    menuZIndex={4000}
-                    closeSignal={closeMenus}
-                />
-            </div>
-            <div className="relative z-[3000]">
-                <SearchableSelect
-                    placeholder={t("order.commune", { defaultValue: "Commune" })}
-                    items={communeItems}
-                    value={v.commune || ""}
-                    onChange={(code) => setLevel("commune", code)}
-                    disabled={!v.district}
-                    clearable
-                    portalToBody
-                    menuZIndex={4000}
-                    closeSignal={closeMenus}
-                />
-            </div>
-            <div className="relative z-[3000]">
-                <SearchableSelect
-                    placeholder={t("order.village", { defaultValue: "Village" })}
-                    items={villageItems}
-                    value={v.village || ""}
-                    onChange={(code) => setLevel("village", code)}
-                    disabled={!v.commune}
-                    clearable
-                    portalToBody
-                    menuZIndex={4000}
-                    closeSignal={closeMenus}
-                />
-            </div>
+            <SearchableSelect
+                placeholder={t("order.province", { defaultValue: "Province" })}
+                items={provinceItems}
+                value={v.province || ""}
+                onChange={(code) => setLevel("province", code)}
+                clearable
+                loading={loading}
+                portalToBody
+                menuZIndex={5000}
+                closeSignal={closeMenus}
+            />
+
+            <SearchableSelect
+                placeholder={t("order.district", { defaultValue: "District" })}
+                items={districtItems}
+                value={v.district || ""}
+                onChange={(code) => setLevel("district", code)}
+                disabled={!v.province}
+                clearable
+                portalToBody
+                menuZIndex={5000}
+                closeSignal={closeMenus}
+            />
+
+            <SearchableSelect
+                placeholder={t("order.commune", { defaultValue: "Commune" })}
+                items={communeItems}
+                value={v.commune || ""}
+                onChange={(code) => setLevel("commune", code)}
+                disabled={!v.district}
+                clearable
+                portalToBody
+                menuZIndex={5000}
+                closeSignal={closeMenus}
+            />
+
+            <SearchableSelect
+                placeholder={t("order.village", { defaultValue: "Village" })}
+                items={villageItems}
+                value={v.village || ""}
+                onChange={(code) => setLevel("village", code)}
+                disabled={!v.commune}
+                clearable
+                portalToBody
+                menuZIndex={5000}
+                closeSignal={closeMenus}
+            />
         </div>
     );
 }
