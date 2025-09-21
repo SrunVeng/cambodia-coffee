@@ -139,7 +139,7 @@
     "name_short": "姓名过短。",
     "email_invalid": "请输入有效的邮箱地址。",
     "phone_required": "请输入电话号码。",
-    "phone_invalid": "请使用 6–20 位数字（允许数字、空格、+ 或 -）。"
+    "phone_invalid": "使用柬埔寨本地格式（0XXXXXXXX 或 0XXXXXXXXX）：号码须以 0 开头，共 9–10 位；不允许 +855 或符号。"
   },
   "footer": {
     "facebook": "脸书",

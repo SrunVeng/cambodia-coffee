@@ -41,9 +41,7 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", onScroll)
     }, [])
 
-    useEffect(() => {
-        setOpen(false)
-    }, [pathname])
+    useEffect(() => { setOpen(false) }, [pathname])
 
     useEffect(() => {
         const cls = "overflow-hidden"
@@ -52,9 +50,7 @@ export default function Navbar() {
         return () => document.body.classList.remove(cls)
     }, [open])
 
-    const onKeyDown = useCallback((e) => {
-        if (e.key === "Escape") setOpen(false)
-    }, [])
+    const onKeyDown = useCallback((e) => { if (e.key === "Escape") setOpen(false) }, [])
     useEffect(() => {
         if (!open) return
         window.addEventListener("keydown", onKeyDown)
@@ -89,7 +85,7 @@ export default function Navbar() {
           </span>
                 </Link>
 
-                {/* Desktop nav (tight spacing) */}
+                {/* Desktop nav */}
                 <nav className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-5">
                     {NAV.map(({ to, key }) => (
                         <NavLink
@@ -111,7 +107,7 @@ export default function Navbar() {
                     ))}
                 </nav>
 
-                {/* Desktop actions (LanguageSwitch disabled when menu is open) */}
+                {/* Desktop actions */}
                 <div className="hidden md:flex items-center gap-2">
                     <div
                         className={open ? "pointer-events-none opacity-50" : ""}
@@ -120,9 +116,9 @@ export default function Navbar() {
                     >
                         <LanguageSwitch key={open ? "ls-disabled" : "ls-enabled"} disabled={open} />
                     </div>
-                    <Link to="/order" aria-label={t("nav.cart", { defaultValue: "My Cart" })} className="inline-flex">
-                        <CartIcon active={pathname === "/order"} />
-                    </Link>
+
+                    {/* ❗ CartIcon already contains its own link – do NOT wrap it in <Link> */}
+                    <CartIcon active={pathname === "/order"} />
                 </div>
 
                 {/* Mobile actions */}
@@ -135,9 +131,8 @@ export default function Navbar() {
                         <LanguageSwitch key={open ? "lsm-disabled" : "lsm-enabled"} disabled={open} />
                     </div>
 
-                    <Link to="/order" aria-label={t("nav.cart", { defaultValue: "My Cart" })} className="inline-flex">
-                        <CartIcon active={pathname === "/order"} />
-                    </Link>
+                    {/* ❗ Same here – render only the CartIcon */}
+                    <CartIcon active={pathname === "/order"} />
 
                     {/* Animated Hamburger Button */}
                     <button
@@ -167,7 +162,7 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* Mobile menu with hover/tap & selected effects */}
+            {/* Mobile menu */}
             <AnimatePresence>
                 {open && (
                     <>
@@ -232,7 +227,6 @@ export default function Navbar() {
                       </span>
                                         </NavLink>
 
-                                        {/* Thin divider between items */}
                                         {idx < NAV.length - 1 && (
                                             <div aria-hidden className="px-2">
                                                 <div className="h-px bg-[var(--ring)]/60" />

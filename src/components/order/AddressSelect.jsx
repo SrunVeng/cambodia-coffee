@@ -1,43 +1,45 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { translateName } from "../../utils/i18n-helpers";
 import SearchableSelect from "../../components/ui/SearchableSelect.jsx";
 
 const s = (v) => (v == null ? "" : String(v));
-const C = typeof window !== "undefined" ? (window.__ADDR_CACHE__ ||= {}) : {};
+const CACHE = typeof window !== "undefined" ? (window.__ADDR_CACHE__ ||= {}) : {};
 
-export default function AddressSelect({ value, onChange, lang }) {
+export default function AddressSelect({ value, onChange, lang, closeMenus }) {
     const { i18n, t } = useTranslation();
     const L = (lang || i18n.language || "en").toLowerCase();
     const v = value || {};
 
-    const [provinces, setProvinces] = useState(C.provinces || []);
-    const [districts, setDistricts] = useState(C.districts || []);
-    const [communes, setCommunes] = useState(C.communes || []);
-    const [villages, setVillages] = useState(C.villages || []);
+    const [provinces, setProvinces] = useState(CACHE.provinces || []);
+    const [districts, setDistricts] = useState(CACHE.districts || []);
+    const [communes, setCommunes] = useState(CACHE.communes || []);
+    const [villages, setVillages] = useState(CACHE.villages || []);
 
     useEffect(() => {
         let alive = true;
         (async () => {
             try {
-                if (!C.provinces) {
+                if (!CACHE.provinces) {
                     const [p, d, c, vv] = await Promise.all([
                         fetch("/address/provinces.json").then((r) => r.json()),
                         fetch("/address/districts.json").then((r) => r.json()),
                         fetch("/address/communes.json").then((r) => r.json()),
                         fetch("/address/villages.json").then((r) => r.json()),
                     ]);
+
                     const P = (p.provinces || p).map((x) => ({ ...x, code: s(x.code), province_code: s(x.province_code) }));
                     const D = (d.districts || d).map((x) => ({ ...x, code: s(x.code), province_code: s(x.province_code) }));
                     const Cc = (c.communes || c).map((x) => ({ ...x, code: s(x.code), district_code: s(x.district_code) }));
                     const V = (vv.villages || vv).map((x) => ({ ...x, code: s(x.code), commune_code: s(x.commune_code) }));
-                    C.provinces = P; C.districts = D; C.communes = Cc; C.villages = V;
+
+                    CACHE.provinces = P; CACHE.districts = D; CACHE.communes = Cc; CACHE.villages = V;
                 }
                 if (!alive) return;
-                setProvinces(C.provinces);
-                setDistricts(C.districts);
-                setCommunes(C.communes);
-                setVillages(C.villages);
+                setProvinces(CACHE.provinces);
+                setDistricts(CACHE.districts);
+                setCommunes(CACHE.communes);
+                setVillages(CACHE.villages);
             } catch (e) {
                 console.error("Address load failed", e);
             }
@@ -47,39 +49,18 @@ export default function AddressSelect({ value, onChange, lang }) {
 
     const labelOf = (obj) => translateName(obj, L);
 
-    const provincesL = useMemo(
-        () => provinces.map((x) => ({ ...x, label: labelOf(x) })),
-        [provinces, L]
-    );
+    const provincesL = useMemo(() => provinces.map((x) => ({ ...x, label: labelOf(x) })), [provinces, L]);
 
-    const dByProv = useMemo(
-        () => districts.filter((d) => s(d.province_code) === s(v.province)),
-        [districts, v.province]
-    );
-    const districtsL = useMemo(
-        () => dByProv.map((x) => ({ ...x, label: labelOf(x) })),
-        [dByProv, L]
-    );
+    const dByProv = useMemo(() => districts.filter((d) => s(d.province_code) === s(v.province)), [districts, v.province]);
+    const districtsL = useMemo(() => dByProv.map((x) => ({ ...x, label: labelOf(x) })), [dByProv, L]);
 
-    const cByDist = useMemo(
-        () => communes.filter((c) => s(c.district_code) === s(v.district)),
-        [communes, v.district]
-    );
-    const communesL = useMemo(
-        () => cByDist.map((x) => ({ ...x, label: labelOf(x) })),
-        [cByDist, L]
-    );
+    const cByDist = useMemo(() => communes.filter((c) => s(c.district_code) === s(v.district)), [communes, v.district]);
+    const communesL = useMemo(() => cByDist.map((x) => ({ ...x, label: labelOf(x) })), [cByDist, L]);
 
-    const vByComm = useMemo(
-        () => villages.filter((x) => s(x.commune_code) === s(v.commune)),
-        [villages, v.commune]
-    );
-    const villagesL = useMemo(
-        () => vByComm.map((x) => ({ ...x, label: labelOf(x) })),
-        [vByComm, L]
-    );
+    const vByComm = useMemo(() => villages.filter((x) => s(x.commune_code) === s(v.commune)), [villages, v.commune]);
+    const villagesL = useMemo(() => vByComm.map((x) => ({ ...x, label: labelOf(x) })), [vByComm, L]);
 
-    // 🔒 Keep *Name fields in sync with language (same as before)
+    // Sync name fields to current language
     const lastSyncRef = useRef("");
     useEffect(() => {
         const key = [L, v.province, v.district, v.commune, v.village].map(s).join("|");
@@ -142,20 +123,17 @@ export default function AddressSelect({ value, onChange, lang }) {
         onChange?.(next);
     };
 
-    // ✅ Stable items to prevent dropdown from closing on every keystroke
     const asItems = (arr) => arr.map((x) => ({ value: s(x.code), label: x.label }));
-    const provinceItems  = useMemo(() => asItems(provincesL), [provincesL]);
+    const provinceItems = useMemo(() => asItems(provincesL), [provincesL]);
     const districtItems  = useMemo(() => asItems(districtsL), [districtsL]);
     const communeItems   = useMemo(() => asItems(communesL), [communesL]);
     const villageItems   = useMemo(() => asItems(villagesL), [villagesL]);
 
-    // Loading hint (optional)
     const loading = !provinces.length;
 
     return (
         <div className="grid gap-3 md:grid-cols-4">
-            {/* Use portal to body + high z-index so menus always overlay the map */}
-            <div className="relative z-[9999]">
+            <div className="relative z-[3000]">
                 <SearchableSelect
                     placeholder={t("order.province", { defaultValue: "Province" })}
                     items={provinceItems}
@@ -163,15 +141,12 @@ export default function AddressSelect({ value, onChange, lang }) {
                     onChange={(code) => setLevel("province", code)}
                     clearable
                     loading={loading}
-                    /* If your SearchableSelect wraps react-select: */
-                    menuPortalTarget={typeof document !== "undefined" ? document.body : null}
-                    menuPosition="fixed"
-                    menuZIndex={9999}
-                    /* If it’s your own component, implement a similar portal prop and pass it: portalToBody */
                     portalToBody
+                    menuZIndex={4000}
+                    closeSignal={closeMenus}
                 />
             </div>
-            <div className="relative z-[9999]">
+            <div className="relative z-[3000]">
                 <SearchableSelect
                     placeholder={t("order.district", { defaultValue: "District" })}
                     items={districtItems}
@@ -179,13 +154,12 @@ export default function AddressSelect({ value, onChange, lang }) {
                     onChange={(code) => setLevel("district", code)}
                     disabled={!v.province}
                     clearable
-                    menuPortalTarget={typeof document !== "undefined" ? document.body : null}
-                    menuPosition="fixed"
-                    menuZIndex={9999}
                     portalToBody
+                    menuZIndex={4000}
+                    closeSignal={closeMenus}
                 />
             </div>
-            <div className="relative z-[9999]">
+            <div className="relative z-[3000]">
                 <SearchableSelect
                     placeholder={t("order.commune", { defaultValue: "Commune" })}
                     items={communeItems}
@@ -193,13 +167,12 @@ export default function AddressSelect({ value, onChange, lang }) {
                     onChange={(code) => setLevel("commune", code)}
                     disabled={!v.district}
                     clearable
-                    menuPortalTarget={typeof document !== "undefined" ? document.body : null}
-                    menuPosition="fixed"
-                    menuZIndex={9999}
                     portalToBody
+                    menuZIndex={4000}
+                    closeSignal={closeMenus}
                 />
             </div>
-            <div className="relative z-[9999]">
+            <div className="relative z-[3000]">
                 <SearchableSelect
                     placeholder={t("order.village", { defaultValue: "Village" })}
                     items={villageItems}
@@ -207,10 +180,9 @@ export default function AddressSelect({ value, onChange, lang }) {
                     onChange={(code) => setLevel("village", code)}
                     disabled={!v.commune}
                     clearable
-                    menuPortalTarget={typeof document !== "undefined" ? document.body : null}
-                    menuPosition="fixed"
-                    menuZIndex={9999}
                     portalToBody
+                    menuZIndex={4000}
+                    closeSignal={closeMenus}
                 />
             </div>
         </div>

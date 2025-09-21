@@ -44,22 +44,6 @@ function Spinner({ className = "" }) {
 }
 
 // ---------- Component ----------
-/**
- * Props
- * - open: boolean
- * - title: string | ReactNode
- * - hint?: string | ReactNode
- * - confirmLabel?: string
- * - cancelLabel?: string
- * - onConfirm?: () => void | Promise<any>
- * - onCancel?: () => void
- * - tone?: "brand" | "neutral" | "danger"
- * - size?: "sm" | "md" | "lg"
- * - icon?: ReactNode
- * - closeOnBackdrop?: boolean (default true)
- * - initialFocus?: "confirm" | "cancel" (default "cancel")
- * - mountId?: string (default "modal-root" if exists, else document.body)
- */
 const LeaveGuard = React.memo(function LeaveGuard({
                                                       open,
                                                       title,
@@ -106,14 +90,8 @@ const LeaveGuard = React.memo(function LeaveGuard({
 
     const panelVariants = useMemo(() => ({
         initial: { y: prefersReducedMotion ? 0 : 18, scale: prefersReducedMotion ? 1 : 0.985, opacity: 0 },
-        animate: {
-            y: 0, scale: 1, opacity: 1,
-            transition: { duration: prefersReducedMotion ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] } // gentle "expo out"
-        },
-        exit: {
-            y: prefersReducedMotion ? 0 : -8, scale: prefersReducedMotion ? 1 : 0.99, opacity: 0,
-            transition: { duration: prefersReducedMotion ? 0 : 0.16, ease: [0.4, 0, 1, 1] }
-        },
+        animate: { y: 0, scale: 1, opacity: 1, transition: { duration: prefersReducedMotion ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] } },
+        exit:    { y: prefersReducedMotion ? 0 : -8, scale: prefersReducedMotion ? 1 : 0.99, opacity: 0, transition: { duration: prefersReducedMotion ? 0 : 0.16, ease: [0.4, 0, 1, 1] } },
     }), [prefersReducedMotion]);
 
     // Body lock + focus trap
@@ -133,18 +111,11 @@ const LeaveGuard = React.memo(function LeaveGuard({
             if (e.key === "Tab") {
                 const focusables = getFocusable(dialogRef.current);
                 if (!focusables.length) return;
-
                 const first = focusables[0];
                 const last = focusables[focusables.length - 1];
                 const active = document.activeElement;
-
-                if (e.shiftKey && active === first) {
-                    e.preventDefault();
-                    last.focus();
-                } else if (!e.shiftKey && active === last) {
-                    e.preventDefault();
-                    first.focus();
-                }
+                if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
             }
         };
 
@@ -181,8 +152,8 @@ const LeaveGuard = React.memo(function LeaveGuard({
         }
     };
 
-    // Visual theme (subtle vintage coffee look)
-    const tones = {
+    // theme (fixed: avoid self-reference)
+    const TONES = {
         brand: {
             headIcon: "text-amber-700 dark:text-amber-300",
             confirm:
@@ -201,13 +172,10 @@ const LeaveGuard = React.memo(function LeaveGuard({
                 "bg-red-700 text-white hover:bg-red-800 focus-visible:ring-red-400 " +
                 "dark:bg-red-500 dark:hover:bg-red-600",
         },
-    }[tone] || tones?.brand;
-
-    const sizes = {
-        sm: "max-w-sm",
-        md: "max-w-md",
-        lg: "max-w-lg",
     };
+    const tones = TONES[tone] || TONES.brand;
+
+    const sizes = { sm: "max-w-sm", md: "max-w-md", lg: "max-w-lg" };
 
     const mountTarget =
         (typeof document !== "undefined" && mountId && document.getElementById(mountId)) ||
@@ -219,7 +187,8 @@ const LeaveGuard = React.memo(function LeaveGuard({
     return createPortal(
         <AnimatePresence>
             {open ? (
-                <div className="fixed inset-0 z-[100]">
+                // z-index raised so it always sits above SearchableSelect menus
+                <div className="fixed inset-0 z-[10000]">
                     {/* Backdrop */}
                     <motion.div
                         aria-hidden="true"
@@ -229,10 +198,7 @@ const LeaveGuard = React.memo(function LeaveGuard({
                     />
 
                     {/* Panel */}
-                    <div
-                        role="presentation"
-                        className="absolute inset-0 grid place-items-center p-4 sm:p-6"
-                    >
+                    <div role="presentation" className="absolute inset-0 grid place-items-center p-4 sm:p-6">
                         <motion.div
                             ref={dialogRef}
                             role={tone === "danger" ? "alertdialog" : "dialog"}
@@ -241,7 +207,6 @@ const LeaveGuard = React.memo(function LeaveGuard({
                             aria-describedby={descId}
                             className={[
                                 "w-full", sizes[size],
-                                // Card look: soft paper with subtle vintage cast
                                 "rounded-xl shadow-2xl border",
                                 "border-[rgba(80,56,40,0.18)]",
                                 "bg-[#fdf7ef] dark:bg-[#241a15]",
@@ -256,17 +221,11 @@ const LeaveGuard = React.memo(function LeaveGuard({
                                     {icon ?? <AlertTriangle className="w-5 h-5" />}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <h2
-                                        id={titleId}
-                                        className="text-lg font-semibold leading-snug text-[#35261c] dark:text-[#eadfce]"
-                                    >
+                                    <h2 id={titleId} className="text-lg font-semibold leading-snug text-[#35261c] dark:text-[#eadfce]">
                                         {title}
                                     </h2>
                                     {hint ? (
-                                        <p
-                                            id={descId}
-                                            className="mt-1 text-sm leading-relaxed text-[#5b4638] dark:text-[#cdbfae]"
-                                        >
+                                        <p id={descId} className="mt-1 text-sm leading-relaxed text-[#5b4638] dark:text-[#cdbfae]">
                                             {hint}
                                         </p>
                                     ) : null}

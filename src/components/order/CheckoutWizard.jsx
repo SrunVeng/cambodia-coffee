@@ -21,6 +21,9 @@ import {
 
 import { computeDeliveryFee } from "../../utils/distance"
 
+// ✅ Cambodia mobile/landline (no country code), 9–10 digits total with leading 0
+const KH_PHONE = /^0[1-9]\d{7,8}$/
+
 export default function CheckoutWizard() {
     const { t, i18n } = useTranslation()
     const toast = useToast()
@@ -29,8 +32,11 @@ export default function CheckoutWizard() {
     const [info, setInfo] = useState(() => readJSON(LS_KEYS.INFO, {}))
     const [summary, setSummary] = useState(() => readJSON(LS_KEYS.SUMMARY, {}))
     const [lastVisited, setLastVisited] = useState(null)
-
     const [confirmResetOpen, setConfirmResetOpen] = useState(false)
+
+    // Live draft for Step 1 and its validity
+    const [infoDraft, setInfoDraft] = useState(info)
+    const [step1Valid, setStep1Valid] = useState(false)
 
     const navigate = useNavigate()
     const clearCart = useCart((s) => s.clear)
@@ -40,11 +46,20 @@ export default function CheckoutWizard() {
     const activeIdx = step - 1
     const completedArr = completedFromActive(activeIdx, steps.length)
 
-    const deliveryFee = useMemo(() => computeDeliveryFee(info), [info])
+    // Use the live draft while on step 1 so going back keeps values
+    const liveInfo = step === 1 ? infoDraft : info
+    const deliveryFee = useMemo(() => computeDeliveryFee(liveInfo), [liveInfo])
 
-    // Validation for each step
+    // ✅ Validation for each step (STRICT address + strict phone format)
     const isStepValid = (idx) => {
-        if (idx === 0) return !!info?.name && !!info?.phone && info?.address?.province
+        if (idx === 0) {
+            const src = liveInfo
+            const a = src?.address || {}
+            const phoneOk = KH_PHONE.test(String(src?.phone ?? "").trim())
+            const nameOk = !!src?.name // (you can enforce min length if desired)
+            const addressOk = !!(a.province && a.district && a.commune && a.village)
+            return nameOk && phoneOk && addressOk
+        }
         if (idx === 1) return cartItems.length > 0
         if (idx === 2) return !!summary?.total && summary?.items?.length > 0
         if (idx === 3) return true
@@ -85,23 +100,20 @@ export default function CheckoutWizard() {
         navigate("/reciept")
     }
 
-    // ---- RESET LOGIC ----
+    // RESET
     const doReset = () => {
-        // clear app state
         setInfo({})
         setSummary({})
         setStep(1)
         setLastVisited(null)
+        setInfoDraft({})
+        setStep1Valid(false)
 
-        // clear persisted
         writeJSON(LS_KEYS.INFO, {})
         writeJSON(LS_KEYS.SUMMARY, {})
         writeJSON(LS_KEYS.RECEIPT, {})
 
-        // clear cart items
         clearCart()
-
-        // close dialog + toast
         setConfirmResetOpen(false)
         toast(t("order.reset.done", { defaultValue: "Order has been reset." }))
     }
@@ -111,9 +123,18 @@ export default function CheckoutWizard() {
             case 1:
                 return (
                     <Info
-                        data={info}
+                        data={liveInfo}
                         onNext={next}
                         onResetClick={() => setConfirmResetOpen(true)}
+                        // ✅ Recompute validity here to keep wizard as the single source of truth
+                        onProgress={(draft) => {
+                            setInfoDraft(draft || {})
+                            const a = draft?.address || {}
+                            const phoneOk = KH_PHONE.test(String(draft?.phone ?? "").trim())
+                            const nameOk = !!draft?.name
+                            const addressOk = !!(a.province && a.district && a.commune && a.village)
+                            setStep1Valid(nameOk && phoneOk && addressOk)
+                        }}
                     />
                 )
             case 2:
@@ -151,6 +172,9 @@ export default function CheckoutWizard() {
         }
     }, [step, info, summary, deliveryFee]) // eslint-disable-line react-hooks/exhaustive-deps
 
+    // Pulse cue on next reachable step (uses stricter step1Valid now)
+    const advanceCue = step === 1 ? step1Valid : reachable[activeIdx + 1]
+
     return (
         <div className="max-w-3xl mx-auto p-4 space-y-4">
             {/* Stepper */}
@@ -163,13 +187,20 @@ export default function CheckoutWizard() {
                     reachable={reachable}
                     lastVisited={lastVisited}
                     onStepClick={(i) => {
-                        if (reachable[i]) {
-                            setLastVisited(step - 1)
-                            setStep(i + 1)
+                        if (!reachable[i]) return
+                        setLastVisited(step - 1)
+
+                        // If leaving step 1 via stepper and draft is valid, persist it
+                        if (step === 1 && i >= 1 && step1Valid && infoDraft) {
+                            setInfo(infoDraft)
+                            writeJSON(LS_KEYS.INFO, infoDraft)
                         }
+
+                        setStep(i + 1)
                     }}
                     size="md"
                     showPartial
+                    advanceCue={!!advanceCue}
                 />
             </div>
 

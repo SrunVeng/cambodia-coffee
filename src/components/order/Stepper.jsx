@@ -11,6 +11,8 @@ export default function Stepper({
                                     size = "md",
                                     showPartial = true,
                                     className = "",
+                                    advanceCue = false, // pulse on next reachable step
+                                    lang, // optional
                                 }) {
     const items = steps.map((s, i) =>
         typeof s === "string" ? { id: i, label: s } : { id: s.id ?? i, label: s.label }
@@ -34,7 +36,6 @@ export default function Stepper({
 
     return (
         <nav aria-label="Progress" className={`w-full bg-transparent ${className}`}>
-            {/* Mobile helper */}
             <p className="sm:hidden mb-3 text-xs text-[#857567] text-center">
                 {items.length ? `Step ${safeActive + 1} of ${items.length}` : "—"}
             </p>
@@ -50,59 +51,79 @@ export default function Stepper({
                     const isDone = !!completed[i]
                     const isActive = i === safeActive
                     const wasVisited = lastVisited === i && !isActive
-                    const canClick =
-                        typeof onStepClick === "function" && (reachable[i] || i <= safeActive)
+                    const canClick = typeof onStepClick === "function" && (reachable[i] || i <= safeActive)
+                    const showCue = advanceCue && i === safeActive + 1 && reachable[i]
 
                     return (
                         <React.Fragment key={step.id}>
                             {/* DOT */}
                             <div className="row-start-1 col-span-1 flex items-center justify-center">
-                                <motion.button
-                                    type="button"
-                                    whileHover={canClick ? { scale: 1.08 } : {}}
-                                    whileTap={canClick ? { scale: 0.95 } : {}}
-                                    animate={
-                                        isActive
-                                            ? { scale: 1.15, boxShadow: "0 0 0 4px rgba(201,164,76,0.4)" }
-                                            : wasVisited
-                                                ? { scale: 1.05, boxShadow: "0 0 0 3px rgba(75,46,36,0.3)" }
-                                                : { scale: 1, boxShadow: "0 0 0 0px transparent" }
-                                    }
-                                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                    onClick={() => (canClick ? onStepClick(i) : null)}
-                                    disabled={!canClick}
-                                    aria-current={isActive ? "step" : undefined}
-                                    className={`flex items-center justify-center rounded-full border shadow-sm transition-colors
-                    w-[var(--dot)] h-[var(--dot)]
-                    ${
-                                        isDone
-                                            ? "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white border-transparent"
-                                            : isActive
-                                                ? "bg-[#fffaf3] text-[#3b2a1d] border-[#c9a44c]"
-                                                : wasVisited
-                                                    ? "bg-[#fff8ef] text-[#3b2a1d] border-[#c9a44c]"
-                                                    : "bg-[#fbf8f3] text-[#857567] border-[#e7dbc9]"
-                                    }
-                    ${canClick ? "cursor-pointer" : "cursor-not-allowed opacity-60"}
-                  `}
-                                >
-                                    {isDone ? (
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            className="w-5 h-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2.5"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <path d="M20 6 9 17l-5-5" />
-                                        </svg>
-                                    ) : (
-                                        <span className="text-sm font-semibold">{i + 1}</span>
+                                <div className="relative">
+                                    {showCue && (
+                                        <>
+                      <span
+                          aria-hidden
+                          className="pointer-events-none absolute inset-0 rounded-full animate-ping"
+                          style={{ backgroundColor: "rgba(201,164,76,0.35)" }}
+                      />
+                                            <span
+                                                aria-hidden
+                                                className="pointer-events-none absolute inset-0 rounded-full"
+                                                style={{ boxShadow: "0 0 0 6px rgba(201,164,76,0.25)" }}
+                                            />
+                                        </>
                                     )}
-                                </motion.button>
+
+                                    <motion.button
+                                        type="button"
+                                        whileHover={canClick ? { scale: 1.08 } : {}}
+                                        whileTap={canClick ? { scale: 0.95 } : {}}
+                                        animate={
+                                            isActive
+                                                ? { scale: 1.15, boxShadow: "0 0 0 4px rgba(201,164,76,0.4)" }
+                                                : wasVisited
+                                                    ? { scale: 1.05, boxShadow: "0 0 0 3px rgba(75,46,36,0.3)" }
+                                                    : { scale: 1, boxShadow: "0 0 0 0px transparent" }
+                                        }
+                                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                        onClick={() => (canClick ? onStepClick(i) : null)}
+                                        disabled={!canClick}
+                                        aria-current={isActive ? "step" : undefined}
+                                        className={`flex items-center justify-center rounded-full border shadow-sm transition-colors
+                      w-[var(--dot)] h-[var(--dot)]
+                      ${
+                                            isDone
+                                                ? "bg-gradient-to-br from-[#4b2e24] to-[#2d1a14] text-white border-transparent"
+                                                : isActive
+                                                    ? "bg-[#fffaf3] text-[#3b2a1d] border-[#c9a44c]"
+                                                    : wasVisited
+                                                        ? "bg-[#fff8ef] text-[#3b2a1d] border-[#c9a44c]"
+                                                        : "bg-[#fbf8f3] text-[#857567] border-[#e7dbc9]"
+                                        }
+                      ${canClick ? "cursor-pointer" : "cursor-not-allowed opacity-60"}
+                    `}
+                                        aria-label={
+                                            showCue ? `Go to ${step.label}` : isActive ? `Current: ${step.label}` : step.label
+                                        }
+                                    >
+                                        {isDone ? (
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                className="w-5 h-5"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            >
+                                                <path d="M20 6 9 17l-5-5" />
+                                            </svg>
+                                        ) : (
+                                            <span className="text-sm font-semibold">{i + 1}</span>
+                                        )}
+                                    </motion.button>
+                                </div>
                             </div>
 
                             {/* CONNECTOR */}

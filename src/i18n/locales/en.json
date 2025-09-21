@@ -137,7 +137,7 @@
     "name_short": "Name is too short.",
     "email_invalid": "Please enter a valid email.",
     "phone_required": "Your phone number is required.",
-    "phone_invalid": "Use 6–20 digits (numbers, spaces, + or - allowed)."
+    "phone_invalid": "Use Cambodian national format (0XXXXXXXX or 0XXXXXXXXX): enter 9–10 digits starting with 0; no +855 or symbols."
   },
   "footer": {
     "facebook": "Facebook",

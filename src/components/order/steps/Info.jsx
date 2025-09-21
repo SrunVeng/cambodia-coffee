@@ -24,14 +24,12 @@ const ERR_DEFAULTS = {
 const Icon = {
     User: (p) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
-            <path strokeWidth="1.5" d="M20 21a8 8 0 10-16 0"/>
-            <circle cx="12" cy="7" r="4" strokeWidth="1.5"/>
+            <path strokeWidth="1.5" d="M20 21a8 8 0 10-16 0"/><circle cx="12" cy="7" r="4" strokeWidth="1.5"/>
         </svg>
     ),
     Mail: (p) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
-            <path strokeWidth="1.5" d="M4 6h16v12H4z"/>
-            <path strokeWidth="1.5" d="M4 7l8 6 8-6"/>
+            <path strokeWidth="1.5" d="M4 6h16v12H4z"/><path strokeWidth="1.5" d="M4 7l8 6 8-6"/>
         </svg>
     ),
     Phone: (p) => (
@@ -41,14 +39,12 @@ const Icon = {
     ),
     MapPin: (p) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
-            <path strokeWidth="1.5" d="M12 22s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z"/>
-            <circle cx="12" cy="10" r="3" strokeWidth="1.5"/>
+            <path strokeWidth="1.5" d="M12 22s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="10" r="3" strokeWidth="1.5"/>
         </svg>
     ),
     RotateCcw: (p) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
-            <path strokeWidth="1.5" d="M1 4v6h6"/>
-            <path strokeWidth="1.5" d="M3.5 13A8.5 8.5 0 1120 8"/>
+            <path strokeWidth="1.5" d="M1 4v6h6"/><path strokeWidth="1.5" d="M3.5 13A8.5 8.5 0 1120 8"/>
         </svg>
     ),
     ArrowRight: (p) => (
@@ -58,34 +54,12 @@ const Icon = {
     ),
 }
 
-// ---------- field wrapper ----------
-function Field({ id, label, required, error, hint, leadingIcon, children }) {
-    return (
-        <div className="space-y-1.5">
-            <label htmlFor={id} className="flex items-center gap-2 text-sm font-medium text-[#3b2a1d]">
-                {leadingIcon}
-                <span>
-          {label}
-                    {required && <span className="ml-1 text-red-500" aria-hidden>*</span>}
-        </span>
-            </label>
-            {children}
-            {error ? (
-                <p className="text-xs text-red-600" role="alert">{error}</p>
-            ) : hint ? (
-                <p className="text-xs text-[#857567]">{hint}</p>
-            ) : null}
-        </div>
-    )
-}
-
 // ---------- Leaflet loader ----------
 function ensureLeaflet() {
     return new Promise((resolve, reject) => {
         if (typeof window === "undefined") return resolve(null)
         if (window.L) return resolve(window.L)
 
-        // CSS
         const linkId = "leaflet-css"
         if (!document.getElementById(linkId)) {
             const link = document.createElement("link")
@@ -95,7 +69,6 @@ function ensureLeaflet() {
             document.head.appendChild(link)
         }
 
-        // JS
         const scriptId = "leaflet-js"
         const existing = document.getElementById(scriptId)
         if (existing) {
@@ -113,87 +86,68 @@ function ensureLeaflet() {
     })
 }
 
-// ---------- Mini map picker (single marker + full cleanup + map under dropdowns) ----------
+// ---------- Mini map picker ----------
 function MiniMapPicker({ value, onChange, height = 240, autoOpenOnGeo = false }) {
-    const containerId = React.useMemo(() => "leaflet-picker-" + Math.random().toString(36).slice(2), []);
-    const [open, setOpen] = useState(false);
-    const [ready, setReady] = useState(false);
-    const mapRef = useRef(null);
-    const markerRef = useRef(null);
-    const clickHandlerRef = useRef(null);
+    const containerId = React.useMemo(() => "leaflet-picker-" + Math.random().toString(36).slice(2), [])
+    const [open, setOpen] = useState(false)
+    const [ready, setReady] = useState(false)
+    const mapRef = useRef(null)
+    const markerRef = useRef(null)
+    const clickHandlerRef = useRef(null)
 
-    // init map when opened
     useEffect(() => {
-        if (!open) return;
-
-        let disposed = false;
-
+        if (!open) return
+        let disposed = false
         ensureLeaflet().then((L) => {
-            if (disposed) return;
-            setReady(true);
-
-            const start = value?.geo?.lat && value?.geo?.lng
-                ? [value.geo.lat, value.geo.lng]
-                : [11.5564, 104.9282]; // Phnom Penh default
-
-            const map = L.map(containerId, { zoomControl: true }).setView(start, value?.geo ? 16 : 12);
-            mapRef.current = map;
-
+            if (disposed) return
+            setReady(true)
+            const start = value?.geo?.lat && value?.geo?.lng ? [value.geo.lat, value.geo.lng] : [11.5564, 104.9282]
+            const map = L.map(containerId, { zoomControl: true }).setView(start, value?.geo ? 16 : 12)
+            mapRef.current = map
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
                 maxZoom: 19
-            }).addTo(map);
-
-            // single reusable marker
+            }).addTo(map)
             if (value?.geo?.lat && value?.geo?.lng) {
-                markerRef.current = L.marker([value.geo.lat, value.geo.lng]).addTo(map);
+                markerRef.current = L.marker([value.geo.lat, value.geo.lng]).addTo(map)
             } else {
-                markerRef.current = L.marker(start);
-                // not added to map until first set
+                markerRef.current = L.marker(start)
             }
-
-            // click handler (stored for cleanup)
             clickHandlerRef.current = (e) => {
-                const { lat, lng } = e.latlng;
-                if (!map.hasLayer(markerRef.current)) markerRef.current.addTo(map);
-                markerRef.current.setLatLng([lat, lng]);
-                onChange?.((a) => ({ ...(a || {}), geo: { lat, lng }, geoSrc: "manual", geoAcc: undefined }));
-            };
-            map.on("click", clickHandlerRef.current);
-        });
-
-        // CLEANUP: remove handlers, layers and map instance
+                const { lat, lng } = e.latlng
+                if (!map.hasLayer(markerRef.current)) markerRef.current.addTo(map)
+                markerRef.current.setLatLng([lat, lng])
+                onChange?.((a) => ({ ...(a || {}), geo: { lat, lng }, geoSrc: "manual", geoAcc: undefined }))
+            }
+            map.on("click", clickHandlerRef.current)
+        })
         return () => {
-            disposed = true;
+            disposed = true
             if (mapRef.current) {
                 if (clickHandlerRef.current) {
-                    mapRef.current.off("click", clickHandlerRef.current);
-                    clickHandlerRef.current = null;
+                    mapRef.current.off("click", clickHandlerRef.current)
+                    clickHandlerRef.current = null
                 }
-                try { mapRef.current.remove(); } catch {}
+                try { mapRef.current.remove() } catch {}
             }
-            mapRef.current = null;
-            markerRef.current = null;
-        };
-    }, [open, containerId, onChange]);
+            mapRef.current = null
+            markerRef.current = null
+        }
+    }, [open, containerId, onChange])
 
-    // react to external geo changes (Use current location)
     useEffect(() => {
-        const { lat, lng } = value?.geo || {};
+        const { lat, lng } = value?.geo || {}
         if (!lat || !lng) {
-            if (autoOpenOnGeo && !open) setOpen(true);
-            return;
+            if (autoOpenOnGeo && !open) setOpen(true)
+            return
         }
-        if (autoOpenOnGeo && !open) {
-            setOpen(true);
-            return;
-        }
-        const map = mapRef.current;
-        if (!map || !markerRef.current) return;
-        if (!map.hasLayer(markerRef.current)) markerRef.current.addTo(map);
-        map.setView([lat, lng], 17, { animate: true });
-        markerRef.current.setLatLng([lat, lng]);
-    }, [value?.geo, autoOpenOnGeo, open]);
+        if (autoOpenOnGeo && !open) { setOpen(true); return }
+        const map = mapRef.current
+        if (!map || !markerRef.current) return
+        if (!map.hasLayer(markerRef.current)) markerRef.current.addTo(map)
+        map.setView([lat, lng], 17, { animate: true })
+        markerRef.current.setLatLng([lat, lng])
+    }, [value?.geo, autoOpenOnGeo, open])
 
     return (
         <div className="space-y-2">
@@ -204,9 +158,7 @@ function MiniMapPicker({ value, onChange, height = 240, autoOpenOnGeo = false })
                     className="inline-flex items-center gap-2 rounded-lg border border-[#e7dbc9] bg-white/70 px-3 py-1.5 text-xs font-medium text-[#3b2a1d] shadow-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c]"
                 >
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none">
-                        <path d="M3 7l9-4 9 4-9 4-9-4z" strokeWidth="1.5" />
-                        <path d="M3 17l9-4 9 4" strokeWidth="1.5" />
-                        <path d="M3 12l9 4 9-4" strokeWidth="1.5" />
+                        <path d="M3 7l9-4 9 4-9 4-9-4z" strokeWidth="1.5"/><path d="M3 17l9-4 9 4" strokeWidth="1.5"/><path d="M3 12l9 4 9-4" strokeWidth="1.5"/>
                     </svg>
                     {open ? "Hide map" : "Pick on map"}
                 </button>
@@ -215,14 +167,14 @@ function MiniMapPicker({ value, onChange, height = 240, autoOpenOnGeo = false })
                     <button
                         type="button"
                         onClick={() => {
-                            if (!mapRef.current) return;
-                            mapRef.current.locate({ setView: true, maxZoom: 17, enableHighAccuracy: true });
+                            if (!mapRef.current) return
+                            mapRef.current.locate({ setView: true, maxZoom: 17, enableHighAccuracy: true })
                             mapRef.current.once("locationfound", (e) => {
-                                const { lat, lng } = e.latlng;
-                                if (!mapRef.current.hasLayer(markerRef.current)) markerRef.current.addTo(mapRef.current);
-                                markerRef.current.setLatLng([lat, lng]);
-                                onChange?.((a) => ({ ...(a || {}), geo: { lat, lng }, geoSrc: "gps-map", geoAcc: undefined }));
-                            });
+                                const { lat, lng } = e.latlng
+                                if (!mapRef.current.hasLayer(markerRef.current)) markerRef.current.addTo(mapRef.current)
+                                markerRef.current.setLatLng([lat, lng])
+                                onChange?.((a) => ({ ...(a || {}), geo: { lat, lng }, geoSrc: "gps-map", geoAcc: undefined }))
+                            })
                         }}
                         className="inline-flex items-center gap-1 rounded-md border border-[#e7dbc9] px-2 py-1 text-[11px] text-[#3b2a1d]"
                     >
@@ -232,19 +184,14 @@ function MiniMapPicker({ value, onChange, height = 240, autoOpenOnGeo = false })
             </div>
 
             {open && (
-                <div
-                    id={containerId}
-                    style={{ height }}
-                    className="rounded-xl border border-[#e7dbc9] overflow-hidden z-0" /* keep map behind dropdowns */
-                    aria-busy={!ready}
-                />
+                <div id={containerId} style={{ height }} className="rounded-xl border border-[#e7dbc9] overflow-hidden z-0" aria-busy={!ready}/>
             )}
         </div>
-    );
+    )
 }
 
 // ---------- main form ----------
-export default function Info({ data, onNext, onResetClick }) {
+export default function Info({ data, onNext, onResetClick, onProgress }) {
     const { t, i18n } = useTranslation()
     const {
         register,
@@ -252,42 +199,65 @@ export default function Info({ data, onNext, onResetClick }) {
         setError,
         clearErrors,
         reset: resetForm,
+        setValue,
+        watch,
         formState: { errors, isValid, isSubmitting },
     } = useForm({
         defaultValues: { name: "", email: "", phone: "", ...(data || {}) },
         mode: "onChange",
     })
 
+    // mirror address validity into RHF so isValid updates instantly
+    useEffect(() => {
+        register("addressGuard", { validate: (v) => v === "ok" || "address.required" })
+    }, [register])
+
     const [addr, setAddr] = useState(data?.address || {})
     const [geoBusy, setGeoBusy] = useState(false)
     const [geoError, setGeoError] = useState("")
     const [openMapOnGeo, setOpenMapOnGeo] = useState(false)
+    const [closeMenusFlag, setCloseMenusFlag] = useState(false)
     const watchIdRef = useRef(null)
     const watchTimerRef = useRef(null)
 
     const L = normalizeLang(i18n.language)
     const toErr = (key) => t(key, { defaultValue: ERR_DEFAULTS[key] || "Invalid value." })
 
-    // sync down when parent resets
+    // keep form in sync if parent resets/loads different data
     useEffect(() => {
         resetForm({ name: data?.name || "", email: data?.email || "", phone: data?.phone || "" })
         setAddr(data?.address || {})
     }, [data, resetForm])
+
+    // push address validity into RHF hidden field (STRICT: all levels required)
+    useEffect(() => {
+        const ok = !!(addr?.province && addr?.district && addr?.commune && addr?.village)
+        setValue("addressGuard", ok ? "ok" : "", { shouldValidate: true })
+        if (!ok) setError("address", { type: "required", message: "address.required" })
+        else clearErrors("address")
+    }, [addr, setValue, setError, clearErrors])
+
+    const nameVal = watch("name")
+    const emailVal = watch("email")
+    const phoneVal = watch("phone")
 
     const canSubmit = useMemo(
         () => isValid && !!addr?.province && !!addr?.district && !!addr?.commune && !!addr?.village && !isSubmitting,
         [isValid, addr?.province, addr?.district, addr?.commune, addr?.village, isSubmitting]
     )
 
+    // inform parent so stepper can become clickable immediately (STRICT address)
     useEffect(() => {
-        const ok = !!(addr?.province && addr?.district && addr?.commune && addr?.village)
-        if (!ok) setError("address", { type: "required", message: "address.required" })
-        else clearErrors("address")
-    }, [addr, setError, clearErrors])
-
-    const selectedParts = useMemo(() => {
-        return [addr.villageName, addr.communeName, addr.districtName, addr.provinceName].filter(Boolean).join(", ")
-    }, [addr.villageName, addr.communeName, addr.districtName, addr.provinceName])
+        const draft = {
+            name: nameVal || "",
+            email: emailVal || "",
+            phone: phoneVal || "",
+            address: addr || {},
+        }
+        const a = draft.address || {}
+        const validForNext = !!(draft.name && draft.phone && a.province && a.district && a.commune && a.village)
+        onProgress?.(draft, validForNext)
+    }, [nameVal, emailVal, phoneVal, addr, onProgress])
 
     const submit = async (v) => {
         if (!canSubmit) return
@@ -303,20 +273,19 @@ export default function Info({ data, onNext, onResetClick }) {
     }, [resetForm])
 
     const handleResetPress = () => {
+        setCloseMenusFlag((f) => !f) // close AddressSelect menus
         if (onResetClick) onResetClick()
         else clearLocal()
     }
 
-    const inputBase =
-        "block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2"
+    const inputBase = "block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2"
     const okRing = "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"
     const errRing = "border-red-300 focus:border-red-400 focus:ring-red-300"
-    const focusRing = "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c]"
 
-    // ---- Region guard (Cambodia bbox – adjust if needed) ----
+    // Cambodia bounds guard
     const inCambodiaBBox = ({ lat, lng }) => lat >= 9.5 && lat <= 14.8 && lng >= 102.0 && lng <= 107.8
 
-    // ---- Geolocation helpers ----
+    // Geolocation helpers
     const stopWatch = () => {
         if (watchIdRef.current != null && navigator.geolocation?.clearWatch) {
             navigator.geolocation.clearWatch(watchIdRef.current)
@@ -331,7 +300,7 @@ export default function Info({ data, onNext, onResetClick }) {
     const isGoodFix = (coords) => {
         const acc = coords?.accuracy ?? 99999
         if (!Number.isFinite(acc)) return false
-        if (acc > 1000) return false // reject IP-level coarse fixes
+        if (acc > 1000) return false
         const { latitude: lat, longitude: lng } = coords || {}
         if (typeof lat === "number" && typeof lng === "number") {
             if (!inCambodiaBBox({ lat, lng })) return false
@@ -345,13 +314,12 @@ export default function Info({ data, onNext, onResetClick }) {
 
         if (!isGoodFix(coords)) {
             setGeoError("We couldn’t get your exact location. Please pick your spot on the map.")
-            // Center map to let user adjust, but do NOT set final geo
-            setAddr(a => ({ ...(a || {}), geoPreview: { lat: latitude, lng: longitude }, geoAcc: accuracy, geoSrc: sourceLabel }))
+            setAddr((a) => ({ ...(a || {}), geoPreview: { lat: latitude, lng: longitude }, geoAcc: accuracy, geoSrc: sourceLabel }))
             setOpenMapOnGeo(true)
             return false
         }
 
-        setAddr(a => ({ ...(a || {}), geo: { lat: latitude, lng: longitude }, geoAcc: accuracy, geoSrc: sourceLabel, geoPreview: undefined }))
+        setAddr((a) => ({ ...(a || {}), geo: { lat: latitude, lng: longitude }, geoAcc: accuracy, geoSrc: sourceLabel, geoPreview: undefined }))
         setOpenMapOnGeo(true)
         return true
     }
@@ -361,21 +329,12 @@ export default function Info({ data, onNext, onResetClick }) {
         stopWatch()
 
         const isSecure = window.location.protocol === "https:" || window.location.hostname === "localhost"
-        if (!isSecure) {
-            setGeoError("Location needs HTTPS (or localhost). Open the site via https://")
-            return
-        }
-        if (!("geolocation" in navigator)) {
-            setGeoError("Geolocation not supported in this browser.")
-            return
-        }
+        if (!isSecure) { setGeoError("Location needs HTTPS (or localhost). Open the site via https://"); return }
+        if (!("geolocation" in navigator)) { setGeoError("Geolocation not supported in this browser."); return }
         try {
             if (navigator.permissions?.query) {
                 const p = await navigator.permissions.query({ name: "geolocation" })
-                if (p.state === "denied") {
-                    setGeoError("Location permission is blocked. Enable it in your browser settings.")
-                    return
-                }
+                if (p.state === "denied") { setGeoError("Location permission is blocked. Enable it in your browser settings."); return }
             }
         } catch {}
 
@@ -385,7 +344,6 @@ export default function Info({ data, onNext, onResetClick }) {
             (pos) => {
                 const accepted = applyPosition(pos.coords, "gps-instant")
                 const acc = pos.coords?.accuracy ?? 99999
-
                 if ((!accepted || acc > 60) && navigator.geolocation.watchPosition) {
                     watchIdRef.current = navigator.geolocation.watchPosition(
                         (p) => {
@@ -415,8 +373,16 @@ export default function Info({ data, onNext, onResetClick }) {
 
     useEffect(() => stopWatch, [])
 
+    const selectedParts = useMemo(
+        () => [addr.villageName, addr.communeName, addr.districtName, addr.provinceName].filter(Boolean).join(", "),
+        [addr.villageName, addr.communeName, addr.districtName, addr.provinceName]
+    )
+
     return (
         <form onSubmit={handleSubmit(submit)} className="space-y-6">
+            {/* hidden input used only for RHF validity */}
+            <input type="hidden" {...register("addressGuard")} />
+
             <div className="rounded-2xl bg-gradient-to-br from-[#efe6d6] to-[#f7efe3] p-[1px] shadow-md">
                 <div className="rounded-2xl bg-[#fffbf3] p-6 sm:p-8">
                     {/* Header */}
@@ -431,88 +397,65 @@ export default function Info({ data, onNext, onResetClick }) {
 
                     {/* Grid fields */}
                     <div className="grid gap-5 sm:grid-cols-2">
-                        <Field
-                            id="name"
-                            label={t("order.name", { defaultValue: "Full Name" })}
-                            required
-                            leadingIcon={<Icon.User className="text-[#6b5545]" />}
-                            error={errors.name && t(errors.name.message, { defaultValue: ERR_DEFAULTS[errors.name.message] })}
-                        >
+                        <div className="space-y-1.5">
+                            <label htmlFor="name" className="flex items-center gap-2 text-sm font-medium text-[#3b2a1d]">
+                                <Icon.User className="text-[#6b5545]" />
+                                <span>{t("order.name", { defaultValue: "Full Name" })}<span className="ml-1 text-red-500" aria-hidden>*</span></span>
+                            </label>
                             <input
-                                id="name"
-                                type="text"
-                                autoComplete="name"
+                                id="name" type="text" autoComplete="name"
                                 placeholder={t("order.name_placeholder", { defaultValue: "e.g. Srey Neang" })}
-                                {...register("name", {
-                                    required: "errors.name_required",
-                                    minLength: { value: 2, message: "errors.name_short" },
-                                })}
-                                className={`block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2 ${errors.name ? "border-red-300 focus:border-red-400 focus:ring-red-300" : "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"}`}
+                                {...register("name", { required: "errors.name_required", minLength: { value: 2, message: "errors.name_short" } })}
+                                className={`${inputBase} ${errors.name ? errRing : okRing}`}
                             />
-                        </Field>
+                            {errors.name && <p className="text-xs text-red-600" role="alert">{t(errors.name.message, { defaultValue: ERR_DEFAULTS[errors.name.message] })}</p>}
+                        </div>
 
-                        <Field
-                            id="email"
-                            label={t("order.email", { defaultValue: "Email" })}
-                            hint={t("common.optional", { defaultValue: "(optional)" })}
-                            leadingIcon={<Icon.Mail className="text-[#6b5545]" />}
-                            error={errors.email && t(errors.email.message, { defaultValue: ERR_DEFAULTS[errors.email.message] })}
-                        >
+                        <div className="space-y-1.5">
+                            <label htmlFor="email" className="flex items-center gap-2 text-sm font-medium text-[#3b2a1d]">
+                                <Icon.Mail className="text-[#6b5545]" />
+                                <span>{t("order.email", { defaultValue: "Email" })} <span className="text-[#857567]">{t("common.optional", { defaultValue: "(optional)" })}</span></span>
+                            </label>
                             <input
-                                id="email"
-                                type="email"
-                                autoComplete="email"
+                                id="email" type="email" autoComplete="email"
                                 placeholder={t("order.email_placeholder", { defaultValue: "you@domain.com" })}
-                                {...register("email", {
-                                    validate: (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "errors.email_invalid",
-                                })}
-                                className={`block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2 ${errors.email ? "border-red-300 focus:border-red-400 focus:ring-red-300" : "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"}`}
+                                {...register("email", { validate: (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "errors.email_invalid" })}
+                                className={`${inputBase} ${errors.email ? errRing : okRing}`}
                             />
-                        </Field>
+                            {errors.email && <p className="text-xs text-red-600" role="alert">{t(errors.email.message, { defaultValue: ERR_DEFAULTS[errors.email.message] })}</p>}
+                        </div>
 
-                        <Field
-                            id="phone"
-                            label={t("order.phone", { defaultValue: "Phone" })}
-                            required
-                            leadingIcon={<Icon.Phone className="text-[#6b5545]" />}
-                            error={errors.phone && t(errors.phone.message, { defaultValue: ERR_DEFAULTS[errors.phone.message] })}
-                        >
+                        <div className="space-y-1.5">
+                            <label htmlFor="phone" className="flex items-center gap-2 text-sm font-medium text-[#3b2a1d]">
+                                <Icon.Phone className="text-[#6b5545]" />
+                                <span>{t("order.phone", { defaultValue: "Phone" })}<span className="ml-1 text-red-500" aria-hidden>*</span></span>
+                            </label>
                             <input
-                                id="phone"
-                                type="tel"
-                                inputMode="tel"
-                                autoComplete="tel"
+                                id="phone" type="tel" inputMode="tel" autoComplete="tel"
                                 placeholder={t("order.phone_placeholder", { defaultValue: "+855 12 345 678" })}
-                                {...register("phone", {
-                                    required: "errors.phone_required",
-                                    pattern: { value: /^[+0-9()\-\s]{6,20}$/, message: "errors.phone_invalid" },
-                                })}
-                                className={`block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2 ${errors.phone ? "border-red-300 focus:border-red-400 focus:ring-red-300" : "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"}`}
+                                {...register("phone", { required: "errors.phone_required", pattern: { value: /^0[1-9]\d{7,8}$/, message: "errors.phone_invalid" } })}
+                                className={`${inputBase} ${errors.phone ? errRing : okRing}`}
                             />
-                        </Field>
+                            {errors.phone && <p className="text-xs text-red-600" role="alert">{t(errors.phone.message, { defaultValue: ERR_DEFAULTS[errors.phone.message] })}</p>}
+                        </div>
                     </div>
 
                     {/* Address picker */}
                     <div className="mt-5 space-y-2">
                         <label className="flex items-center gap-2 text-sm font-medium text-[#3b2a1d]">
                             <Icon.MapPin className="text-[#6b5545]" />
-                            <span>
-                {t("order.address", { defaultValue: "Address" })}
-                                <span className="ml-1 text-red-500" aria-hidden>*</span>
-              </span>
+                            <span>{t("order.address", { defaultValue: "Address" })}<span className="ml-1 text-red-500" aria-hidden>*</span></span>
                         </label>
 
                         <div className={`rounded-xl border ${errors.address ? "border-red-300" : "border-[#e7dbc9]"} bg-[#fffaf3] p-3 shadow-sm`}>
-                            <AddressSelect value={addr} onChange={setAddr} lang={L} />
+                            <AddressSelect value={addr} onChange={setAddr} lang={L} closeMenus={closeMenusFlag} />
 
-                            {/* Street inside Address block */}
                             <div className="mt-3">
                                 <label htmlFor="street" className="block text-xs font-medium text-[#3b2a1d] mb-1">
                                     {t("order.street", { defaultValue: "Street / House / Landmark" })}
                                 </label>
                                 <input
-                                    id="street"
-                                    type="text"
+                                    id="street" type="text"
                                     placeholder={t("order.street_placeholder", { defaultValue: "Street 123, House 45, near market" })}
                                     value={addr?.street || ""}
                                     onChange={(e) => setAddr((a) => ({ ...(a || {}), street: e.target.value }))}
@@ -523,7 +466,6 @@ export default function Info({ data, onNext, onResetClick }) {
                                 </p>
                             </div>
 
-                            {/* Helper row */}
                             <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 {(addr.province || addr.provinceName) ? (
                                     <p className="text-xs text-[#6b5545]">
@@ -539,14 +481,13 @@ export default function Info({ data, onNext, onResetClick }) {
                                     type="button"
                                     onClick={handleUseLocation}
                                     disabled={geoBusy}
-                                    className={`inline-flex items-center gap-2 self-start rounded-lg border border-[#e7dbc9] bg-white/70 px-3 py-1.5 text-xs font-medium text-[#3b2a1d] shadow-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c] disabled:cursor-not-allowed disabled:opacity-60`}
+                                    className="inline-flex items-center gap-2 self-start rounded-lg border border-[#e7dbc9] bg-white/70 px-3 py-1.5 text-xs font-medium text-[#3b2a1d] shadow-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c] disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     <Icon.MapPin />
                                     {geoBusy ? t("address.locating", { defaultValue: "Locating…" }) : t("address.use_current", { defaultValue: "Use current location" })}
                                 </button>
                             </div>
 
-                            {/* Leaflet picker */}
                             <div className="mt-2">
                                 <MiniMapPicker value={addr} onChange={setAddr} autoOpenOnGeo={openMapOnGeo} />
                             </div>
@@ -560,9 +501,7 @@ export default function Info({ data, onNext, onResetClick }) {
                             </p>
                         )}
                         {addr?.geoPreview && !addr?.geo && (
-                            <p className="text-[11px] text-[#b56b00]">
-                                This location may be off. Please place the pin on your address.
-                            </p>
+                            <p className="text-[11px] text-[#b56b00]">This location may be off. Please place the pin on your address.</p>
                         )}
 
                         {geoError && <p className="mt-1 text-xs text-red-600" role="alert">{geoError}</p>}
