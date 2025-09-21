@@ -71,6 +71,9 @@
     "name":"姓名","email":"邮箱","phone":"电话",
     "address":"地址","province":"省/直辖市","district":"区/县","commune":"乡/街道","village":"村/社区",
     "deliveryFee":"运费","subtotal":"小计","total":"合计",
+    "street": "街道 / 门牌 / 地标",
+    "street_placeholder": "如：123街，45号，近市场",
+    "street_hint": "添加就近地标或公寓名称，方便配送。",
     "reset": {
       "title": "要重置订单吗？",
       "hint": "这将清空联系人、地址、商品和总价。",
@@ -120,7 +123,10 @@
     "proceed_payment": "去支付",
     "qty": "数量",
     "each": "每件",
-    "item": "商品"
+    "item": "商品",
+    "remark": "备注",
+    "remark_placeholder": "例如：到达时请来电、放在大门口、不要加糖等。",
+    "remark_hint": "可选。此备注会随您的订单一并提交。"
   },
   "address": {
     "search_placeholder": "搜索…",
@@ -132,7 +138,25 @@
     "street": "详细地址",
     "street_placeholder": "如：XX路 XX号 / 楼层/门牌号",
     "selected": "已选择",
-    "required": "请完善您的地址。"
+    "required": "请完善您的地址。",
+    "choose_hint": "依次选择 省 → 区/县 → 乡/街道 → 村。",
+    "pinned": "已置针",
+    "preview_inexact": "此位置可能不准确，请在地图上放置准确位置。",
+    "confirm_pin": "我确认地图针已放在准确的收货位置",
+    "pin_unconfirmed": "未确认针或 GPS 精度较低（±{{m}}米）。请拖动地图针或勾选确认。",
+    "locate_inexact": "无法获得精确位置，请在地图上选择准确位置。",
+    "geo_https_required": "定位需要 HTTPS（或 localhost）。请通过 https:// 打开。",
+    "geo_not_supported": "此浏览器不支持定位功能。",
+    "geo_permission_blocked": "定位权限被阻止，请在浏览器设置中启用。",
+    "geo_permission_denied": "已拒绝定位权限，请允许访问位置。",
+    "geo_position_unavailable": "无法获取位置，请尝试在户外使用。",
+    "geo_timeout": "定位超时，请重试。",
+    "geo_failed": "获取当前位置失败。",
+    "locating": "正在定位…",
+    "use_current": "使用当前位置",
+    "map_hide": "隐藏地图",
+    "map_pick": "在地图上选点",
+    "map_locate": "在地图上定位"
   },
   "errors": {
     "name_required": "请输入姓名。",

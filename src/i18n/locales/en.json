@@ -71,6 +71,9 @@
     "name":"Full Name","email":"Email","phone":"Phone",
     "address":"Address","province":"Province","district":"District","commune":"Commune","village":"Village",
     "deliveryFee":"Delivery Fee","subtotal":"Subtotal","total":"Total",
+    "street": "Street / House / Landmark",
+    "street_placeholder": "Street 123, House 45, near market",
+    "street_hint": "Add nearest landmark or apartment for easier delivery.",
     "reset": {
       "title": "Start the order over?",
       "hint": "This will delete contact info, address, items, and the total.",
@@ -118,7 +121,10 @@
     "proceed_payment": "Proceed to Payment",
     "qty": "Qty",
     "each": "ea",
-    "item": "Item"
+    "item": "Item",
+    "remark": "Remark / Note",
+    "remark_placeholder": "E.g., call when arriving, leave at the gate, no sugar, etc.",
+    "remark_hint": "Optional. This will be sent with your order."
   },
   "address": {
     "search_placeholder": "Search…",
@@ -130,7 +136,25 @@
     "street": "Street",
     "street_placeholder": "e.g., Street/House/Building/Floor",
     "selected": "Selected",
-    "required": "Please complete your address."
+    "required": "Please complete your address.",
+    "choose_hint": "Choose province → district → commune → village.",
+    "pinned": "Pinned",
+    "preview_inexact": "This location may be off. Please place the pin on your address.",
+    "confirm_pin": "I confirm the map pin is on my exact delivery point",
+    "pin_unconfirmed": "Pin not confirmed or GPS accuracy is low (±{{m}}m). Please drag the pin or confirm.",
+    "locate_inexact": "We couldn’t get your exact location. Please pick your spot on the map.",
+    "geo_https_required": "Location needs HTTPS (or localhost). Open the site via https://",
+    "geo_not_supported": "Geolocation not supported in this browser.",
+    "geo_permission_blocked": "Location permission is blocked. Enable it in your browser settings.",
+    "geo_permission_denied": "Permission denied. Please allow location access.",
+    "geo_position_unavailable": "Position unavailable. Please try again outdoors.",
+    "geo_timeout": "Request timed out. Tap again.",
+    "geo_failed": "Failed to get current location.",
+    "locating": "Locating…",
+    "use_current": "Use current location",
+    "map_hide": "Hide map",
+    "map_pick": "Pick on map",
+    "map_locate": "Locate on map"
   },
   "errors": {
     "name_required": "Your name is required.",

@@ -50,15 +50,23 @@ export default function CheckoutWizard() {
     const liveInfo = step === 1 ? infoDraft : info
     const deliveryFee = useMemo(() => computeDeliveryFee(liveInfo), [liveInfo])
 
-    // ✅ Validation for each step (STRICT address + strict phone format)
+    // Helper: pin-confirm rule (pin is optional, but if present, must be confirmed)
+    const geoConfirmRule = (a = {}) => {
+        const g = a.geo
+        const hasGeo = !!(g && typeof g.lat === "number" && typeof g.lng === "number")
+        return !hasGeo || !!a.geoConfirmed
+    }
+
+    // ✅ Validation for each step (STRICT address + strict phone format + optional-pin-confirm)
     const isStepValid = (idx) => {
         if (idx === 0) {
             const src = liveInfo
             const a = src?.address || {}
             const phoneOk = KH_PHONE.test(String(src?.phone ?? "").trim())
-            const nameOk = !!src?.name // (you can enforce min length if desired)
+            const nameOk = !!src?.name
             const addressOk = !!(a.province && a.district && a.commune && a.village)
-            return nameOk && phoneOk && addressOk
+            const geoOk = geoConfirmRule(a) // ⬅️ new
+            return nameOk && phoneOk && addressOk && geoOk
         }
         if (idx === 1) return cartItems.length > 0
         if (idx === 2) return !!summary?.total && summary?.items?.length > 0
@@ -126,14 +134,15 @@ export default function CheckoutWizard() {
                         data={liveInfo}
                         onNext={next}
                         onResetClick={() => setConfirmResetOpen(true)}
-                        // ✅ Recompute validity here to keep wizard as the single source of truth
+                        // ✅ Keep wizard as source of truth (also enforce pin-confirm rule here)
                         onProgress={(draft) => {
                             setInfoDraft(draft || {})
                             const a = draft?.address || {}
                             const phoneOk = KH_PHONE.test(String(draft?.phone ?? "").trim())
                             const nameOk = !!draft?.name
                             const addressOk = !!(a.province && a.district && a.commune && a.village)
-                            setStep1Valid(nameOk && phoneOk && addressOk)
+                            const geoOk = geoConfirmRule(a) // ⬅️ new
+                            setStep1Valid(nameOk && phoneOk && addressOk && geoOk)
                         }}
                     />
                 )

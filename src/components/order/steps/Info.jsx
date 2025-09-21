@@ -23,33 +23,33 @@ const ERR_DEFAULTS = {
 // ---------- icons ----------
 const Icon = {
     User: (p) => (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
-            <path strokeWidth="1.5" d="M20 21a8 8 0 10-16 0"/><circle cx="12" cy="7" r="4" strokeWidth="1.5"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 " + (p.className || "")}>
+            <path strokeWidth="1.5" d="M20 21a8 8 0 10-16 0" /><circle cx="12" cy="7" r="4" strokeWidth="1.5" />
         </svg>
     ),
     Mail: (p) => (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
-            <path strokeWidth="1.5" d="M4 6h16v12H4z"/><path strokeWidth="1.5" d="M4 7l8 6 8-6"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 " + (p.className || "")}>
+            <path strokeWidth="1.5" d="M4 6h16v12H4z" /><path strokeWidth="1.5" d="M4 7l8 6 8-6" />
         </svg>
     ),
     Phone: (p) => (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
-            <path strokeWidth="1.5" d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011.1-.2 11 11 0 003.5.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h2.4a1 1 0 011 1 11 11 0 00.6 3.5 1 1 0 01-.2 1.1l-2.2 2.2z"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 " + (p.className || "")}>
+            <path strokeWidth="1.5" d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011.1-.2 11 11 0 003.5.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h2.4a1 1 0 011 1 11 11 0 00.6 3.5 1 1 0 01-.2 1.1l-2.2 2.2z" />
         </svg>
     ),
     MapPin: (p) => (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
-            <path strokeWidth="1.5" d="M12 22s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="10" r="3" strokeWidth="1.5"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 " + (p.className || "")}>
+            <path strokeWidth="1.5" d="M12 22s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z" /><circle cx="12" cy="10" r="3" strokeWidth="1.5" />
         </svg>
     ),
     RotateCcw: (p) => (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
-            <path strokeWidth="1.5" d="M1 4v6h6"/><path strokeWidth="1.5" d="M3.5 13A8.5 8.5 0 1120 8"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 " + (p.className || "")}>
+            <path strokeWidth="1.5" d="M1 4v6h6" /><path strokeWidth="1.5" d="M3.5 13A8.5 8.5 0 1120 8" />
         </svg>
     ),
     ArrowRight: (p) => (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 "+(p.className||"")}>
-            <path strokeWidth="1.5" d="M5 12h14M13 5l7 7-7 7"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={"h-4 w-4 " + (p.className || "")}>
+            <path strokeWidth="1.5" d="M5 12h14M13 5l7 7-7 7" />
         </svg>
     ),
 }
@@ -88,6 +88,7 @@ function ensureLeaflet() {
 
 // ---------- Mini map picker ----------
 function MiniMapPicker({ value, onChange, height = 240, autoOpenOnGeo = false }) {
+    const { t } = useTranslation()
     const containerId = React.useMemo(() => "leaflet-picker-" + Math.random().toString(36).slice(2), [])
     const [open, setOpen] = useState(false)
     const [ready, setReady] = useState(false)
@@ -117,7 +118,13 @@ function MiniMapPicker({ value, onChange, height = 240, autoOpenOnGeo = false })
                 const { lat, lng } = e.latlng
                 if (!map.hasLayer(markerRef.current)) markerRef.current.addTo(map)
                 markerRef.current.setLatLng([lat, lng])
-                onChange?.((a) => ({ ...(a || {}), geo: { lat, lng }, geoSrc: "manual", geoAcc: undefined }))
+                onChange?.((a) => ({
+                    ...(a || {}),
+                    geo: { lat, lng },
+                    geoSrc: "manual",
+                    geoAcc: undefined,
+                    geoConfirmed: true, // manual pin = confirmed
+                }))
             }
             map.on("click", clickHandlerRef.current)
         })
@@ -128,7 +135,7 @@ function MiniMapPicker({ value, onChange, height = 240, autoOpenOnGeo = false })
                     mapRef.current.off("click", clickHandlerRef.current)
                     clickHandlerRef.current = null
                 }
-                try { mapRef.current.remove() } catch {}
+                try { mapRef.current.remove() } catch { }
             }
             mapRef.current = null
             markerRef.current = null
@@ -158,9 +165,11 @@ function MiniMapPicker({ value, onChange, height = 240, autoOpenOnGeo = false })
                     className="inline-flex items-center gap-2 rounded-lg border border-[#e7dbc9] bg-white/70 px-3 py-1.5 text-xs font-medium text-[#3b2a1d] shadow-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#c9a44c]"
                 >
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none">
-                        <path d="M3 7l9-4 9 4-9 4-9-4z" strokeWidth="1.5"/><path d="M3 17l9-4 9 4" strokeWidth="1.5"/><path d="M3 12l9 4 9-4" strokeWidth="1.5"/>
+                        <path d="M3 7l9-4 9 4-9 4-9-4z" strokeWidth="1.5" /><path d="M3 17l9-4 9 4" strokeWidth="1.5" /><path d="M3 12l9 4 9-4" strokeWidth="1.5" />
                     </svg>
-                    {open ? "Hide map" : "Pick on map"}
+                    {open
+                        ? t("address.map_hide", { defaultValue: "Hide map" })
+                        : t("address.map_pick", { defaultValue: "Pick on map" })}
                 </button>
 
                 {open && (
@@ -173,18 +182,24 @@ function MiniMapPicker({ value, onChange, height = 240, autoOpenOnGeo = false })
                                 const { lat, lng } = e.latlng
                                 if (!mapRef.current.hasLayer(markerRef.current)) markerRef.current.addTo(mapRef.current)
                                 markerRef.current.setLatLng([lat, lng])
-                                onChange?.((a) => ({ ...(a || {}), geo: { lat, lng }, geoSrc: "gps-map", geoAcc: undefined }))
+                                onChange?.((a) => ({
+                                    ...(a || {}),
+                                    geo: { lat, lng },
+                                    geoSrc: "gps-map",
+                                    geoAcc: undefined,
+                                    geoConfirmed: false,
+                                }))
                             })
                         }}
                         className="inline-flex items-center gap-1 rounded-md border border-[#e7dbc9] px-2 py-1 text-[11px] text-[#3b2a1d]"
                     >
-                        Locate on map
+                        {t("address.map_locate", { defaultValue: "Locate on map" })}
                     </button>
                 )}
             </div>
 
             {open && (
-                <div id={containerId} style={{ height }} className="rounded-xl border border-[#e7dbc9] overflow-hidden z-0" aria-busy={!ready}/>
+                <div id={containerId} style={{ height }} className="rounded-xl border border-[#e7dbc9] overflow-hidden z-0" aria-busy={!ready} />
             )}
         </div>
     )
@@ -214,7 +229,7 @@ export default function Info({ data, onNext, onResetClick, onProgress }) {
 
     const [addr, setAddr] = useState(data?.address || {})
     const [geoBusy, setGeoBusy] = useState(false)
-    const [geoError, setGeoError] = useState("")
+    const [geoErrorKey, setGeoErrorKey] = useState("")
     const [openMapOnGeo, setOpenMapOnGeo] = useState(false)
     const [closeMenusFlag, setCloseMenusFlag] = useState(false)
     const watchIdRef = useRef(null)
@@ -241,49 +256,18 @@ export default function Info({ data, onNext, onResetClick, onProgress }) {
     const emailVal = watch("email")
     const phoneVal = watch("phone")
 
-    const canSubmit = useMemo(
-        () => isValid && !!addr?.province && !!addr?.district && !!addr?.commune && !!addr?.village && !isSubmitting,
-        [isValid, addr?.province, addr?.district, addr?.commune, addr?.village, isSubmitting]
-    )
-
-    // inform parent so stepper can become clickable immediately (STRICT address)
-    useEffect(() => {
-        const draft = {
-            name: nameVal || "",
-            email: emailVal || "",
-            phone: phoneVal || "",
-            address: addr || {},
-        }
-        const a = draft.address || {}
-        const validForNext = !!(draft.name && draft.phone && a.province && a.district && a.commune && a.village)
-        onProgress?.(draft, validForNext)
-    }, [nameVal, emailVal, phoneVal, addr, onProgress])
-
-    const submit = async (v) => {
-        if (!canSubmit) return
-        const next = { ...v, address: addr }
-        try { localStorage.setItem("info", JSON.stringify(next)) } catch {}
-        await onNext?.(next)
-    }
-
-    const clearLocal = useCallback(() => {
-        resetForm({ name: "", email: "", phone: "" })
-        setAddr({})
-        try { localStorage.removeItem("info") } catch {}
-    }, [resetForm])
-
-    const handleResetPress = () => {
-        setCloseMenusFlag((f) => !f) // close AddressSelect menus
-        if (onResetClick) onResetClick()
-        else clearLocal()
-    }
-
-    const inputBase = "block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2"
-    const okRing = "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"
-    const errRing = "border-red-300 focus:border-red-400 focus:ring-red-300"
-
     // Cambodia bounds guard
     const inCambodiaBBox = ({ lat, lng }) => lat >= 9.5 && lat <= 14.8 && lng >= 102.0 && lng <= 107.8
+
+    // Determine if geo is trusted (for payload; UI gating uses geoConfirmed rule below)
+    const isTrustedGeo = (a) => {
+        const g = a?.geo
+        if (!g) return false
+        if (!inCambodiaBBox(g)) return false
+        if (a.geoSrc === "manual") return true
+        const acc = a.geoAcc ?? Infinity
+        return acc <= 50 && a.geoConfirmed === true
+    }
 
     // Geolocation helpers
     const stopWatch = () => {
@@ -313,30 +297,43 @@ export default function Info({ data, onNext, onResetClick, onProgress }) {
         if (typeof latitude !== "number" || typeof longitude !== "number") return false
 
         if (!isGoodFix(coords)) {
-            setGeoError("We couldn’t get your exact location. Please pick your spot on the map.")
-            setAddr((a) => ({ ...(a || {}), geoPreview: { lat: latitude, lng: longitude }, geoAcc: accuracy, geoSrc: sourceLabel }))
+            setGeoErrorKey("address.locate_inexact")
+            setAddr((a) => ({
+                ...(a || {}),
+                geoPreview: { lat: latitude, lng: longitude },
+                geoAcc: accuracy,
+                geoSrc: sourceLabel,
+                geoConfirmed: false,
+            }))
             setOpenMapOnGeo(true)
             return false
         }
 
-        setAddr((a) => ({ ...(a || {}), geo: { lat: latitude, lng: longitude }, geoAcc: accuracy, geoSrc: sourceLabel, geoPreview: undefined }))
+        setAddr((a) => ({
+            ...(a || {}),
+            geo: { lat: latitude, lng: longitude },
+            geoAcc: accuracy,
+            geoSrc: sourceLabel,
+            geoConfirmed: false,
+            geoPreview: undefined,
+        }))
         setOpenMapOnGeo(true)
         return true
     }
 
     const handleUseLocation = async () => {
-        setGeoError("")
+        setGeoErrorKey("")
         stopWatch()
 
         const isSecure = window.location.protocol === "https:" || window.location.hostname === "localhost"
-        if (!isSecure) { setGeoError("Location needs HTTPS (or localhost). Open the site via https://"); return }
-        if (!("geolocation" in navigator)) { setGeoError("Geolocation not supported in this browser."); return }
+        if (!isSecure) { setGeoErrorKey("address.geo_https_required"); return }
+        if (!("geolocation" in navigator)) { setGeoErrorKey("address.geo_not_supported"); return }
         try {
             if (navigator.permissions?.query) {
                 const p = await navigator.permissions.query({ name: "geolocation" })
-                if (p.state === "denied") { setGeoError("Location permission is blocked. Enable it in your browser settings."); return }
+                if (p.state === "denied") { setGeoErrorKey("address.geo_permission_blocked"); return }
             }
-        } catch {}
+        } catch { }
 
         setGeoBusy(true)
 
@@ -351,7 +348,7 @@ export default function Info({ data, onNext, onResetClick, onProgress }) {
                             const a = p.coords?.accuracy ?? 99999
                             if (ok && a <= 30) stopWatch()
                         },
-                        () => {},
+                        () => { },
                         { enableHighAccuracy: true, maximumAge: 0, timeout: 12000 }
                     )
                     watchTimerRef.current = setTimeout(stopWatch, 12000)
@@ -359,12 +356,12 @@ export default function Info({ data, onNext, onResetClick, onProgress }) {
                 setGeoBusy(false)
             },
             (err) => {
-                const msg = ({
-                    1: "Permission denied. Please allow location access.",
-                    2: "Position unavailable. Please try again outdoors.",
-                    3: "Request timed out. Tap again.",
-                })[err?.code] || "Failed to get current location."
-                setGeoError(msg)
+                const code = err?.code
+                const key = code === 1 ? "address.geo_permission_denied"
+                    : code === 2 ? "address.geo_position_unavailable"
+                        : code === 3 ? "address.geo_timeout"
+                            : "address.geo_failed"
+                setGeoErrorKey(key)
                 setGeoBusy(false)
             },
             { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
@@ -377,6 +374,76 @@ export default function Info({ data, onNext, onResetClick, onProgress }) {
         () => [addr.villageName, addr.communeName, addr.districtName, addr.provinceName].filter(Boolean).join(", "),
         [addr.villageName, addr.communeName, addr.districtName, addr.provinceName]
     )
+
+    // canSubmit: base form valid + if a pin exists it must be confirmed
+    const { isValid: rhfValid, isSubmitting: rhfSubmitting } = { isValid, isSubmitting }
+    const canSubmit = useMemo(() => {
+        const baseOk =
+            rhfValid &&
+            !!addr?.province && !!addr?.district && !!addr?.commune && !!addr?.village &&
+            !rhfSubmitting
+        const hasPin = !!(addr?.geo && typeof addr.geo.lat === "number" && typeof addr.geo.lng === "number")
+        const confirmedOk = !hasPin || !!addr?.geoConfirmed
+        return baseOk && confirmedOk
+    }, [rhfValid, rhfSubmitting, addr?.province, addr?.district, addr?.commune, addr?.village, addr?.geo, addr?.geoConfirmed])
+
+    // inform parent so stepper can become clickable immediately (STRICT address + optional pin confirm)
+    useEffect(() => {
+        const draft = {
+            name: nameVal || "",
+            email: emailVal || "",
+            phone: phoneVal || "",
+            address: addr || {},
+        }
+        const a = draft.address || {}
+        const hasPin = !!(a?.geo && typeof a.geo.lat === "number" && typeof a.geo.lng === "number")
+        const confirmedOk = !hasPin || !!a.geoConfirmed
+        const validForNext = !!(draft.name && draft.phone && a.province && a.district && a.commune && a.village && confirmedOk)
+        onProgress?.(draft, validForNext)
+    }, [nameVal, emailVal, phoneVal, addr, onProgress])
+
+    const submit = async (v) => {
+        if (!canSubmit) return
+
+        const trusted = isTrustedGeo(addr)
+        const safeAddr = {
+            province: addr.province,
+            provinceName: addr.provinceName,
+            district: addr.district,
+            districtName: addr.districtName,
+            commune: addr.commune,
+            communeName: addr.communeName,
+            village: addr.village,
+            villageName: addr.villageName,
+            street: addr.street,
+            geoTrusted: trusted,
+            ...(trusted
+                    ? { geo: addr.geo, geoAcc: addr.geoAcc, geoSrc: addr.geoSrc, geoConfirmed: true }
+                    : { geoCandidate: addr.geo || addr.geoPreview, geoAcc: addr.geoAcc, geoSrc: addr.geoSrc }
+            ),
+        }
+
+        const next = { ...v, address: safeAddr }
+
+        try { localStorage.setItem("info", JSON.stringify(next)) } catch { }
+        await onNext?.(next)
+    }
+
+    const clearLocal = useCallback(() => {
+        resetForm({ name: "", email: "", phone: "" })
+        setAddr({})
+        try { localStorage.removeItem("info") } catch { }
+    }, [resetForm])
+
+    const handleResetPress = () => {
+        setCloseMenusFlag((f) => !f) // close AddressSelect menus
+        if (onResetClick) onResetClick()
+        else clearLocal()
+    }
+
+    const inputBase = "block w-full rounded-xl px-4 py-3 shadow-sm transition bg-[#fffaf3] text-[#3b2a1d] placeholder-[#9b8b7c] border focus:outline-none focus:ring-2"
+    const okRing = "border-[#e7dbc9] focus:border-[#c9a44c] focus:ring-[#c9a44c]"
+    const errRing = "border-red-300 focus:border-red-400 focus:ring-red-300"
 
     return (
         <form onSubmit={handleSubmit(submit)} className="space-y-6">
@@ -432,7 +499,7 @@ export default function Info({ data, onNext, onResetClick, onProgress }) {
                             </label>
                             <input
                                 id="phone" type="tel" inputMode="tel" autoComplete="tel"
-                                placeholder={t("order.phone_placeholder", { defaultValue: "+855 12 345 678" })}
+                                placeholder={t("order.phone_placeholder", { defaultValue: "0XX XXX XXXX" })}
                                 {...register("phone", { required: "errors.phone_required", pattern: { value: /^0[1-9]\d{7,8}$/, message: "errors.phone_invalid" } })}
                                 className={`${inputBase} ${errors.phone ? errRing : okRing}`}
                             />
@@ -491,6 +558,28 @@ export default function Info({ data, onNext, onResetClick, onProgress }) {
                             <div className="mt-2">
                                 <MiniMapPicker value={addr} onChange={setAddr} autoOpenOnGeo={openMapOnGeo} />
                             </div>
+
+                            {/* Confirm pin & accuracy hints */}
+                            {addr?.geo && (
+                                <label className="mt-2 flex items-start gap-2 text-xs text-[#3b2a1d]">
+                                    <input
+                                        type="checkbox"
+                                        className="mt-0.5"
+                                        checked={!!addr.geoConfirmed}
+                                        onChange={(e) => setAddr(a => ({ ...(a || {}), geoConfirmed: e.target.checked }))}
+                                    />
+                                    <span>{t("address.confirm_pin", { defaultValue: "I confirm the map pin is on my exact delivery point" })}</span>
+                                </label>
+                            )}
+
+                            {addr?.geo && !addr?.geoConfirmed && (
+                                <p className="text-[11px] text-[#b56b00] mt-1">
+                                    {t("address.pin_unconfirmed", {
+                                        defaultValue: "Pin not confirmed or GPS accuracy is low (±{{m}}m). Please drag the pin or confirm.",
+                                        m: Math.round(addr.geoAcc ?? 0),
+                                    })}
+                                </p>
+                            )}
                         </div>
 
                         {addr?.geo?.lat && addr?.geo?.lng && (
@@ -501,10 +590,12 @@ export default function Info({ data, onNext, onResetClick, onProgress }) {
                             </p>
                         )}
                         {addr?.geoPreview && !addr?.geo && (
-                            <p className="text-[11px] text-[#b56b00]">This location may be off. Please place the pin on your address.</p>
+                            <p className="text-[11px] text-[#b56b00]">
+                                {t("address.preview_inexact", { defaultValue: "This location may be off. Please place the pin on your address." })}
+                            </p>
                         )}
 
-                        {geoError && <p className="mt-1 text-xs text-red-600" role="alert">{geoError}</p>}
+                        {geoErrorKey && <p className="mt-1 text-xs text-red-600" role="alert">{t(geoErrorKey)}</p>}
                         {errors.address && <p className="text-xs text-red-600" role="alert">{toErr(errors.address.message)}</p>}
                     </div>
 
