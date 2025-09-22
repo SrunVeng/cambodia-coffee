@@ -292,6 +292,13 @@
     "qr_alt": "Telegram QR code",
     "telegram_url": "https://t.me/your_channel_or_bot",
     "telegram_qr": ""
+  },
+  "select": {
+    "search_placeholder": "Search…",
+    "no_results": "No results",
+    "loading": "Loading…",
+    "clear": "Clear selection",
+    "clear_hint": "(Del)"
   }
 
 }

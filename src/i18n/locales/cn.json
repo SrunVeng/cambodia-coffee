@@ -293,5 +293,12 @@
     "qr_alt": "Telegram 二维码",
     "telegram_url": "https://t.me/your_channel_or_bot",
     "telegram_qr": ""
+  },
+  "select": {
+    "search_placeholder": "搜索…",
+    "no_results": "无结果",
+    "loading": "正在加载…",
+    "clear": "清除选择",
+    "clear_hint": "（Del）"
   }
 }

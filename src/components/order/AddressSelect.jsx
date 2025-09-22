@@ -3,18 +3,29 @@ import { useTranslation } from "react-i18next";
 import { translateName } from "../../utils/i18n-helpers";
 import SearchableSelect from "../../components/ui/SearchableSelect.jsx";
 
+
 const s = (v) => (v == null ? "" : String(v));
 const CACHE = typeof window !== "undefined" ? (window.__ADDR_CACHE__ ||= {}) : {};
 
+
+/**
+ * AddressSelect (improved)
+ * - Safe caching + resilient fetch with clear mapping
+ * - Names auto-sync to language
+ * - Clean reset rules when changing upper levels
+ * - Search placeholders passed through
+ */
 export default function AddressSelect({ value, onChange, lang, closeMenus }) {
     const { i18n, t } = useTranslation();
     const L = (lang || i18n.language || "en").toLowerCase();
     const v = value || {};
 
+
     const [provinces, setProvinces] = useState(CACHE.provinces || []);
     const [districts, setDistricts] = useState(CACHE.districts || []);
     const [communes, setCommunes] = useState(CACHE.communes || []);
     const [villages, setVillages] = useState(CACHE.villages || []);
+
 
     useEffect(() => {
         let alive = true;
@@ -28,10 +39,12 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
                         fetch("/address/villages.json").then((r) => r.json()),
                     ]);
 
+
                     const P = (p.provinces || p).map((x) => ({ ...x, code: s(x.code), province_code: s(x.province_code) }));
                     const D = (d.districts || d).map((x) => ({ ...x, code: s(x.code), province_code: s(x.province_code) }));
                     const Cc = (c.communes || c).map((x) => ({ ...x, code: s(x.code), district_code: s(x.district_code) }));
                     const V = (vv.villages || vv).map((x) => ({ ...x, code: s(x.code), commune_code: s(x.commune_code) }));
+
 
                     CACHE.provinces = P; CACHE.districts = D; CACHE.communes = Cc; CACHE.villages = V;
                 }
@@ -47,25 +60,29 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
         return () => { alive = false; };
     }, []);
 
+
     const labelOf = (obj) => translateName(obj, L);
 
+
     const provincesL = useMemo(() => provinces.map((x) => ({ ...x, label: labelOf(x) })), [provinces, L]);
+
 
     const dByProv = useMemo(() => districts.filter((d) => s(d.province_code) === s(v.province)), [districts, v.province]);
     const districtsL = useMemo(() => dByProv.map((x) => ({ ...x, label: labelOf(x) })), [dByProv, L]);
 
+
     const cByDist = useMemo(() => communes.filter((c) => s(c.district_code) === s(v.district)), [communes, v.district]);
     const communesL = useMemo(() => cByDist.map((x) => ({ ...x, label: labelOf(x) })), [cByDist, L]);
 
+
     const vByComm = useMemo(() => villages.filter((x) => s(x.commune_code) === s(v.commune)), [villages, v.commune]);
     const villagesL = useMemo(() => vByComm.map((x) => ({ ...x, label: labelOf(x) })), [vByComm, L]);
-
-    // Sync name fields to current language
     const lastSyncRef = useRef("");
     useEffect(() => {
         const key = [L, v.province, v.district, v.commune, v.village].map(s).join("|");
         if (key === lastSyncRef.current) return;
         lastSyncRef.current = key;
+
 
         const next = { ...v };
         if (v.province) {
@@ -92,8 +109,8 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
         ) {
             onChange?.(next);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [L, provinces, districts, communes, villages, v.province, v.district, v.commune, v.village]);
+
 
     const setLevel = (level, code) => {
         const next = { ...v };
@@ -102,8 +119,8 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
             next.province = s(code) || undefined;
             next.provinceName = item ? labelOf(item) : undefined;
             next.district = next.districtName = undefined;
-            next.commune  = next.communeName  = undefined;
-            next.village  = next.villageName  = undefined;
+            next.commune = next.communeName = undefined;
+            next.village = next.villageName = undefined;
         } else if (level === "district") {
             const item = dByProv.find((d) => s(d.code) === s(code));
             next.district = s(code) || undefined;
@@ -123,14 +140,15 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
         onChange?.(next);
     };
 
+
     const asItems = (arr) => arr.map((x) => ({ value: s(x.code), label: x.label }));
     const provinceItems = useMemo(() => asItems(provincesL), [provincesL]);
-    const districtItems  = useMemo(() => asItems(districtsL), [districtsL]);
-    const communeItems   = useMemo(() => asItems(communesL), [communesL]);
-    const villageItems   = useMemo(() => asItems(villagesL), [villagesL]);
+    const districtItems = useMemo(() => asItems(districtsL), [districtsL]);
+    const communeItems = useMemo(() => asItems(communesL), [communesL]);
+    const villageItems = useMemo(() => asItems(villagesL), [villagesL]);
+
 
     const loading = !provinces.length;
-
     return (
         <div className="grid gap-3 md:grid-cols-4">
             <SearchableSelect
@@ -143,7 +161,13 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
                 portalToBody
                 menuZIndex={5000}
                 closeSignal={closeMenus}
+                searchPlaceholder={t("select.search_placeholder")}
+                noResultsText={t("select.no_results")}
+                loadingText={t("select.loading")}
+                clearText={t("select.clear")}
+                clearHint={t("select.clear_hint")}
             />
+
 
             <SearchableSelect
                 placeholder={t("order.district", { defaultValue: "District" })}
@@ -155,7 +179,13 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
                 portalToBody
                 menuZIndex={5000}
                 closeSignal={closeMenus}
+                searchPlaceholder={t("select.search_placeholder")}
+                noResultsText={t("select.no_results")}
+                loadingText={t("select.loading")}
+                clearText={t("select.clear")}
+                clearHint={t("select.clear_hint")}
             />
+
 
             <SearchableSelect
                 placeholder={t("order.commune", { defaultValue: "Commune" })}
@@ -167,8 +197,12 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
                 portalToBody
                 menuZIndex={5000}
                 closeSignal={closeMenus}
+                searchPlaceholder={t("select.search_placeholder")}
+                noResultsText={t("select.no_results")}
+                loadingText={t("select.loading")}
+                clearText={t("select.clear")}
+                clearHint={t("select.clear_hint")}
             />
-
             <SearchableSelect
                 placeholder={t("order.village", { defaultValue: "Village" })}
                 items={villageItems}
@@ -179,6 +213,11 @@ export default function AddressSelect({ value, onChange, lang, closeMenus }) {
                 portalToBody
                 menuZIndex={5000}
                 closeSignal={closeMenus}
+              searchPlaceholder={t("select.search_placeholder")}
+              noResultsText={t("select.no_results")}
+              loadingText={t("select.loading")}
+              clearText={t("select.clear")}
+              clearHint={t("select.clear_hint")}
             />
         </div>
     );

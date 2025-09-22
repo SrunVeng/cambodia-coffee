@@ -291,5 +291,12 @@
     "qr_alt": "QR Telegram",
     "telegram_url": "https://t.me/your_channel_or_bot",
     "telegram_qr": ""
+  },
+  "select": {
+    "search_placeholder": "ស្វែងរក…",
+    "no_results": "មិនមានលទ្ធផល",
+    "loading": "កំពុងផ្ទុក…",
+    "clear": "លុបជម្រើស",
+    "clear_hint": "(Del)"
   }
 }
