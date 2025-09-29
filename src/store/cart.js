@@ -21,7 +21,11 @@ function readItems() {
 
 function writeItems(items) {
     if (typeof window === "undefined") return;
-    try { localStorage.setItem(KEY, JSON.stringify(items)); } catch { /* empty */ }
+    try {
+        localStorage.setItem(KEY, JSON.stringify(items));
+    } catch {
+        /* empty */
+    }
 }
 
 export const useCart = create((set, get) => ({
@@ -29,7 +33,9 @@ export const useCart = create((set, get) => ({
 
     add(item) {
         const items = [...get().items];
-        const idx = items.findIndex((i) => i.id === item.id && i.variantId === item.variantId);
+        const idx = items.findIndex(
+            (i) => i.id === item.id && i.variantId === item.variantId
+        );
         if (idx > -1) {
             items[idx].qty = clampQty((items[idx].qty || 0) + (item.qty || 1));
         } else {
@@ -41,7 +47,9 @@ export const useCart = create((set, get) => ({
 
     addOrIncrement(itemKey, delta = 1) {
         const items = [...get().items];
-        const idx = items.findIndex((i) => i.id === itemKey.id && i.variantId === itemKey.variantId);
+        const idx = items.findIndex(
+            (i) => i.id === itemKey.id && i.variantId === itemKey.variantId
+        );
         if (idx > -1) {
             items[idx].qty = clampQty((items[idx].qty || 0) + delta);
         } else {
@@ -52,14 +60,18 @@ export const useCart = create((set, get) => ({
     },
 
     remove(itemKey) {
-        const items = get().items.filter((i) => !(i.id === itemKey.id && i.variantId === itemKey.variantId));
+        const items = get().items.filter(
+            (i) => !(i.id === itemKey.id && i.variantId === itemKey.variantId)
+        );
         writeItems(items);
         set({ items });
     },
 
     setQty(itemKey, qty) {
         const items = get().items.map((i) =>
-            i.id === itemKey.id && i.variantId === itemKey.variantId ? { ...i, qty: clampQty(qty) } : i
+            i.id === itemKey.id && i.variantId === itemKey.variantId
+                ? { ...i, qty: clampQty(qty) }
+                : i
         );
         writeItems(items);
         set({ items });
@@ -67,7 +79,9 @@ export const useCart = create((set, get) => ({
 
     increment(itemKey) {
         const items = get().items.map((i) =>
-            i.id === itemKey.id && i.variantId === itemKey.variantId ? { ...i, qty: clampQty((i.qty || 0) + 1) } : i
+            i.id === itemKey.id && i.variantId === itemKey.variantId
+                ? { ...i, qty: clampQty((i.qty || 0) + 1) }
+                : i
         );
         writeItems(items);
         set({ items });
@@ -76,7 +90,9 @@ export const useCart = create((set, get) => ({
     decrement(itemKey) {
         const items = get()
             .items.map((i) =>
-                i.id === itemKey.id && i.variantId === itemKey.variantId ? { ...i, qty: clampQty((i.qty || 0) - 1) } : i
+                i.id === itemKey.id && i.variantId === itemKey.variantId
+                    ? { ...i, qty: clampQty((i.qty || 0) - 1) }
+                    : i
             )
             .filter((i) => i.qty > 0);
         writeItems(items);
@@ -90,12 +106,19 @@ export const useCart = create((set, get) => ({
     },
 
     clear() {
-        try { localStorage.removeItem(KEY); } catch { /* empty */ }
+        try {
+            localStorage.removeItem(KEY);
+        } catch {
+            /* empty */
+        }
         set({ items: [] });
     },
 
     subtotal() {
-        return get().items.reduce((s, i) => s + (Number(i.price) || 0) * (i.qty || 0), 0);
+        return get().items.reduce(
+            (s, i) => s + (Number(i.price) || 0) * (i.qty || 0),
+            0
+        );
     },
 
     count() {
@@ -113,7 +136,9 @@ if (typeof window !== "undefined") {
                 if (JSON.stringify(items) !== JSON.stringify(curr)) {
                     useCart.setState({ items });
                 }
-            } catch { /* empty */ }
+            } catch {
+                /* empty */
+            }
         }
     });
 }

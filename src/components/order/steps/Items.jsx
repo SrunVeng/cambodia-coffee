@@ -1,9 +1,9 @@
+// src/pages/order/steps/Items.jsx
 import { useMemo, useState } from "react";
 import { useCart } from "../../../store/cart";
 import { fmt } from "../../../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Trash2 } from "lucide-react";
 
 import ProductPicker from "../../../components/ProductPicker.jsx";
 import Line from "../../../components/Line";
@@ -23,19 +23,17 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
     const [pickerOpen, setPickerOpen] = useState(false);
     const [clearOpen, setClearOpen] = useState(false);
 
-    const total = useMemo(() => (subtotal || 0) + (deliveryFee || 0), [subtotal, deliveryFee]);
+    const total = useMemo(
+        () => (subtotal || 0) + (deliveryFee || 0),
+        [subtotal, deliveryFee]
+    );
 
     const handleInc = (it) => increment({ id: it.id, variantId: it.variantId });
     const handleDec = (it) => decrement({ id: it.id, variantId: it.variantId });
     const handleRemove = (it) => remove({ id: it.id, variantId: it.variantId });
 
     function goNext() {
-        try {
-            localStorage.setItem(
-                "summary",
-                JSON.stringify({ currency, items, subtotal, deliveryFee, total })
-            );
-        } catch {}
+        // ✅ Let the Wizard recompute & persist summary (single source of truth)
         onNext?.({ currency, items, subtotal, deliveryFee, total });
     }
 
@@ -61,9 +59,17 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
                             onClick={() => setPickerOpen(true)}
                         >
                             {/* plus icon */}
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                 aria-hidden="true">
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                            >
                                 <path d="M12 5v14M5 12h14" />
                             </svg>
                             {t("items.addMore", { defaultValue: "Add more products" })}
@@ -81,9 +87,17 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
                                 onClick={() => setClearOpen(true)}
                             >
                                 {/* trash icon */}
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                     aria-hidden="true">
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    aria-hidden="true"
+                                >
                                     <polyline points="3 6 5 6 21 6"></polyline>
                                     <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
                                     <path d="M10 11v6M14 11v6"></path>
@@ -100,9 +114,17 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
                     <div className="grid place-items-center py-10 text-center">
                         <div className="mb-3 opacity-70">
                             {/* shopping bag icon */}
-                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
-                                 className="mx-auto">
+                            <svg
+                                width="36"
+                                height="36"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="mx-auto"
+                            >
                                 <path d="M6 2l3 3h6l3-3" />
                                 <path d="M6 6h12l-1 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 6z" />
                                 <path d="M9 10v-2a3 3 0 0 1 6 0v2" />
@@ -123,9 +145,17 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
                             onClick={() => setPickerOpen(true)}
                         >
                             {/* plus icon */}
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                 aria-hidden="true">
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                            >
                                 <path d="M12 5v14M5 12h14" />
                             </svg>
                             {t("items.addMore", { defaultValue: "Add more products" })}
@@ -136,7 +166,7 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
                         <AnimatePresence initial={false}>
                             {items.map((i) => (
                                 <motion.div
-                                    key={i.id + '::' + i.variantId}
+                                    key={i.id + "::" + i.variantId}
                                     initial={{ opacity: 0, y: 12 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -12 }}
@@ -151,9 +181,9 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
                                     <Line
                                         item={i}
                                         currency={i.currency || currency}
-                                        onInc={handleInc}
-                                        onDec={handleDec}
-                                        onRemove={handleRemove}
+                                        onInc={(it) => handleInc(it)}
+                                        onDec={(it) => handleDec(it)}
+                                        onRemove={(it) => handleRemove(it)}
                                     />
                                 </motion.div>
                             ))}
@@ -166,10 +196,12 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
             <div className="rounded-2xl border border-[#e7dbc9] bg-[#fffaf3] shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
                     <div className="opacity-80">
-                        {t("payment.subtotal", { defaultValue: "Subtotal" })}: {fmt(subtotal || 0, currency)}
+                        {t("payment.subtotal", { defaultValue: "Subtotal" })}:{" "}
+                        {fmt(subtotal || 0, currency)}
                     </div>
                     <div className="opacity-80">
-                        {t("payment.delivery", { defaultValue: "Delivery" })}: {fmt(deliveryFee || 0, currency)}
+                        {t("payment.delivery", { defaultValue: "Delivery" })}:{" "}
+                        {fmt(deliveryFee || 0, currency)}
                     </div>
                 </div>
                 <div className="text-right">
@@ -189,7 +221,7 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
                     className="
             inline-flex items-center justify-center rounded-xl px-4 py-2.5
             text-sm font-medium text-[#2d1a14]
-            border border-[#e7dbc9] bg-white/70
+            border border-[#e7dbc9] bg.white/70
             hover:border-[#c9a44c] hover:shadow-sm
             focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a44c] focus-visible:ring-offset-2
           "
@@ -240,7 +272,8 @@ export default function Items({ currency = "KHR", deliveryFee = 0, onNext, onBac
                 danger
                 title={t("items.clearTitle", { defaultValue: "Clear your cart?" })}
                 hint={t("items.clearHint", {
-                    defaultValue: "This will remove all items from your cart. This action cannot be undone.",
+                    defaultValue:
+                        "This will remove all items from your cart. This action cannot be undone.",
                 })}
                 confirmLabel={t("items.clear", { defaultValue: "Clear cart" })}
                 cancelLabel={t("common.cancel", { defaultValue: "Cancel" })}

@@ -1,344 +1,264 @@
-import React, { useMemo, useRef, useEffect } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Minus, Plus } from "lucide-react";
+import { motion } from "framer-motion";
 
 /**
- * Enhanced Stepper
- * — Accessible, animated, and themeable horizontal stepper
- *
- * Props
- *  - steps: Array<string | { id?: string|number, label: string }>
- *  - active: number (0-based index of the current step)
- *  - completed: boolean[] (same length as steps)
- *  - reachable: boolean[] (same length as steps)
- *  - lastVisited: number | undefined
- *  - onStepClick: (index:number)=>void
- *  - size: "sm" | "md" | "lg" (default: "md")
- *  - showPartial: boolean (default: true) – show half connector for the active step
- *  - className: string
- *  - clickable: boolean (default: true)
- *  - variant: "brand" | "neutral" (default: "brand") – color palette
- *
- * Accessibility
- *  - The nav has role="progressbar" with aria-valuenow/min/max.
- *  - Each step button has aria-current="step" when active.
- *  - Full keyboard support: ←/→ to move focus, Home/End to jump, Enter/Space to activate.
+ * QtyStepper (flat design + your hover/tap pattern)
  */
-export default function Stepper({
-                                    steps = [],
-                                    active = 0,
-                                    completed = [],
-                                    reachable = [],
-                                    lastVisited,
-                                    onStepClick,
-                                    size = "md",
-                                    showPartial = true,
-                                    className = "",
-                                    clickable = true,
-                                    variant = "brand",
-                                }) {
-    const reduceMotion = useReducedMotion?.() ?? false;
+export default function QtyStepper({
+                                       value = 1,
+                                       min = 1,
+                                       max,
+                                       step = 1,
+                                       onDec,
+                                       onInc,
+                                       onChange,
+                                       size = "md",
+                                       disabled = false,
+                                       className = "",
+                                       unit,
+                                       showQuickAdds = false,
+                                       quickAdds,
+                                   }) {
+    const sizes = {
+        sm: { btnH: "h-8", text: "text-sm", pad: "px-2.5", gap: "gap-1.5", icon: "w-4 h-4", inph: "h-8 px-2", chip: "text-xs px-2 py-1" },
+        md: { btnH: "h-10", text: "text-base", pad: "px-3.5", gap: "gap-2", icon: "w-4 h-4", inph: "h-10 px-3", chip: "text-sm px-3 py-1.5" },
+        lg: { btnH: "h-12", text: "text-lg", pad: "px-4", gap: "gap-2.5", icon: "w-5 h-5", inph: "h-12 px-4", chip: "text-base px-3.5 py-2" },
+    };
+    const S = sizes[size] ?? sizes.md;
 
-    const items = useMemo(
-        () =>
-            steps.map((s, i) =>
-                typeof s === "string" ? { id: i, label: s } : { id: s.id ?? i, label: s.label }
-            ),
-        [steps]
-    );
+    const safeMin = Math.max(min ?? 0, 0);
+    const safeMax = typeof max === "number" ? Math.max(max, safeMin) : undefined;
 
-    const last = Math.max(items.length - 1, 0);
-    const safeActive = Math.min(Math.max(active, 0), last);
-    const segCount = Math.max(items.length - 1, 0);
+    const canDec = !disabled && value > safeMin;
+    const canInc = !disabled && (typeof safeMax !== "number" || value < safeMax);
 
-    const sizeCfg = {
-        sm: { dot: 32, icon: 16, label: "text-xs", ring: "ring-1", trackH: "h-[2px]" },
-        md: { dot: 44, icon: 18, label: "text-sm", ring: "ring-2", trackH: "h-[3px]" },
-        lg: { dot: 56, icon: 20, label: "text-base", ring: "ring-2", trackH: "h-[4px]" },
-    }[size] ?? { dot: 44, icon: 18, label: "text-sm", ring: "ring-2", trackH: "h-[3px]" };
+    const theme =
+        "text-[#2d1a14] [--ring:#c9a44c] [--brd:#e7dbc9] [--bg:255_249_241] [--bg2:255_255_255]";
 
-    const palette = variant === "neutral"
-        ? {
-            dotDone: "from-gray-900 to-gray-700",
-            dotActiveBg: "bg-white",
-            dotIdleBg: "bg-gray-50",
-            dotIdleText: "text-gray-500",
-            dotActiveText: "text-gray-900",
-            dotVisited: "bg-white",
-            border: "border-gray-300",
-            ring: "ring-gray-300",
-            trackBg: "bg-gray-200",
-            trackHalf: "bg-gray-500",
-            trackFull: "bg-gray-900",
-            shadowGlow: "shadow-[0_0_0_0_rgba(0,0,0,0)]",
+    const wrapBase = "inline-flex items-center";
+
+    // Rectangular button base
+    const btnBase =
+        "inline-flex items-center justify-center rounded-lg " +
+        "bg-white/90 hover:bg-white " +
+        "ring-1 ring-inset ring-[color:var(--brd)] " +
+        "transition-colors duration-150 ease-out " +
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 " +
+        "disabled:opacity-40 disabled:cursor-not-allowed";
+
+    const centerBase =
+        "font-semibold tabular-nums tracking-tight select-none rounded-lg " +
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]";
+
+    // ---------- Helpers ----------
+    const clamp = (n) => {
+        const lo = safeMin;
+        const hi = typeof safeMax === "number" ? safeMax : Number.POSITIVE_INFINITY;
+        if (!Number.isFinite(n)) return lo;
+        return Math.min(Math.max(Math.trunc(n), lo), hi);
+    };
+
+    const applyChange = (next) => {
+        const c = clamp(next);
+        if (onChange) {
+            onChange(c);
+            return;
         }
-        : {
-            // "brand" (coffee) palette – tweak freely
-            dotDone: "from-[#4b2e24] to-[#2d1a14]",
-            dotActiveBg: "bg-[#fffaf3]",
-            dotIdleBg: "bg-[#fbf8f3]",
-            dotIdleText: "text-[#857567]",
-            dotActiveText: "text-[#2d1a14]",
-            dotVisited: "bg-[#fff8ef]",
-            border: "border-[#e7dbc9]",
-            ring: "ring-[#c9a44c]",
-            trackBg: "bg-[#e7dbc9]",
-            trackHalf: "bg-[#c9a44c]",
-            trackFull: "bg-[#4b2e24]",
-            shadowGlow: "shadow-[0_0_0_0_rgba(0,0,0,0)]",
-        };
-
-    // Build CSS columns: dot, 1fr, dot, 1fr, ... dot
-    const cols = [];
-    for (let i = 0; i < items.length; i++) {
-        cols.push("var(--dot)");
-        if (i < items.length - 1) cols.push("1fr");
-    }
-
-    const connectorState = (i) => {
-        if (i < safeActive) return "full";
-        if (i === safeActive && i < segCount && showPartial) return "half";
-        return "empty";
+        const delta = c - value;
+        if (delta > 0) onInc?.();
+        else if (delta < 0) onDec?.();
     };
 
-    // refs for keyboard nav
-    const btnRefs = useRef([]);
-    btnRefs.current = [];
-    const setBtnRef = (el) => {
-        if (el) btnRefs.current.push(el);
+    const incOnce = () => {
+        if (!canInc) return;
+        if (onChange) applyChange(value + step);
+        else onInc?.();
+    };
+    const decOnce = () => {
+        if (!canDec) return;
+        if (onChange) applyChange(value - step);
+        else onDec?.();
     };
 
-    const canStepClick = (i) =>
-        typeof onStepClick === "function" && clickable && (reachable[i] || i <= safeActive);
-
-    const moveFocus = (nextIdx) => {
-        const clamped = Math.max(0, Math.min(items.length - 1, nextIdx));
-        const el = btnRefs.current[clamped];
-        if (el) el.focus();
+    // ---------- Hold-to-repeat with acceleration ----------
+    const holdRef = useRef({ t: null, int: null, started: false, ticks: 0, kind: null });
+    const clearHold = () => {
+        const h = holdRef.current;
+        if (h.t) clearTimeout(h.t);
+        if (h.int) clearInterval(h.int);
+        holdRef.current = { t: null, int: null, started: false, ticks: 0, kind: null };
     };
-
-    const onKeyDown = (e, i) => {
-        // Allow navigation even if the button is disabled, for accessibility
-        switch (e.key) {
-            case "ArrowLeft":
-            case "Left":
-                e.preventDefault();
-                moveFocus(i - 1);
-                break;
-            case "ArrowRight":
-            case "Right":
-                e.preventDefault();
-                moveFocus(i + 1);
-                break;
-            case "Home":
-                e.preventDefault();
-                moveFocus(0);
-                break;
-            case "End":
-                e.preventDefault();
-                moveFocus(items.length - 1);
-                break;
-            case "Enter":
-            case " ": // Space
-                if (canStepClick(i)) {
-                    e.preventDefault();
-                    onStepClick?.(i);
-                }
-                break;
-            default:
-                break;
-        }
-    };
-
-    // Announce active step change politely
-    const liveRef = useRef(null);
     useEffect(() => {
-        if (liveRef.current) {
-            liveRef.current.textContent = `Step ${safeActive + 1} of ${items.length}: ${items[safeActive]?.label ?? ""}`;
+        const up = () => clearHold();
+        window.addEventListener("pointerup", up);
+        window.addEventListener("pointercancel", up);
+        return () => {
+            window.removeEventListener("pointerup", up);
+            window.removeEventListener("pointercancel", up);
+            clearHold();
+        };
+    }, []);
+    const startHold = (kind) => {
+        if (disabled) return;
+        clearHold();
+        holdRef.current.kind = kind;
+        holdRef.current.t = setTimeout(() => {
+            holdRef.current.started = true;
+            holdRef.current.ticks = 0;
+            let interval = 140;
+            const tick = () => {
+                holdRef.current.ticks += 1;
+                if (holdRef.current.kind === "inc") {
+                    if (!canInc) return clearHold();
+                    incOnce();
+                } else {
+                    if (!canDec) return clearHold();
+                    decOnce();
+                }
+                if (holdRef.current.ticks === 15 || holdRef.current.ticks === 35 || holdRef.current.ticks === 70) {
+                    clearInterval(holdRef.current.int);
+                    interval = holdRef.current.ticks === 15 ? 90 : holdRef.current.ticks === 35 ? 55 : 35;
+                    holdRef.current.int = setInterval(tick, interval);
+                }
+            };
+            holdRef.current.int = setInterval(tick, interval);
+        }, 260);
+    };
+
+    // ---------- Editable center (only if onChange provided) ----------
+    const [editing, setEditing] = useState(false);
+    const [draft, setDraft] = useState("");
+    useEffect(() => {
+        if (!editing) setDraft(String(value));
+    }, [value, editing]);
+    const commitDraft = () => {
+        const n = clamp(Number(draft));
+        applyChange(n);
+        setEditing(false);
+    };
+    const cancelEdit = () => {
+        setDraft(String(value));
+        setEditing(false);
+    };
+    const canType = !!onChange && !disabled;
+
+    // readable number + stable width
+    const fmt = useMemo(() => new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }), []);
+    const display = fmt.format(value);
+    const ch = Math.max(3, String(display).length + (unit ? unit.length + 1 : 0));
+
+    // Quick add chips
+    const quickList = useMemo(() => quickAdds ?? [10, 50, 100], [quickAdds]);
+
+    // Keyboard
+    const onWrapperKeyDown = (e) => {
+        if (disabled) return;
+        if (e.key === "ArrowUp" || e.key === "+") {
+            e.preventDefault();
+            incOnce();
+        } else if (e.key === "ArrowDown" || e.key === "-") {
+            e.preventDefault();
+            decOnce();
         }
-    }, [safeActive, items]);
+    };
 
     return (
-        <nav
-            aria-label="Progress"
-            role="progressbar"
-            aria-valuemin={1}
-            aria-valuenow={items.length ? safeActive + 1 : 0}
-            aria-valuemax={items.length || 1}
-            className={`w-full bg-transparent ${className}`}
-        >
-            {/* live region for SR users */}
-            <p ref={liveRef} className="sr-only" aria-live="polite" />
+        <div className={`flex flex-col items-start ${theme} ${className}`} onKeyDown={onWrapperKeyDown}>
+            <div className={`${wrapBase} ${S.gap} ${S.pad}`} role="group" aria-label="Quantity stepper">
+                {/* Decrease */}
+                <motion.button
+                    type="button"
+                    aria-label="Decrease quantity"
+                    disabled={!canDec}
+                    onClick={decOnce}
+                    onPointerDown={() => startHold("dec")}
+                    onPointerUp={clearHold}
+                    onPointerLeave={clearHold}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    className={`${btnBase} ${S.btnH} px-3`}
+                >
+                    <Minus className={`${S.icon}`} aria-hidden="true" />
+                </motion.button>
 
-            {/* Mobile helper */}
-            <p className="sm:hidden mb-3 text-xs text-[#857567] text-center select-none">
-                {items.length ? `Step ${safeActive + 1} of ${items.length}` : "—"}
-            </p>
-
-            <div
-                className="grid gap-y-2 sm:gap-y-3"
-                style={{
-                    gridTemplateColumns: cols.join(" "),
-                    ["--dot"]: `${sizeCfg.dot}px`,
-                }}
-            >
-                {items.map((step, i) => {
-                    const isDone = !!completed[i];
-                    const isActive = i === safeActive;
-                    const wasVisited = lastVisited === i && !isActive;
-                    const canClick = canStepClick(i);
-
-                    const baseBtn = `flex items-center justify-center rounded-full border shadow-sm transition-colors focus:outline-none focus-visible:${sizeCfg.ring} focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${palette.ring}`;
-                    const dimWhenDisabled = canClick ? "opacity-100" : "opacity-80";
-
-                    const stateClasses = isDone
-                        ? `bg-gradient-to-br ${palette.dotDone} text-white border-transparent`
-                        : isActive
-                            ? `${palette.dotActiveBg} ${palette.dotActiveText} ${palette.border}`
-                            : wasVisited
-                                ? `${palette.dotVisited} ${palette.dotActiveText} ${palette.border}`
-                                : `${palette.dotIdleBg} ${palette.dotIdleText} ${palette.border}`;
-
-                    return (
-                        <React.Fragment key={step.id}>
-                            {/* DOT */}
-                            <div className="row-start-1 col-span-1 flex items-center justify-center">
-                                <motion.button
-                                    ref={setBtnRef}
-                                    type="button"
-                                    whileHover={canClick && !reduceMotion ? { scale: 1.06 } : undefined}
-                                    whileTap={canClick && !reduceMotion ? { scale: 0.96 } : undefined}
-                                    animate={!reduceMotion
-                                        ? isActive
-                                            ? { scale: 1.1, boxShadow: "0 0 0 6px rgba(201,164,76,0.35)" }
-                                            : wasVisited
-                                                ? { scale: 1.03, boxShadow: "0 0 0 4px rgba(75,46,36,0.25)" }
-                                                : { scale: 1, boxShadow: "0 0 0 0px rgba(0,0,0,0)" }
-                                        : undefined}
-                                    transition={{ type: "spring", stiffness: 320, damping: 22 }}
-                                    onKeyDown={(e) => onKeyDown(e, i)}
-                                    onClick={() => (canClick ? onStepClick?.(i) : null)}
-                                    disabled={!canClick}
-                                    aria-current={isActive ? "step" : undefined}
-                                    aria-disabled={!canClick ? true : undefined}
-                                    tabIndex={isActive ? 0 : -1}
-                                    className={`${baseBtn} w-[var(--dot)] h-[var(--dot)] ${stateClasses} ${dimWhenDisabled} ${
-                                        canClick ? "cursor-pointer" : "cursor-default select-none"
-                                    }`}
-                                    title={canClick ? `Go to ${step.label}` : step.label}
-                                >
-                                    {isDone ? (
-                                        <motion.svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            className="shrink-0"
-                                            width={sizeCfg.icon}
-                                            height={sizeCfg.icon}
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2.5"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <motion.path
-                                                d="M20 6 9 17l-5-5"
-                                                initial={reduceMotion ? undefined : { pathLength: 0 }}
-                                                animate={reduceMotion ? undefined : { pathLength: 1 }}
-                                                transition={{ duration: 0.5, ease: "easeOut" }}
-                                            />
-                                        </motion.svg>
-                                    ) : (
-                                        <span className="font-semibold" style={{ fontSize: sizeCfg.icon * 0.7 }}>
-                      {i + 1}
-                    </span>
-                                    )}
-
-                                    {/* Active glow pulse */}
-                                    {isActive && !reduceMotion && (
-                                        <motion.span
-                                            aria-hidden
-                                            className="absolute inset-0 rounded-full"
-                                            style={{ boxShadow: "0 0 0 0 rgba(201,164,76,0.0)" }}
-                                            animate={{ boxShadow: [
-                                                    "0 0 0 0 rgba(201,164,76,0.0)",
-                                                    "0 0 0 12px rgba(201,164,76,0.12)",
-                                                    "0 0 0 0 rgba(201,164,76,0.0)",
-                                                ] }}
-                                            transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
-                                        />
-                                    )}
-                                </motion.button>
-                            </div>
-
-                            {/* CONNECTOR */}
-                            {i < segCount && (
-                                <div className="row-start-1 col-span-1 flex items-center">
-                                    <div className={`w-full ${sizeCfg.trackH} rounded-full ${palette.trackBg} overflow-hidden relative`}>
-                                        {/* shimmer (behind) */}
-                                        {!reduceMotion && (
-                                            <motion.div
-                                                aria-hidden
-                                                className="absolute inset-y-0 left-0 w-1/3 opacity-0"
-                                                style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent)" }}
-                                                animate={{ x: ["-50%", "150%"], opacity: [0, 1, 0] }}
-                                                transition={{ duration: 1.6, repeat: Infinity, ease: "linear" }}
-                                            />
-                                        )}
-
-                                        <motion.div
-                                            className={`h-full rounded-full ${
-                                                connectorState(i) === "half"
-                                                    ? palette.trackHalf
-                                                    : connectorState(i) === "full"
-                                                        ? palette.trackFull
-                                                        : palette.trackBg
-                                            }`}
-                                            initial={reduceMotion ? undefined : { width: 0 }}
-                                            animate={{
-                                                width:
-                                                    connectorState(i) === "full"
-                                                        ? "100%"
-                                                        : connectorState(i) === "half"
-                                                            ? "50%"
-                                                            : "0%",
-                                            }}
-                                            transition={{ duration: 0.55, ease: "easeInOut" }}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                        </React.Fragment>
-                    );
-                })}
-
-                {/* Labels */}
-                {items.map((step, i) => {
-                    const isDone = !!completed[i];
-                    const isActive = i === safeActive;
-                    const wasVisited = lastVisited === i && !isActive;
-                    return (
-                        <div
-                            key={`label-${step.id}`}
-                            className="row-start-2 flex items-start justify-center"
-                            style={{ gridColumn: `${i * 2 + 1} / span 1` }}
+                {/* Center display / input */}
+                <div className="flex items-center">
+                    {canType && editing ? (
+                        <input
+                            autoFocus
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            min={safeMin}
+                            max={safeMax}
+                            className={`${S.inph} ${S.text} ${centerBase} bg-white/70 ring-1 ring-inset ring-[color:var(--brd)] text-center w-[8ch]`}
+                            value={draft}
+                            onChange={(e) => setDraft(e.target.value.replace(/[^\d]/g, ""))}
+                            onBlur={commitDraft}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") { e.preventDefault(); commitDraft(); }
+                                if (e.key === "Escape") { e.preventDefault(); cancelEdit(); }
+                            }}
+                            aria-label="Enter quantity"
+                        />
+                    ) : (
+                        <button
+                            type="button"
+                            className={`${S.inph} ${S.text} ${centerBase} hover:bg-white/60 text-center transition-colors duration-150`}
+                            onClick={() => canType && setEditing(true)}
+                            title={canType ? "Tap to type" : undefined}
+                            aria-live="polite"
+                            aria-atomic="true"
+                            role="spinbutton"
+                            aria-valuemin={safeMin}
+                            aria-valuemax={typeof safeMax === "number" ? safeMax : undefined}
+                            aria-valuenow={value}
+                            style={{ minWidth: `${ch}ch` }}
                         >
-              <span
-                  className={`${sizeCfg.label} text-center max-w-[120px] sm:max-w-[160px] leading-tight truncate ${
-                      isActive
-                          ? `${palette.dotActiveText} font-bold`
-                          : wasVisited
-                              ? "text-[#c9a44c] font-medium"
-                              : isDone
-                                  ? "text-[#3b2a1d] font-medium"
-                                  : palette.dotIdleText
-                  }`}
-                  title={step.label}
-              >
-                {step.label}
-              </span>
-                        </div>
-                    );
-                })}
+                            {display}
+                            {unit ? <span className="ml-1 font-normal opacity-70">{unit}</span> : null}
+                        </button>
+                    )}
+                </div>
+
+                {/* Increase */}
+                <motion.button
+                    type="button"
+                    aria-label="Increase quantity"
+                    disabled={!canInc}
+                    onClick={incOnce}
+                    onPointerDown={() => startHold("inc")}
+                    onPointerUp={clearHold}
+                    onPointerLeave={clearHold}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    className={`${btnBase} ${S.btnH} px-3`}
+                >
+                    <Plus className={`${S.icon}`} aria-hidden="true" />
+                </motion.button>
             </div>
-        </nav>
+
+            {/* Quick adds (optional) */}
+            {showQuickAdds && !!onChange && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                    {quickList.map((q) => {
+                        const next = clamp(value + q);
+                        const disabledChip = disabled || (typeof safeMax === "number" && value >= safeMax);
+                        return (
+                            <button
+                                key={q}
+                                type="button"
+                                disabled={disabledChip}
+                                onClick={() => applyChange(next)}
+                                className={`${S.chip} rounded-full ring-1 ring-inset ring-[color:var(--brd)] bg-white/90 hover:bg-white transition-colors duration-150`}
+                                title={`Add +${q}${unit ? " " + unit : ""}`}
+                            >
+                                +{q}{unit ? unit : ""}
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
     );
 }
