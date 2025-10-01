@@ -5,6 +5,7 @@ import Order from './pages/Order'
 import About from './pages/About'
 import Contact  from './pages/Contact.jsx'
 import Confirm from './pages/Confirm.jsx'
+import Receipt from "./components/order/steps/Receipt.jsx";
 
 export default function RoutesView(){
     return (
@@ -14,7 +15,7 @@ export default function RoutesView(){
             <Route path="/order" element={<Order/>} />
             <Route path="/about" element={<About/>} />
             <Route path="/contact" element={<Contact/>} />
-            <Route path="/reciept" element={<Confirm/>} />
+            <Route path="/receipt" element={<Receipt/>} />
         </Routes>
     )
 }

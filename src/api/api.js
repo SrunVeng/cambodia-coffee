@@ -1,6 +1,6 @@
 // src/api/api.js
 // Hardcode your base here (change any time). No mock, no .env.
-export const API_BASE = "http://localhost:8080";
+export const API_BASE = "http://localhost:8081";
 
 export async function postJson(path, body, init = {}) {
     const url = `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
@@ -42,7 +42,7 @@ export async function getJson(path, init = {}) {
 // Public endpoints you can change later on the backend side:
 export function createOrder(payload) {
     // COD or generic “create order”
-    return postJson("/orders", payload);
+    return postJson("/api/v1/order/create", payload);
 }
 
 export function requestAbaPayment(payload) {
