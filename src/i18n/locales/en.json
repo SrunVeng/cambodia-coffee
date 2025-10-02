@@ -92,7 +92,10 @@
     "added": "Added to cart!",
     "reset": "Reset",
     "tapToSelect": "Tap a variant to add",
-    "close": "Close"
+    "close": "Close",
+    "download": "Download",
+    "delete": "Delete",
+    "actions": "Actions"
   },
   "payment": {
     "cod": "Cash on Delivery",
@@ -299,6 +302,31 @@
     "loading": "Loading…",
     "clear": "Clear selection",
     "clear_hint": "(Del)"
+  },
+  "receipt": {
+    "title": "Receipt",
+    "missing": "No receipt found.",
+    "new_order": "Start New Order",
+    "subtotal": "Subtotal",
+    "delivery_fee": "Delivery Fee",
+    "total": "Total",
+    "status": "Status"
+  },
+  "myorder": {
+    "title": "My Order",
+    "subtitle": "Your most recent order",
+    "empty_title": "You don’t have any orders yet",
+    "empty_desc": "Start your first order now.",
+    "start_order": "Make an Order",
+    "order_no": "Order No.",
+    "date": "Date",
+    "items": "Items",
+    "more": "more item(s)",
+    "all": "All Receipts",
+    "count": "saved",
+    "view_receipt": "View Receipt",
+    "download_pdf_tip": "Use print → Save as PDF"
   }
 
 }
+

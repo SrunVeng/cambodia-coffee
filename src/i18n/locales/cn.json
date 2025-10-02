@@ -88,6 +88,9 @@
     "unit": "单位",
     "total": "合计",
     "remove": "移除",
+    "download": "下载",
+    "delete": "删除",
+    "actions": "操作",
     "optional": "（可选）",
     "added": "已加入购物车！",
     "confirm": "确认",
@@ -300,5 +303,29 @@
     "loading": "正在加载…",
     "clear": "清除选择",
     "clear_hint": "（Del）"
+  },
+  "receipt": {
+    "title": "收据",
+    "missing": "未找到收据。",
+    "new_order": "开始新订单",
+    "subtotal": "小计",
+    "delivery_fee": "配送费",
+    "total": "合计",
+    "status": "状态"
+  },
+  "myorder": {
+    "title": "我的订单",
+    "subtitle": "您最近的订单",
+    "empty_title": "你还没有订单",
+    "empty_desc": "现在就开始你的第一笔订单。",
+    "start_order": "去下单",
+    "order_no": "订单号",
+    "date": "日期",
+    "items": "商品",
+    "more": "更多商品",
+    "all": "全部收据",
+    "count": "已保存",
+    "view_receipt": "查看收据",
+    "download_pdf_tip": "使用“打印 → 另存为 PDF”"
   }
 }
