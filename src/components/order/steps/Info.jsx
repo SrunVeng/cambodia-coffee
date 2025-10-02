@@ -20,6 +20,23 @@ const normalizeLang = (L) => {
     return ["en", "kh", "cn"].includes(x) ? x : "en";
 };
 
+// 1) Add this helper near the top (outside the component):
+function clearLocalStorageExcept(keepKeys = []) {
+    try {
+        const preserved = new Map();
+        for (const k of keepKeys) {
+            const v = localStorage.getItem(k);
+            if (v !== null) preserved.set(k, v);
+        }
+        localStorage.clear();
+        for (const [k, v] of preserved.entries()) {
+            localStorage.setItem(k, v);
+        }
+    } catch {
+        // ignore storage errors (private mode, etc.)
+    }
+}
+
 const ERR_DEFAULTS = {
     "address.required": "Please complete your address.",
     "errors.name_required": "Your name is required.",
@@ -573,6 +590,8 @@ export default function Info({ data, onNext, onResetClick, onProgress }) {
     };
 
     const clearLocal = useCallback(() => {
+        // keep "receipt" only (and tolerate "reciept" typo)
+        clearLocalStorageExcept(["receipt", "reciept"]);
         resetForm({ name: "", email: "", phone: "" });
         setAddr({});
     }, [resetForm]);

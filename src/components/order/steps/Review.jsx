@@ -1,8 +1,9 @@
+// src/pages/order/steps/Review.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { buildOrderPayload } from "../../../utils/orderPayload";
-import { normalizeLang } from "../../../utils/i18n-helpers";
+import { buildOrderRequestVo } from "../../../utils/orderPayload";
 
+/* --- local helpers --- */
 function readCartFromLocalStorage() {
     if (typeof window === "undefined") return [];
     try {
@@ -14,26 +15,48 @@ function readCartFromLocalStorage() {
     }
 }
 
+const normalizeLang = (lang) => {
+    if (!lang) return "en";
+    const l = String(lang).toLowerCase();
+    if (l.startsWith("kh") || l.startsWith("km")) return "kh";
+    if (l.startsWith("en")) return "en";
+    return l.slice(0, 2);
+};
+
 export default function Review({ info = {}, summary = {}, onNext, onBack }) {
     const { t, i18n } = useTranslation();
 
     const address = info.address || {};
-    const { provinceName, districtName, communeName, villageName, street, geo } = address;
+    const {
+        provinceName, districtName, communeName, villageName, street,
+        province, district, commune, village,
+        geo, geoCandidate, geoPreview,
+        geoSrc, geoTrusted, geoConfirmed,
+        gmaps_search,
+    } = address;
 
+    // Address line for display
     const addressLine = useMemo(() => {
         const parts = [villageName, communeName, districtName, provinceName].filter(Boolean);
         return [street, parts.join(", ")].filter(Boolean).join(" • ");
     }, [street, villageName, communeName, districtName, provinceName]);
 
-    const currency = summary.currency || "KHR";
-    const locale = i18n.language || "en";
-    const money = (v) => new Intl.NumberFormat(locale, { style: "currency", currency }).format(Number(v || 0));
+    // Currency/language contexts
+    const currency = summary.currency || "USD"; // display currency
+    const language = normalizeLang(i18n.language);
+    const locale = i18n.language || "en-US";
 
+    // Money formatter (for UI only)
+    const money = (v) =>
+        new Intl.NumberFormat(locale, { style: "currency", currency }).format(Number(v || 0));
+
+    // Items from summary or local storage
     const items = useMemo(() => {
         if (Array.isArray(summary.items) && summary.items.length) return summary.items;
         return readCartFromLocalStorage();
     }, [summary.items]);
 
+    // Build a safe, human list for the UI preview
     const safeItems = useMemo(() => {
         const lang = normalizeLang(i18n.language);
         return items.map((it, i) => {
@@ -53,27 +76,26 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
         });
     }, [items, i18n.language, t]);
 
+    // Summaries for UI preview; actual request is built by buildOrderRequestVo
     const subtotal = summary.subtotal ?? safeItems.reduce((s, x) => s + Number(x.lineTotal || 0), 0);
     const deliveryFee = summary.deliveryFee ?? 0;
     const total = summary.total ?? subtotal + Number(deliveryFee || 0);
 
-    // Remark / Note
-    const [remark, setRemark] = useState(summary.remark || "");
-    const maxRemark = 300;
+    // Pick the best available geo for map preview + backend links
+    const loc = geo || geoCandidate || geoPreview;
+    const lat = loc?.lat;
+    const lng = loc?.lng;
+    const gmapsEmbed =
+        lat && lng ? `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed` : null;
+    const gmapsSearch =
+        gmaps_search || (lat && lng ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}` : null);
 
-    // ---- Build Google Maps URLs from geo ----
-    const lat = geo?.lat;
-    const lng = geo?.lng;
-
-    // Visible iframe for user preview
-    const gmapsEmbed = lat && lng ? `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed` : null;
-
-    // Backend-ready links (NOT rendered)
-    const gmapsSearch = lat && lng ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}` : null;
-    const gmapsDirections = lat && lng ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}` : null;
-
+    // Prepare the EXACT backend request VO
     const payload = useMemo(() => {
-        return buildOrderPayload({
+        return buildOrderRequestVo({
+            method: summary.method || "cod",     // 'cod' | 'aba'
+            language,
+            currency,
             customer: { name: info.name || "", phone: info.phone || "", email: info.email || "" },
             address: {
                 provinceName: provinceName || "",
@@ -81,47 +103,52 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
                 communeName: communeName || "",
                 villageName: villageName || "",
                 street: street || "",
-                province: address.province || null,
-                district: address.district || null,
-                commune: address.commune || null,
-                village: address.village || null,
-                geo: geo || null,
+                // The *_Code fields map to your select values
+                province: province || "",
+                district: district || "",
+                commune: commune || "",
+                village: village || "",
+
+                // Geo fields
+                geo: loc ? { lat: Number(lat), lng: Number(lng) } : undefined,
+                geoSrc: geoSrc || (loc ? "manual" : undefined),
+                geoTrusted: Boolean(geoTrusted),
+                geoConfirmed: Boolean(geoConfirmed),
+                gmaps_search: gmapsSearch || undefined,
             },
-            items,
-            currency,
+            items,                        // raw cart items; will be normalized inside util
             deliveryFee,
+            // If you have a live KHR rate, pass it here; fallback is 4100 in util
+            khrRate: window.__KHR_RATE__ ?? 4100,
+            userAgent: (typeof navigator !== "undefined" && navigator.userAgent) || "unknown",
+            step: "payment",
+            source: "web",
             locale,
-            // ⬇️ Include prebuilt Google URLs for backend (do not render)
-            meta: {
-                source: "web",
-                remark: remark || "",
-                geo: geo || null,
-                gmaps_search: gmapsSearch || null,
-                gmaps_directions: gmapsDirections || null,
-                gmaps_embed: gmapsEmbed || null,
-            },
         });
     }, [
-        info.name, info.phone, info.email,
+        summary.method, language, currency, info.name, info.phone, info.email,
         provinceName, districtName, communeName, villageName, street,
-        address.province, address.district, address.commune, address.village,
-        geo, items, currency, deliveryFee, locale, remark,
-        gmapsSearch, gmapsDirections, gmapsEmbed,
+        province, district, commune, village,
+        loc, lat, lng, geoSrc, geoTrusted, geoConfirmed, gmapsSearch,
+        items, deliveryFee, locale
     ]);
 
+    // Persist for debugging or later steps (optional)
     useEffect(() => {
         try {
-            localStorage.setItem("order_payload", JSON.stringify(payload));
+            localStorage.setItem("order_request_vo", JSON.stringify(payload));
             localStorage.setItem("info", JSON.stringify(info || {}));
-            localStorage.setItem("summary", JSON.stringify({ currency, items, subtotal, deliveryFee, total, remark }));
+            localStorage.setItem("summary_preview", JSON.stringify({ currency, items, subtotal, deliveryFee, total }));
         } catch {}
-    }, [payload, info, currency, items, subtotal, deliveryFee, total, remark]);
+    }, [payload, info, currency, items, subtotal, deliveryFee, total]);
 
     return (
         <div className="space-y-5">
             {/* Customer */}
             <div className="card p-4 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]">
-                <div className="font-semibold text-[#3b2a1d] mb-2">{t("review.customer", { defaultValue: "Customer" })}</div>
+                <div className="font-semibold text-[#3b2a1d] mb-2">
+                    {t("review.customer", { defaultValue: "Customer" })}
+                </div>
                 <div className="text-sm text-[#3b2a1d]/90">
                     <span className="font-medium">{info.name || "—"}</span>
                     <span className="mx-2">•</span>
@@ -137,8 +164,12 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
 
             {/* Address + Google Map preview (iframe only) */}
             <div className="card p-4 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]">
-                <div className="font-semibold text-[#3b2a1d] mb-2">{t("review.address", { defaultValue: "Address" })}</div>
-                <div className="text-sm text-[#3b2a1d]/90">{addressLine || t("review.no_address", { defaultValue: "—" })}</div>
+                <div className="font-semibold text-[#3b2a1d] mb-2">
+                    {t("review.address", { defaultValue: "Address" })}
+                </div>
+                <div className="text-sm text-[#3b2a1d]/90">
+                    {addressLine || t("review.no_address", { defaultValue: "—" })}
+                </div>
 
                 {gmapsEmbed && (
                     <div className="mt-3 rounded-xl overflow-hidden border border-[#e7dbc9]">
@@ -153,12 +184,13 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
                         />
                     </div>
                 )}
-                {/* NOTE: No visible "Open in Google Maps" link; backend URLs are in payload.meta */}
             </div>
 
             {/* Items */}
             <div className="card p-4 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]">
-                <div className="font-semibold text-[#3b2a1d] mb-3">{t("review.order_items", { defaultValue: "Order Items" })}</div>
+                <div className="font-semibold text-[#3b2a1d] mb-3">
+                    {t("review.order_items", { defaultValue: "Order Items" })}
+                </div>
                 {safeItems.length ? (
                     <div className="space-y-2">
                         {safeItems.map((it, i) => (
@@ -184,7 +216,9 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
 
                 <div className="mt-4 border-t border-[#e7dbc9] pt-3 space-y-1 text-sm">
                     <div className="flex justify-between">
-                        <span className="text-[#6b5545]">{t("review.subtotal", { defaultValue: "Subtotal" })}</span>
+            <span className="text-[#6b5545]">
+              {t("review.subtotal", { defaultValue: "Subtotal" })}
+            </span>
                         <span className="text-[#3b2a1d]">{money(subtotal)}</span>
                     </div>
                     <div className="flex justify-between">
@@ -198,25 +232,6 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
                 </div>
             </div>
 
-            {/* Remark / Note */}
-            <div className="card p-4 rounded-2xl border border-[#e7dbc9] bg-[#fffaf3]">
-                <div className="mb-2 flex items-center justify-between">
-                    <div className="font-semibold text-[#3b2a1d]">{t("review.remark", { defaultValue: "Remark / Note" })}</div>
-                    <div className="text-[11px] text-[#857567]">{remark.length}/{maxRemark}</div>
-                </div>
-                <textarea
-                    value={remark}
-                    onChange={(e) => setRemark(e.target.value.slice(0, maxRemark))}
-                    maxLength={maxRemark}
-                    rows={3}
-                    placeholder={t("review.remark_placeholder", { defaultValue: "E.g., call when arriving, leave at the gate, no sugar, etc." })}
-                    className="block w-full resize-y rounded-xl border border-[#e7dbc9] bg-[#fffaf3] px-4 py-3 text-sm text-[#3b2a1d] placeholder-[#9b8b7c] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#c9a44c]"
-                />
-                <p className="mt-1 text-[11px] text-[#857567]">
-                    {t("review.remark_hint", { defaultValue: "Optional. This will be sent with your order." })}
-                </p>
-            </div>
-
             {/* Actions */}
             <div className="flex gap-2">
                 <button className="btn btn-ghost" onClick={onBack}>
@@ -227,7 +242,9 @@ export default function Review({ info = {}, summary = {}, onNext, onBack }) {
                     onClick={() =>
                         onNext?.({
                             info,
-                            summary: { currency, items, subtotal, deliveryFee, total, remark },
+                            summary: { currency, items, subtotal, deliveryFee, total, method: summary.method || "cod" },
+                            // Provide the exact backend request VO to the next step
+                            requestVo: payload,
                         })
                     }
                 >
