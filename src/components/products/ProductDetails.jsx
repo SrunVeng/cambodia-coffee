@@ -1,14 +1,11 @@
 import { useState, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { fmt } from "../../utils/currency"
-import { useCart } from "../../store/cart"
 import { motion } from "framer-motion"
 import { useToast } from "../ui/ToastHub.jsx"
-import VariantPicker from "../ui/VariantPicker.jsx"
 
 export default function ProductDetails({ product, onClose }) {
     const { i18n, t } = useTranslation()
-    const add = useCart((s) => s.add)
     const toast = useToast()
 
     const lang = i18n.language || "en"
@@ -65,40 +62,14 @@ export default function ProductDetails({ product, onClose }) {
                             <h3 className="text-2xl font-bold text-[var(--brand-ink)]">{title}</h3>
                             <div className="text-xs opacity-60 mt-1">{t("products.code")}: {code}</div>
                             <p className="opacity-80 text-sm mt-2">{desc}</p>
-
-                            {/* Custom variant picker */}
-                            {!!product.variants?.length && (
-                                <div className="mt-4">
-                                    <label className="block text-sm mb-1 opacity-70">
-                                        {t("products.chooseSize")}
-                                    </label>
-                                    <VariantPicker
-                                        variants={product.variants}
-                                        basePrice={product.price}
-                                        currency={product.currency}
-                                        value={variant}
-                                        onChange={setVariant}
-                                        placeholder={t("products.chooseSize")}
-                                    />
-                                </div>
-                            )}
                         </div>
 
                         {/* Bottom row: Price + Add button */}
                         <div className="flex items-center justify-between pt-4 border-t border-[var(--ring)]">
-                            <div className="text-lg font-semibold text-[var(--brand-accent)]">
-                                {fmt(price, product.currency)}
+                            <div className="flex items-center gap-2 text-lg font-semibold text-[var(--brand-accent)]">
+                                <span className="text-sm opacity-70">1 KG =</span>
+                                <span>{fmt(price, product.currency)}</span>
                             </div>
-                            <motion.button
-                                whileTap={{ scale: 0.95 }}
-                                whileHover={{ scale: canAdd ? 1.05 : 1.0 }}
-                                className={`btn btn-primary ${!canAdd ? "opacity-60 cursor-not-allowed" : ""}`}
-                                onClick={handleAdd}
-                                disabled={!canAdd}
-                                aria-disabled={!canAdd}
-                            >
-                                {t("products.addToCart")}
-                            </motion.button>
                         </div>
                     </div>
                 </div>

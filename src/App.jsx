@@ -1,7 +1,6 @@
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import RoutesView from './routes';
-import CartDrawer from './components/cart/CartDrawer';
 import ToastHub from "./components/ui/ToastHub.jsx";
 
 export default function App() {
@@ -13,7 +12,6 @@ export default function App() {
                 <RoutesView />
             </main>
             <Footer />
-            <CartDrawer />
             <ToastHub />
         </div>
     );

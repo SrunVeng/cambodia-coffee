@@ -1,8 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { motion } from "framer-motion"
 import { fmt } from "../../utils/currency"
-import VariantPickerForProductCard from "../ui/VariantPickerForProductCard.jsx"
-
 /**
  * Product card with mobile-friendly actions:
  * - Buttons stack on mobile, inline from sm: up.
@@ -82,14 +80,6 @@ export default function ProductCard({ p, onClick }) {
                     >
                         {t("products.details")}
                     </motion.button>
-
-                    {/* Add → choose variant → add */}
-                    <VariantPickerForProductCard
-                        product={p}
-                        size="md"
-                        className="w-full"
-                        requireChoice
-                    />
                 </div>
             </div>
         </motion.div>

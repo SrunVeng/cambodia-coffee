@@ -3,10 +3,6 @@ import Home from './pages/Home'
 import Products from './pages/Products'
 import Order from './pages/Order'
 import About from './pages/About'
-import Contact  from './pages/Contact.jsx'
-import Confirm from './pages/Confirm.jsx'
-import Receipt from "./components/order/steps/Receipt.jsx";
-import MyOrder from "./components/MyOrder.jsx";
 
 export default function RoutesView(){
     return (
@@ -15,9 +11,6 @@ export default function RoutesView(){
             <Route path="/products" element={<Products/>} />
             <Route path="/order" element={<Order/>} />
             <Route path="/about" element={<About/>} />
-            <Route path="/contact" element={<Contact/>} />
-            <Route path="/receipt" element={<Receipt/>} />
-            <Route path="/my-order" element={<MyOrder/>} />
         </Routes>
     )
 }
