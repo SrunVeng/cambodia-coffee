@@ -14,29 +14,5 @@
       "kh": "កាហ្វេម្សៅ",
       "cn": "咖啡粉"
     }
-  },
-  {
-    "id": "accessories",
-    "name": {
-      "en": "Accessories",
-      "kh": "គ្រឿងបន្លាស់",
-      "cn": "配件"
-    }
-  },
-  {
-    "id": "machines",
-    "name": {
-      "en": "Coffee Machine",
-      "kh": "ម៉ាស៊ីនកាហ្វេ",
-      "cn": "咖啡机"
-    }
-  },
-  {
-    "id": "other",
-    "name": {
-      "en": "Other",
-      "kh": "ផ្សេងៗ",
-      "cn": "其他"
-    }
   }
 ]

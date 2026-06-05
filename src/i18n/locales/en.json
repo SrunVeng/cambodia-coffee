@@ -1,7 +1,7 @@
 {
   "nav": { "home":"Home","products":"Products","order":"Order","about":"About Us","cart":"My Cart" },
   "home": {
-    "heroTitle": "Coffee, Calm & Clarity",
+    "heroTitle": "Cambodia Coffee",
     "heroSubtitle": "From farm to cup, discover single-origin beans and signature blends you’ll love.",
     "cta": "Shop Coffee",
     "cards": {
@@ -194,7 +194,7 @@
   "about": {
     "title": "About Us",
     "contact_label": "Contact us",
-    "contact_href": "/contact",
+    "contact_href": "/order",
     "tagline": "Heritage coffee",
     "slogan_primary": "By Cambodians, for Cambodians — and the world.",
     "slogans_alt": [
@@ -326,6 +326,17 @@
     "count": "saved",
     "view_receipt": "View Receipt",
     "download_pdf_tip": "Use print → Save as PDF"
+  },
+  "contactOrder": {
+    "title": "Contact Us",
+    "subtitle": "Scan a QR code to chat with us or reach our team instantly",
+    "call_us": "Call us",
+    "tap_hint": "Tap to open chat",
+      "qr": {
+      "telegram": "Telegram",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook"
+    }
   }
 
 }

@@ -2,10 +2,8 @@ import { useEffect, useState, useCallback } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import LanguageSwitch from "./LanguageSwitch";
 import data from "../../data/data.json";
-import CartIcon from "../cart/CartIcon";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
-import { ShoppingBag, Check } from "lucide-react"; // 👈 swapped from Receipt
 
 const NAV = [
     { to: "/", key: "home" },
@@ -221,16 +219,9 @@ export default function Navbar() {
                         <LanguageSwitch key={open ? "ls-disabled" : "ls-enabled"} disabled={open} />
                     </div>
 
-                    {/* Icon-only My Order, disabled if no receipt */}
-                    <MyOrderIcon
-                        disabled={!hasReceipt}
-                        to={myOrderTo}
-                        active={pathname === "/my-order"}
-                        title={hasReceipt ? myOrderTitleEnabled : myOrderTitleDisabled}
-                    />
 
-                    {/* Cart icon (unchanged) */}
-                    <CartIcon active={pathname === "/order"} />
+
+        
                 </div>
 
                 {/* Mobile actions */}
@@ -249,16 +240,7 @@ export default function Navbar() {
                         <LanguageSwitch key={open ? "lsm-disabled" : "lsm-enabled"} disabled={open} />
                     </div>
 
-                    {/* Mobile My Order icon */}
-                    <MyOrderIcon
-                        disabled={!hasReceipt}
-                        to={myOrderTo}
-                        active={pathname === "/my-order"}
-                        title={hasReceipt ? myOrderTitleEnabled : myOrderTitleDisabled}
-                    />
-
-                    {/* Cart icon */}
-                    <CartIcon active={pathname === "/order"} />
+        
 
                     {/* Animated Hamburger Button */}
                     <button

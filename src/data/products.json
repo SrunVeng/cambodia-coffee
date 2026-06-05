@@ -8,46 +8,18 @@
       "cn": "阿拉比卡拼配"
     },
     "category": "beans",
-    "price": 30000,
+    "price": 60000,
     "currency": "KHR",
-    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1758250696/Arabica_Blend_jfsopc.png"],
+    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1780673954/ChatGPT_Image_Jun_5_2026_10_37_43_PM_b7iptu.png"],
     "rating": 5.0,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 30000 }
+      { "id": "1kg", "label": "1kg", "delta": 34000 }
     ],
     "tags": {
-      "en": ["medium roast", "balanced", "smooth"],
-      "kh": ["កម្រិតលីងមធ្យម", "សមតុល្យ", "ស្រទន់"],
-      "cn": ["中度烘焙", "均衡", "顺滑"]
-    },
-    "desc": {
-      "en": "Well-balanced caffeine and aroma with a smooth taste.",
-      "kh": "កាហ្វេអ៊ីននិងក្លិនក្រអូបសមតុល្យ រសជាតិស្រទន់់ជាប់មាត់់។",
-      "cn": "咖啡因与香气均衡，口感顺滑，余味悠长。"
-    }
-  },
-  {
-    "id": "pow-robustaharmony",
-    "code": "POW-001",
-    "title": {
-      "en": "Robusta Harmony",
-      "kh": "ម្សៅកាហ្វេករ៉ូបុយស្តា ហាម៉ូនី",
-      "cn": "罗布斯塔和谐"
-    },
-    "category": "powder",
-    "price": 12000,
-    "currency": "KHR",
-    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1758250696/Robusta_harmony_g9m7hu.png"],
-    "rating": 5.0,
-    "variants": [
-      { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 12000 }
-    ],
-    "tags": {
-      "en": ["medium roast", "bold caffeine", "smooth body"],
-      "kh": ["កម្រិតលីងមធ្យម", "កាហ្វេអ៊ីនខ្លាំង", "ស្រទន់"],
-      "cn": ["中度烘焙", "醇厚咖啡因", "顺滑口感"]
+      "en": ["Rich", "Aromatic", "Smooth"],
+      "kh": ["រសជាតិខ្លាំង", "ក្លិនឈ្ងុយ", "ស្រទន់"],
+      "cn": ["浓郁", "芳香", "顺滑"]
     },
     "desc": {
       "en": "A well-balanced cup with bold caffeine for focus, rich aroma, a smooth body, and a long-lasting finish.",
@@ -56,88 +28,32 @@
     }
   },
   {
-    "id": "pow-cambodiaclassic",
-    "code": "POW-002",
+    "id": "pow-signature-blend",
+    "code": "POW-001",
     "title": {
-      "en": "Cambodia Classic",
-      "kh": "ម្សៅកាហ្វេ កម្ពុជា ក្លាស៊ិក",
-      "cn": "柬埔寨经典咖啡"
+      "en": "Signature Blend",
+      "kh": "រសជាតិប្រចាំត្រកូល",
+      "cn": "家族传统风味"
     },
     "category": "powder",
-    "price": 11000,
+    "price": 32000,
     "currency": "KHR",
-    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1758250696/Cambodia_Classic_qiqxhy.png"],
-    "rating": 4.5,
+    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1780673954/ChatGPT_Image_Jun_5_2026_10_37_09_PM_kacxrg.png"],
+    "rating": 5.0,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 11000 }
+      { "id": "1kg", "label": "1kg", "delta": 18000 }
     ],
     "tags": {
-      "en": ["medium roast", "balanced caffeine", "aromatic"],
-      "kh": ["កម្រិតលីងមធ្យម", "កាហ្វេអ៊ីនមធ្យម", "ក្លិនឆ្ងុយ"],
-      "cn": ["中度烘焙", "适中咖啡因", "芳香"]
+      "en": ["Rich", "Aromatic", "Smooth"],
+      "kh": ["រសជាតិខ្លាំង", "ក្លិនឈ្ងុយ", "ស្រទន់"],
+      "cn": ["浓郁", "芳香", "顺滑"]
     },
     "desc": {
-      "en": "A balanced cup with medium caffeine—never too strong or too light—aromatic on the nose with a smooth, clean finish.",
-      "kh": "កាហ្វេអ៊ីនមធ្យម—មិនខ្លាំងពេក មិនស្រាលពេក—ក្លិនឆ្ងុយ",
-      "cn": "咖啡因适中——不重不淡——芳香扑鼻"
-    }
-  },
-  {
-    "id": "pow-cambodiadaily",
-    "code": "POW-003",
-    "title": {
-      "en": "Cambodia Daily",
-      "kh": "ម្សៅកាហ្វេកម្ពុជាដេលី",
-      "cn": "柬埔寨每日咖啡粉"
-    },
-    "category": "powder",
-    "price": 8000,
-    "currency": "KHR",
-    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1758250696/Cambodia_Daily_ify17w.png"],
-    "rating": 4.5,
-    "variants": [
-      { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 8000 }
-    ],
-    "tags": {
-      "en": ["light roast", "balanced caffeine", "aromatic", "smooth balance"],
-      "kh": ["កម្រិតលីងស្រាល", "កាហ្វេអ៊ីនសមតុល្យ", "ក្លិនក្រអូប", "ស្រទន់សមតុល្យ"],
-      "cn": ["浅烘焙", "咖啡因均衡", "芳香", "顺滑平衡"]
-    },
-    "desc": {
-      "en": "Light-roasted daily coffee powder with balanced caffeine—aromatic, smooth, and nicely balanced.",
-      "kh": "ម្សៅកាហ្វេឆុងស្រាល សម្រាប់ប្រើប្រចាំថ្ងៃ មានកាហ្វេអ៊ីនសមតុល្យ ក្លិនក្រអូប និងរសជាតិស្រទន់សមតុល្យ។",
-      "cn": "浅烘日常咖啡粉，咖啡因均衡，香气馥郁，口感顺滑且平衡。"
-    }
-  },
-  {
-    "id": "pow-cambodiabasic",
-    "code": "POW-004",
-    "title": {
-      "en": "Cambodia Basic",
-      "kh": "ម្សៅកាហ្វេ កម្ពុជាបេសិក",
-      "cn": "柬埔寨经典咖啡粉"
-    },
-    "category": "powder",
-    "price": 6000,
-    "currency": "KHR",
-    "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1758250696/Cambodia_basic_ichdlj.png"],
-    "rating": 4.0,
-    "variants": [
-      { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 6000 }
-    ],
-    "tags": {
-      "en": ["light roast", "easy drink", "everyday"],
-      "kh": ["កម្រិតលីងស្រាល", "ងាយផឹក", "ប្រើប្រចាំថ្ងៃ"],
-      "cn": ["浅烘焙", "易饮", "日常"]
-    },
-    "desc": {
-      "en": "A simple and easy-drinking Cambodian coffee powder—light roast, smooth taste, perfect for everyday enjoyment.",
-      "kh": "ម្សៅកាហ្វេកម្ពុជា ដែលងាយស្រួលផឹក ឆុងស្រាល រសជាតិស្រទន់ សម្រាប់ប្រើប្រាស់ប្រចាំថ្ងៃ។",
-      "cn": "简洁易饮的柬埔寨咖啡粉，浅度烘焙，口感顺滑，适合每日享用。"
-    }
+    "en": "A unique Family Signature taste with a creamy texture, rich aroma, and a smooth finish.",
+    "kh": "រសជាតិប្រចាំត្រកូល ខ្ទិះ ក្លិនឈ្ងុយ និងរសជាតិស្រទន់",
+    "cn": "独特的家族传统风味，口感顺滑浓郁，香气丰富。"
+  }
   }
 
 ]

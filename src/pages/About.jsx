@@ -1,26 +1,10 @@
 // src/pages/About.jsx
-import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import data from "../data/data.json";
 
-// ----------------- SHARED GALLERY (static, not i18n) -----------------
-const GALLERY = [
-    "https://weaverscoffee.com/cdn/shop/articles/Roasted_coffee_beans_turning_in_a_cooling_tray_of_a_45_kilo_Probat_coffee_roaster_1000x.jpg?v=1696029182",
-    "https://cdn.shopify.com/s/files/1/0187/0338/files/closeup_of_roastd_coffee_coming_out_of_75_kilo_probat.jpg?v=1623941252",
-    "https://media.istockphoto.com/id/1479788163/photo/pouring-coffee-beans-to-cooler-from-coffee-roasting-machine.jpg?s=612x612&w=0&k=20&c=5kfzlpg1L04QiKMzleewebLf7YeDoLqVLyFiRuWzfro=",
-    "https://media.istockphoto.com/id/1333323947/photo/asian-senior-man-craftsperson-observing-freshly-roasted-coffee-beans-being-removed-from-the.jpg?s=612x612&w=0&k=20&c=GvGSEbSEzt4xMqgGqkFcbGvUveVSRDnWzNQhOyIol_k=",
-    "https://library.sweetmarias.com/wp-content/uploads/2024/09/brazil-sweet-marias-coffee-bom-dia-brazil-27.jpg",
-    "https://www.nespresso.com/shared_res/agility/coffeeCommunicationPlatform/coffeeCommunicationPlatform/img/9/listicle_farmers_L.jpg",
-    "/images/gallery/cupping-1.jpg",
-    "/images/gallery/warehouse-1.jpg",
-    "/images/gallery/cafe-2.jpg",
-    "/images/gallery/roast-3.jpg"
-];
-
-// ----------------- helpers & theme -----------------
-const usePrefersReducedMotion = () => useReducedMotion?.() ?? false;
+// ----------------- helpers -----------------
 const cx = (...c) => c.filter(Boolean).join(" ");
 const toArray = (maybe) => {
     if (Array.isArray(maybe)) return maybe;
@@ -31,16 +15,12 @@ const toArray = (maybe) => {
         return Object.values(maybe).map(String).filter(Boolean);
     return [];
 };
-const yearsSince = (year) => Math.max(0, new Date().getFullYear() - year);
 
-const THEME = {
-    ink: "var(--brand-ink)",
-    bg: "var(--brand-bg)",
-    accent: "#E7D9C9" // creamy latte bullets/accents
-};
+const yearsSince = (year) =>
+    Math.max(0, new Date().getFullYear() - year);
 
 function FadeIn({ delay = 0, children, className = "" }) {
-    const reduce = usePrefersReducedMotion();
+    const reduce = useReducedMotion();
     return (
         <motion.div
             initial={reduce ? false : { opacity: 0, y: 8, filter: "blur(4px)" }}
@@ -58,230 +38,34 @@ function Divider({ className = "" }) {
     return (
         <div className={cx("my-12 flex items-center justify-center", className)} aria-hidden="true">
             <i className="h-px w-24 bg-white/15" />
-            <span className="mx-3 text-[10px] tracking-[0.3em] uppercase opacity-60 select-none">• • •</span>
+            <span className="mx-3 text-[10px] tracking-[0.3em] uppercase opacity-60 select-none">
+                • • •
+            </span>
             <i className="h-px w-24 bg-white/15" />
-            <span role="separator" className="sr-only">Section divider</span>
         </div>
     );
 }
 
-// ----------------- page surface (vintage but minimal) -----------------
+// ----------------- page styling -----------------
 const paperBg = {
     backgroundImage: [
         "radial-gradient(1200px 800px at 50% -10%, rgba(255,240,220,0.18), transparent 60%)",
         "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.00))"
     ].join(", ")
 };
+
 const filmGrain = {
-    backgroundImage: "repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.04) 0 1px, transparent 1px 2px)",
+    backgroundImage:
+        "repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.04) 0 1px, transparent 1px 2px)",
     opacity: 0.25,
     mixBlendMode: "soft-light",
     pointerEvents: "none"
 };
 
-// ----------------- Lightbox (a11y + focus trap + scroll lock) -----------------
-function Lightbox({ open, src, alt, onClose }) {
-    const containerRef = useRef(null);
-
-    useEffect(() => {
-        if (!open) return;
-        const prevOverflow = document.body.style.overflow;
-        document.body.style.overflow = "hidden"; // lock background scroll
-        const onKey = (e) => {
-            if (e.key === "Escape") onClose?.();
-            if (e.key === "Tab") {
-                const root = containerRef.current;
-                if (!root) return;
-                const nodes = root.querySelectorAll(
-                    "button,[href],input,select,textarea,[tabindex]:not([tabindex='-1'])"
-                );
-                if (!nodes.length) return;
-                const first = nodes[0];
-                const last = nodes[nodes.length - 1];
-                if (e.shiftKey && document.activeElement === first) {
-                    e.preventDefault();
-                    last.focus();
-                } else if (!e.shiftKey && document.activeElement === last) {
-                    e.preventDefault();
-                    first.focus();
-                }
-            }
-        };
-        window.addEventListener("keydown", onKey);
-        return () => {
-            document.body.style.overflow = prevOverflow;
-            window.removeEventListener("keydown", onKey);
-        };
-    }, [open, onClose]);
-
-    if (!open) return null;
-
-    return (
-        <div
-            ref={containerRef}
-            onClick={onClose}
-            className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Image preview"
-        >
-            <button
-                className="absolute right-4 top-4 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-sm hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                onClick={onClose}
-            >
-                Close
-            </button>
-            <img
-                src={src}
-                alt={alt}
-                className="max-h-[90vh] max-w-[92vw] rounded-xl border border-white/10 shadow-2xl object-contain"
-                onClick={(e) => e.stopPropagation()}
-            />
-        </div>
-    );
-}
-
-// ----------------- Touch swipe (mobile) with click guard -----------------
-function useTouchSwipeScroll(ref, { preventClickRef, threshold = 6 } = {}) {
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-
-        let startX = 0, startY = 0, startScroll = 0;
-
-        const onTouchStart = (e) => {
-            const t = e.touches[0];
-            startX = t.clientX;
-            startY = t.clientY;
-            startScroll = el.scrollLeft;
-            if (preventClickRef) preventClickRef.current = false;
-        };
-
-        const onTouchMove = (e) => {
-            const t = e.touches[0];
-            const dx = t.clientX - startX;
-            const dy = t.clientY - startY;
-
-            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > threshold) {
-                if (preventClickRef) preventClickRef.current = true;
-                el.scrollLeft = startScroll - dx;
-                e.preventDefault();
-            }
-        };
-
-        const onTouchEnd = () => {
-            if (preventClickRef) {
-                const r = preventClickRef;
-                setTimeout(() => { r.current = false; }, 60);
-            }
-        };
-
-        el.addEventListener("touchstart", onTouchStart, { passive: true });
-        el.addEventListener("touchmove", onTouchMove, { passive: false });
-        el.addEventListener("touchend", onTouchEnd);
-
-        return () => {
-            el.removeEventListener("touchstart", onTouchStart);
-            el.removeEventListener("touchmove", onTouchMove);
-            el.removeEventListener("touchend", onTouchEnd);
-        };
-    }, [ref, preventClickRef, threshold]);
-}
-
-// ----------------- Desktop kinetic drag (respects reduced motion) -----------------
-function useMouseKineticScroll(ref, { friction = 0.94, minVelocity = 0.3 } = {}) {
-    const reduce = usePrefersReducedMotion();
-    useEffect(() => {
-        if (reduce) return; // disable kinetic animation if user prefers reduced motion
-        const el = ref.current;
-        if (!el) return;
-        let isDown = false,
-            startX = 0,
-            scrollStart = 0,
-            lastX = 0,
-            lastT = 0,
-            vx = 0,
-            raf;
-
-        const onPointerDown = (e) => {
-            if (e.pointerType !== "mouse" || e.button !== 0) return;
-            isDown = true;
-            el.setPointerCapture?.(e.pointerId);
-            el.classList.add("cursor-grabbing");
-            startX = e.clientX;
-            scrollStart = el.scrollLeft;
-            lastX = e.clientX;
-            lastT = performance.now();
-            vx = 0;
-            cancelAnimationFrame(raf);
-        };
-        const onPointerMove = (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.clientX;
-            const dx = x - startX;
-            el.scrollLeft = scrollStart - dx;
-            const now = performance.now();
-            const dt = Math.max(1, now - lastT);
-            vx = 0.8 * vx + 0.2 * ((x - lastX) / dt) * 16;
-            lastX = x;
-            lastT = now;
-        };
-        const animate = () => {
-            if (Math.abs(vx) < minVelocity) return;
-            el.scrollLeft -= vx;
-            vx *= friction;
-            raf = requestAnimationFrame(animate);
-        };
-        const onPointerUp = (e) => {
-            if (!isDown) return;
-            isDown = false;
-            el.releasePointerCapture?.(e.pointerId);
-            el.classList.remove("cursor-grabbing");
-            raf = requestAnimationFrame(animate);
-        };
-
-        el.addEventListener("pointerdown", onPointerDown, { passive: true });
-        el.addEventListener("pointermove", onPointerMove);
-        window.addEventListener("pointerup", onPointerUp);
-        return () => {
-            el.removeEventListener("pointerdown", onPointerDown);
-            el.removeEventListener("pointermove", onPointerMove);
-            window.removeEventListener("pointerup", onPointerUp);
-            cancelAnimationFrame(raf);
-        };
-    }, [ref, friction, minVelocity, reduce]);
-}
-
-// ----------------- image with graceful fallback + srcSet -----------------
-function ImgWithFallback({ src, alt = "", width = 800, height = 600 }) {
-    const [ok, setOk] = useState(true);
-    const srcSet = `${src} 1x, ${src} 2x`;
-    return ok ? (
-        <img
-            src={src}
-            srcSet={srcSet}
-            alt={alt}
-            width={width}
-            height={height}
-            className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-            loading="lazy"
-            decoding="async"
-            sizes="(max-width: 768px) 70vw, 32vw"
-            onError={() => setOk(false)}
-        />
-    ) : (
-        <div className="aspect-[4/3] w-full flex items-center justify-center text-sm opacity-75">
-            {alt || "Image unavailable"}
-        </div>
-    );
-}
-
-// ----------------- main -----------------
+// ----------------- MAIN -----------------
 export default function About() {
     const { t } = useTranslation();
 
-    // i18n content
     const mission = t("about.mission");
     const core = toArray(t("about.core", { returnObjects: true }));
     const valuesRaw = t("about.values", { returnObjects: true });
@@ -291,15 +75,8 @@ export default function About() {
     const roast = t("about.roast", { returnObjects: true }) || {};
     const heritage = t("about.heritage", { returnObjects: true }) || {};
 
-    // GALLERY from constant (not i18n)
-    const gallery = useMemo(() => GALLERY.map((src) => ({ src })), []);
-    const gallerySlim = useMemo(() => gallery.slice(0, 6), [gallery]);
-
-    const contactHref = t("about.contact_href", { defaultValue: "/contact" });
+    const contactHref = t("about.contact_href", { defaultValue: "/Contact" });
     const contactLabel = t("about.contact_label", { defaultValue: "Contact us" });
-    const slogan = t("about.slogan_primary", {
-        defaultValue: "Made in Cambodia, Shared with the World."
-    });
 
     const labels = {
         mission: t("about.labels.mission", { defaultValue: "Mission" }),
@@ -307,126 +84,58 @@ export default function About() {
         values: t("about.labels.values", { defaultValue: "Values" }),
         roast: t("about.labels.roast", { defaultValue: "Roast" }),
         process: t("about.labels.process", { defaultValue: "Process" }),
-        gallery: t("about.labels.gallery", { defaultValue: "Gallery" }),
         heritageYears: t("about.labels.heritage", { defaultValue: "Years Roasting" }),
-        team: t("about.labels.team", { defaultValue: "Team Members" }),
-        freshness: t("about.labels.freshness", { defaultValue: "Days to Shelf" }),
-        inventory: t("about.labels.inventory", { defaultValue: "Months of Green" }),
         heritageBlock: t("about.labels.heritage_block", { defaultValue: "Our Heritage" })
     };
 
-    // NEW: Founding year and localized years text
     const foundedYear = data?.FOUNDED_YEAR ?? 1990;
     const years = yearsSince(foundedYear);
-    const yearsLocalized = t("units.years", { count: years }); // plural-aware
-
-    // lightbox
-    const [lightbox, setLightbox] = useState({ open: false, src: "", alt: "" });
-
-    // gallery state & interactions
-    const trackRef = useRef(null);
-    const cardRefs = useRef([]);
-    const [active, setActive] = useState(0);
-    const dragBlockClickRef = useRef(false);
-
-    useMouseKineticScroll(trackRef); // desktop drag inertia (respects reduced motion)
-    useTouchSwipeScroll(trackRef, { preventClickRef: dragBlockClickRef }); // mobile swipe
-
-    // active dot via IntersectionObserver
-    useEffect(() => {
-        const root = trackRef.current;
-        if (!root) return;
-        const io = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((e) => {
-                    if (e.isIntersecting) {
-                        const idx = Number(e.target.getAttribute("data-idx"));
-                        if (!Number.isNaN(idx)) setActive(idx);
-                    }
-                });
-            },
-            { root, threshold: 0.6 }
-        );
-        cardRefs.current.forEach((el) => el && io.observe(el));
-        return () => io.disconnect();
-    }, [gallerySlim.length]);
-
-    const scrollTo = (i) => {
-        const el = cardRefs.current[i];
-        if (el) el.scrollIntoView({ inline: "center", behavior: "smooth", block: "nearest" });
-    };
-    const scrollStep = (dir = 1) => {
-        const root = trackRef.current;
-        if (!root) return;
-        const child = cardRefs.current[active];
-        const w = child ? child.clientWidth : 280;
-        root.scrollBy({ left: dir * (w + 24), behavior: "smooth" });
-    };
+    const yearsLocalized = t("units.years", { count: years });
 
     return (
-        <section className="relative w-full bg-[var(--brand-bg)] text-[var(--brand-ink)]" style={paperBg}>
+        <section
+            className="relative w-full bg-[var(--brand-bg)] text-[var(--brand-ink)]"
+            style={paperBg}
+        >
             <div className="pointer-events-none absolute inset-0" style={filmGrain} />
 
             {/* HERO */}
-            <header
-                className="relative container mx-auto max-w-5xl px-6 pt-16 md:pt-20 pb-10 md:pb-12"
-                itemScope
-                itemType="https://schema.org/Organization"
-            >
-                <FadeIn className="text-center">
-                    {/* Logo */}
+            <header className="container mx-auto max-w-5xl px-6 pt-16 pb-10 text-center">
+                <FadeIn>
                     <img
                         src={data.APP_LOGO}
-                        alt={t("about.logo_alt", { defaultValue: "Cambodia Coffee Logo" })}
-                        className="w-16 h-16 md:w-20 md:h-20 object-contain mx-auto mb-4"
+                        alt="Logo"
+                        className="w-16 h-16 mx-auto mb-4 object-contain"
                         loading="eager"
-                        decoding="async"
-                        itemProp="logo"
                     />
 
-                    <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight" itemProp="name">
+                    <h1 className="text-3xl md:text-5xl font-extrabold">
                         {t("about.title", { defaultValue: "About Us" })}
                     </h1>
 
-                    {/* Years badge (localized “{{count}} year(s)”) */}
-                    <p
-                        className="mt-2 inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] uppercase tracking-[0.18em]"
-                        aria-label={`${labels.heritageYears}: ${yearsLocalized}`}
-                    >
-                        {labels.heritageYears}: <span className="font-semibold tracking-tight">{yearsLocalized}</span>
+                    <p className="mt-2 inline-flex gap-2 text-xs uppercase tracking-[0.2em] border border-white/15 px-3 py-1 rounded-full">
+                        {labels.heritageYears}: <span className="font-semibold">{yearsLocalized}</span>
                     </p>
 
-                    <p className="mt-2 text-[11px] md:text-xs uppercase tracking-[0.25em] opacity-70">
-                        {slogan}
-                    </p>
-
-                    <p className="mt-4 text-base md:text-lg opacity-85">
+                    <p className="mt-6 opacity-85">
                         {t("about.tagline", { defaultValue: "Heritage coffee, roasted with care." })}
-                    </p>
-
-                    <p className="mt-4 text-lg opacity-90 max-w-3xl mx-auto">
-                        {t("about.story", {
-                            defaultValue: "We roast in small batches, honor Khmer craft, and deliver cups that feel like home."
-                        })}
                     </p>
                 </FadeIn>
             </header>
 
             {/* CONTENT */}
-            <main className="relative container mx-auto max-w-5xl px-6 pb-16">
+            <main className="container mx-auto max-w-5xl px-6 pb-16">
+
                 {/* Heritage */}
                 {heritage?.body && (
                     <>
-                        <Divider className="my-10" />
+                        <Divider />
                         <FadeIn>
-                            <section className="rounded-2xl border border-white/15 bg-white/[0.055] p-6">
-                                <h2 className="text-lg md:text-xl font-semibold mb-2">
+                            <section className="p-6 rounded-2xl border border-white/15 bg-white/5">
+                                <h2 className="text-lg font-semibold mb-2">
                                     {labels.heritageBlock}
                                 </h2>
-                                <p className="opacity-90">{heritage.body}</p>
-                                {heritage?.note && (
-                                    <p className="mt-3 text-sm opacity-70 italic">— {heritage.note}</p>
-                                )}
+                                <p>{heritage.body}</p>
                             </section>
                         </FadeIn>
                     </>
@@ -435,84 +144,67 @@ export default function About() {
                 {/* Mission */}
                 {mission && (
                     <>
-                        <Divider className="my-10" />
+                        <Divider />
                         <FadeIn>
-                            <section className="rounded-2xl border border-white/15 bg-white/[0.055] p-6">
-                                <h2 className="text-lg md:text-xl font-semibold mb-2">{labels.mission}</h2>
-                                <p className="opacity-90">{mission}</p>
+                            <section className="p-6 rounded-2xl border border-white/15 bg-white/5">
+                                <h2 className="text-lg font-semibold mb-2">
+                                    {labels.mission}
+                                </h2>
+                                <p>{mission}</p>
                             </section>
                         </FadeIn>
                     </>
                 )}
 
-                {/* Core & Values */}
-                {(core.length || values.length) ? (
+                {/* Core + Values */}
+                {(core.length || values.length) && (
                     <>
                         <Divider />
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid md:grid-cols-2 gap-4">
+
                             {!!core.length && (
                                 <FadeIn>
-                                    <section className="rounded-2xl border border-white/15 bg-white/[0.055] p-6 h-full">
-                                        <h2 className="text-lg md:text-xl font-semibold mb-3">{labels.core}</h2>
-                                        <ul className="space-y-2 opacity-95">
+                                    <section className="p-6 rounded-2xl border border-white/15 bg-white/5">
+                                        <h2 className="font-semibold mb-3">{labels.core}</h2>
+                                        <ul className="space-y-2">
                                             {core.map((c, i) => (
-                                                <li key={i} className="flex items-start gap-3 font-semibold">
-                          <span
-                              className="mt-2 h-2.5 w-2.5 rounded-full shrink-0"
-                              style={{ backgroundColor: THEME.accent }}
-                          />
-                                                    <span>{c}</span>
-                                                </li>
+                                                <li key={i}>• {c}</li>
                                             ))}
                                         </ul>
                                     </section>
                                 </FadeIn>
                             )}
+
                             {!!values.length && (
-                                <FadeIn delay={0.05}>
-                                    <section className="rounded-2xl border border-white/15 bg-white/[0.055] p-6 h-full">
-                                        <h2 className="text-lg md:text-xl font-semibold mb-3">{labels.values}</h2>
-                                        <ul className="space-y-3 opacity-95">
+                                <FadeIn>
+                                    <section className="p-6 rounded-2xl border border-white/15 bg-white/5">
+                                        <h2 className="font-semibold mb-3">{labels.values}</h2>
+                                        <ul className="space-y-3">
                                             {values.map((v, i) => (
-                                                <li key={i} className="flex items-start gap-3">
-                          <span
-                              className="mt-2 h-2.5 w-2.5 rounded-full shrink-0"
-                              style={{ backgroundColor: THEME.accent }}
-                          />
-                                                    <div>
-                                                        <div className="font-semibold">{v?.title || ""}</div>
-                                                        {v?.body && <p className="opacity-85">{v.body}</p>}
-                                                    </div>
+                                                <li key={i}>
+                                                    <div className="font-semibold">{v?.title}</div>
+                                                    {v?.body && <p className="opacity-80">{v.body}</p>}
                                                 </li>
                                             ))}
                                         </ul>
                                     </section>
                                 </FadeIn>
                             )}
+
                         </div>
                     </>
-                ) : null}
+                )}
 
                 {/* Roast */}
-                {(roast?.title || roast?.intro || (roast?.highlights || []).length) && (
+                {(roast?.title || roast?.intro) && (
                     <>
                         <Divider />
                         <FadeIn>
                             <section>
-                                <h2 className="text-lg md:text-xl font-semibold mb-2">
-                                    {roast?.title || t("about.roast.title", { defaultValue: "Our Roast" })}
+                                <h2 className="text-lg font-semibold mb-2">
+                                    {roast?.title || "Our Roast"}
                                 </h2>
-                                {roast?.intro && <p className="opacity-90 mb-4">{roast.intro}</p>}
-                                <ul className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    {(roast?.highlights || []).map((h, i) => (
-                                        <li
-                                            key={i}
-                                            className="rounded-xl border border-white/15 bg-white/[0.055] p-4"
-                                        >
-                                            {h}
-                                        </li>
-                                    ))}
-                                </ul>
+                                {roast?.intro && <p>{roast.intro}</p>}
                             </section>
                         </FadeIn>
                     </>
@@ -524,139 +216,21 @@ export default function About() {
                         <Divider />
                         <FadeIn>
                             <section>
-                                <h2 className="text-lg md:text-xl font-semibold mb-4">{labels.process}</h2>
-                                <ol className="relative border-l border-white/20 pl-5">
+                                <h2 className="text-lg font-semibold mb-4">
+                                    {labels.process}
+                                </h2>
+                                <ol className="space-y-4 list-decimal pl-5">
                                     {process.map((step, i) => (
-                                        <li key={i} className="mb-5 ml-2">
-                                            <span className="absolute -left-[9px] mt-1 h-4 w-4 rounded-full border border-white/40 bg-[var(--brand-bg)]" />
+                                        <li key={i}>
                                             <div className="font-medium">
-                                                {step?.title ||
-                                                    t("about.step_title_fallback", { defaultValue: "Step" })}
+                                                {step?.title || "Step"}
                                             </div>
-                                            <p className="opacity-85">
-                                                {step?.body || (typeof step === "string" ? step : "")}
+                                            <p className="opacity-80">
+                                                {step?.body || step}
                                             </p>
                                         </li>
                                     ))}
                                 </ol>
-                            </section>
-                        </FadeIn>
-                    </>
-                )}
-
-                {/* GALLERY */}
-                {!!gallerySlim.length && (
-                    <>
-                        <Divider />
-                        <FadeIn>
-                            <section>
-                                <h2 className="text-lg md:text-xl font-semibold mb-4">{labels.gallery}</h2>
-
-                                <div className="relative -mx-6">
-                                    {/* edge fades */}
-                                    <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-[var(--brand-bg)] to-transparent" />
-                                    <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[var(--brand-bg)] to-transparent" />
-
-                                    {/* arrows (desktop) */}
-                                    <button
-                                        onClick={() => scrollStep(-1)}
-                                        className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 z-10 h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-white/10 backdrop-blur hover:bg-white/20"
-                                        aria-label="Previous image"
-                                        aria-controls="about-gallery"
-                                    >
-                                        ‹
-                                    </button>
-                                    <button
-                                        onClick={() => scrollStep(1)}
-                                        className="hidden md:flex absolute right-1 top-1/2 -translate-y-1/2 z-10 h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-white/10 backdrop-blur hover:bg-white/20"
-                                        aria-label="Next image"
-                                        aria-controls="about-gallery"
-                                    >
-                                        ›
-                                    </button>
-
-                                    {/* track */}
-                                    <div
-                                        id="about-gallery"
-                                        ref={trackRef}
-                                        className={cx(
-                                            "flex gap-6 overflow-x-auto pb-3 px-6 snap-x snap-mandatory cursor-grab",
-                                            "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden select-none",
-                                            "scroll-smooth"
-                                        )}
-                                        style={{
-                                            WebkitOverflowScrolling: "touch",
-                                            touchAction: "pan-y",
-                                            overscrollBehaviorX: "contain",
-                                            scrollSnapType: "x mandatory"
-                                        }}
-                                        role="listbox"
-                                        aria-label={t("about.labels.gallery", { defaultValue: "Gallery" })}
-                                        tabIndex={0}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "ArrowRight") { e.preventDefault(); scrollStep(1); }
-                                            if (e.key === "ArrowLeft")  { e.preventDefault(); scrollStep(-1); }
-                                            if (e.key === "Home")       { e.preventDefault(); scrollTo(0); }
-                                            if (e.key === "End")        { e.preventDefault(); scrollTo(gallerySlim.length - 1); }
-                                        }}
-                                    >
-                                        {gallerySlim.map((g, i) => (
-                                            <button
-                                                key={g.src + i}
-                                                ref={(el) => (cardRefs.current[i] = el)}
-                                                data-idx={i}
-                                                onClick={() => {
-                                                    if (dragBlockClickRef.current) return;
-                                                    setLightbox({
-                                                        open: true,
-                                                        src: g.src,
-                                                        alt: t("about.gallery_alt", { defaultValue: "Gallery image" })
-                                                    });
-                                                }}
-                                                role="option"
-                                                aria-selected={i === active}
-                                                className={cx(
-                                                    "relative shrink-0 w-[15.5rem] md:w-[19rem] snap-center transition-transform duration-500 group",
-                                                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60",
-                                                    "hover:scale-[1.015]"
-                                                )}
-                                                aria-label={t("about.gallery_open", { defaultValue: "Open image" })}
-                                            >
-                                                <ImgWithFallback
-                                                    src={g.src}
-                                                    alt={t("about.gallery_alt", { defaultValue: "Gallery image" })}
-                                                />
-                                                {/* subtle ring + soft drop for vintage vibe */}
-                                                <span className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/10" />
-                                                <span className="pointer-events-none absolute -bottom-2 left-6 right-6 h-4 rounded-full blur-md bg-black/30 opacity-35" />
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                    {/* dots */}
-                                    <div className="mt-5 flex justify-center gap-2">
-                                        {gallerySlim.map((_, i) => (
-                                            <button
-                                                key={i}
-                                                onClick={() => scrollTo(i)}
-                                                className={cx(
-                                                    "h-1.5 w-1.5 rounded-full transition-opacity",
-                                                    i === active
-                                                        ? "opacity-90 bg-[var(--brand-ink)]"
-                                                        : "opacity-40 bg-[var(--brand-ink)]/60"
-                                                )}
-                                                aria-label={`Go to image ${i + 1}`}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <Lightbox
-                                    open={lightbox.open}
-                                    src={lightbox.src}
-                                    alt={lightbox.alt}
-                                    onClose={() => setLightbox({ open: false, src: "", alt: "" })}
-                                />
                             </section>
                         </FadeIn>
                     </>
@@ -667,14 +241,12 @@ export default function About() {
                 <FadeIn className="text-center">
                     <Link
                         to={contactHref}
-                        className="inline-block rounded-xl px-6 py-3 font-semibold bg-[var(--brand-ink)] text-[var(--brand-bg)] hover:opacity-90 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--brand-ink)] focus-visible:ring-offset-[var(--brand-bg)]"
+                        className="inline-block px-6 py-3 rounded-xl font-semibold bg-[var(--brand-ink)] text-[var(--brand-bg)]"
                     >
                         {contactLabel}
                     </Link>
-                    <p className="sr-only">
-                        {t("about.cta_sr_hint", { defaultValue: "Go to contact page" })}
-                    </p>
                 </FadeIn>
+
             </main>
         </section>
     );

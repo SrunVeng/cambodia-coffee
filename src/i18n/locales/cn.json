@@ -1,7 +1,7 @@
 {
   "nav": { "home":"首页","products":"产品","order":"下单","about":"关于我们","cart":"购物车" },
   "home": {
-    "heroTitle": "一杯咖啡，一份从容",
+    "heroTitle": "柬埔寨咖啡",
     "heroSubtitle": "从农场到杯子，发现您喜爱的单一产地咖啡豆和特色混合咖啡。",
     "cta": "选购咖啡",
     "cards": {
@@ -196,7 +196,7 @@
   "about": {
     "title": "关于我们",
     "contact_label": "联系我们",
-    "contact_href": "/contact",
+    "contact_href": "/order",
     "tagline": "传承咖啡",
     "slogan_primary": "由柬埔寨人，为柬埔寨人——并走向世界。",
     "slogans_alt": [
@@ -327,5 +327,17 @@
     "count": "已保存",
     "view_receipt": "查看收据",
     "download_pdf_tip": "使用“打印 → 另存为 PDF”"
-  }
+  },
+
+ "contactOrder": {
+  "title": "联系我们",
+  "subtitle": "扫描二维码与我们联系或直接与团队沟通",
+  "call_us": "拨打电话",
+  "tap_hint": "点击打开",
+   "qr": {
+      "telegram": "Telegram",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook"
+    }
+}
 }
