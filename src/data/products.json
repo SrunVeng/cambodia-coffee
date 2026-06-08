@@ -36,13 +36,13 @@
       "cn": "家族传统风味"
     },
     "category": "powder",
-    "price": 40000,
+    "price": 36000,
     "currency": "KHR",
     "images": ["https://res.cloudinary.com/dayrc0f7r/image/upload/v1780673954/ChatGPT_Image_Jun_5_2026_10_37_09_PM_kacxrg.png"],
     "rating": 5.0,
     "variants": [
       { "id": "500g", "label": "500g", "delta": 0 },
-      { "id": "1kg", "label": "1kg", "delta": 22000 }
+      { "id": "1kg", "label": "1kg", "delta": 15000 }
     ],
     "tags": {
       "en": ["Rich", "Aromatic", "Smooth"],
