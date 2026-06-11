@@ -1,4 +1,4 @@
-import { useState, useTransition } from "react"
+import { useCallback, useState, useTransition } from "react"
 import ProductFilterSort from "../components/products/ProductFilterSort"
 import ProductGrid from "../components/products/ProductGrid"
 import { useTranslation } from "react-i18next"
@@ -7,6 +7,9 @@ export default function Products() {
     const { t } = useTranslation()
     const [filter, setFilter] = useState({ category: "all", sort: "popular", search: "" })
     const [, startTransition] = useTransition()
+    const handleFilterChange = useCallback((next) => {
+        startTransition(() => setFilter(next))
+    }, [])
 
     return (
         <section className="bg-[var(--brand-bg)] min-h-screen py-20">
@@ -15,7 +18,7 @@ export default function Products() {
                     {t("products.title")}
                 </h2>
 
-                <ProductFilterSort onChange={(next) => startTransition(() => setFilter(next))} />
+                <ProductFilterSort onChange={handleFilterChange} />
 
                 {/* Optional: show a subtle pending state */}
                 {/* {isPending && <div className="text-sm opacity-70">Updating…</div>} */}

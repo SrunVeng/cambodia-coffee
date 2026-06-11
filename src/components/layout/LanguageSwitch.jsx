@@ -11,7 +11,7 @@ const LOCALES = [
     { id: 'cn', code: '中文', Flag: CN },
 ]
 
-export default function LanguageSwitch() {
+export default function LanguageSwitch({ disabled = false }) {
     const { i18n } = useTranslation()
     const [open, setOpen] = useState(false)
     const ref = useRef(null)
@@ -35,16 +35,22 @@ export default function LanguageSwitch() {
         return () => window.removeEventListener('keydown', onEsc)
     }, [open])
 
-    const pick = (id) => { setLocale(id); setOpen(false) }
+    const pick = (id) => {
+        if (disabled) return
+        setLocale(id)
+        setOpen(false)
+    }
 
     return (
         <div className="relative" ref={ref}>
             <button
                 type="button"
                 aria-expanded={open}
-                onClick={() => setOpen(v => !v)}
+                disabled={disabled}
+                onClick={() => !disabled && setOpen(v => !v)}
                 className="flex items-center gap-2 rounded-2xl border border-[var(--ring)] bg-white/90 px-3 py-1.5
-                   hover:bg-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-ink)]/20"
+                   hover:bg-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-ink)]/20
+                   disabled:cursor-not-allowed disabled:opacity-60"
             >
                 <CurrentFlag className="h-4 w-auto rounded-[2px] shadow-sm" />
                 <span className="text-sm font-medium">{current.code}</span>
@@ -60,18 +66,21 @@ export default function LanguageSwitch() {
                     ${open ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
             >
                 <ul className="p-1">
-                    {LOCALES.map(({ id, code, Flag }) => (
-                        <li key={id}>
-                            <button
-                                onClick={() => pick(id)}
-                                className={`w-full flex items-center gap-2 rounded-xl px-3 py-2 text-sm
-                                    hover:bg-[var(--brand-bg)]/60 transition ${id===current.id ? 'font-semibold' : ''}`}
-                            >
-                                <Flag className="h-4 w-auto rounded-[2px] shadow-sm" />
-                                <span>{code}</span>
-                            </button>
-                        </li>
-                    ))}
+                    {LOCALES.map((locale) => {
+                        const LocaleFlag = locale.Flag
+                        return (
+                            <li key={locale.id}>
+                                <button
+                                    onClick={() => pick(locale.id)}
+                                    className={`w-full flex items-center gap-2 rounded-xl px-3 py-2 text-sm
+                                        hover:bg-[var(--brand-bg)]/60 transition ${locale.id === current.id ? 'font-semibold' : ''}`}
+                                >
+                                    <LocaleFlag className="h-4 w-auto rounded-[2px] shadow-sm" />
+                                    <span>{locale.code}</span>
+                                </button>
+                            </li>
+                        )
+                    })}
                 </ul>
             </div>
         </div>

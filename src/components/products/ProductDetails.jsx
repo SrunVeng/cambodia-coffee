@@ -1,12 +1,10 @@
-import { useState, useMemo } from "react"
+import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { fmt } from "../../utils/currency"
-import { motion } from "framer-motion"
-import { useToast } from "../ui/ToastHub.jsx"
+import { motion as Motion } from "framer-motion"
 
 export default function ProductDetails({ product, onClose }) {
     const { i18n, t } = useTranslation()
-    const toast = useToast()
 
     const lang = i18n.language || "en"
     const title = product.title?.[lang] || product.title?.en || ""
@@ -14,37 +12,16 @@ export default function ProductDetails({ product, onClose }) {
     const code = product.code || product.id
 
     const hasMany = Array.isArray(product.variants) && product.variants.length > 1
-    const defaultVariant = hasMany ? null : (product.variants?.[0]?.id || "base")
-    const [variant, setVariant] = useState(defaultVariant)
 
     const chosen = useMemo(
-        () => product.variants?.find(v => v.id === variant),
-        [product.variants, variant]
+        () => hasMany ? null : product.variants?.[0],
+        [hasMany, product.variants]
     )
     const price = product.price + (chosen?.delta || 0)
 
-    const canAdd = !!variant
-
-    const handleAdd = () => {
-        if (!canAdd) return
-        add({
-            id: product.id,
-            code,
-            title,
-            price,
-            variantId: variant,
-            qty: 1,
-            currency: product.currency,
-            image: product.images?.[0],
-            variantLabel: chosen?.label,
-        })
-        toast(`${title} — ${t("common.added", { defaultValue: "Added to cart" })}`)
-        onClose?.()
-    }
-
     return (
         <div className="fixed inset-0 bg-black/50 z-50 grid place-items-center px-4" onClick={onClose}>
-            <motion.div
+            <Motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -73,7 +50,7 @@ export default function ProductDetails({ product, onClose }) {
                         </div>
                     </div>
                 </div>
-            </motion.div>
+            </Motion.div>
         </div>
     )
 }

@@ -1,7 +1,7 @@
 // src/pages/About.jsx
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion as Motion, useReducedMotion } from "framer-motion";
 import data from "../data/data.json";
 
 // ----------------- helpers -----------------
@@ -22,7 +22,7 @@ const yearsSince = (year) =>
 function FadeIn({ delay = 0, children, className = "" }) {
     const reduce = useReducedMotion();
     return (
-        <motion.div
+        <Motion.div
             initial={reduce ? false : { opacity: 0, y: 8, filter: "blur(4px)" }}
             whileInView={reduce ? {} : { opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "0px 0px -15% 0px" }}
@@ -30,7 +30,7 @@ function FadeIn({ delay = 0, children, className = "" }) {
             className={className}
         >
             {children}
-        </motion.div>
+        </Motion.div>
     );
 }
 

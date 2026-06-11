@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState, useId, useLayoutEffect } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, useId, useLayoutEffect } from "react"
 import { createPortal } from "react-dom"
 import { ChevronDown, Check } from "lucide-react"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion as Motion } from "framer-motion"
 
 export default function Dropdown({
                                      items = [],
@@ -39,7 +39,7 @@ export default function Dropdown({
             : size === "lg" ? "h-12 text-base px-4"
                 : "h-10 text-sm px-3.5"
 
-    const place = () => {
+    const place = useCallback(() => {
         const btn = btnRef.current
         if (!btn) return
         const r = btn.getBoundingClientRect()
@@ -56,7 +56,7 @@ export default function Dropdown({
 
         setDropUp(shouldDropUp)
         setCoords({ left, top, width })
-    }
+    }, [align])
 
     const openMenu = () => {
         if (disabled || open) return
@@ -66,7 +66,7 @@ export default function Dropdown({
     const closeMenu = () => setOpen(false)
 
     // Position on open and on window changes
-    useLayoutEffect(() => { if (open) place() }, [open, align])
+    useLayoutEffect(() => { if (open) place() }, [open, place])
     useEffect(() => {
         if (!open) return
         const onWin = () => place()
@@ -76,7 +76,7 @@ export default function Dropdown({
             window.removeEventListener("resize", onWin)
             window.removeEventListener("scroll", onWin, true)
         }
-    }, [open])
+    }, [open, place])
 
     // Focus list after it renders
     useEffect(() => {
@@ -146,7 +146,7 @@ export default function Dropdown({
     const Menu = (
         <AnimatePresence>
             {open && (
-                <motion.div
+                <Motion.div
                     ref={menuRef}
                     initial={{ opacity: 0, y: dropUp ? 8 : -8, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -197,7 +197,7 @@ export default function Dropdown({
                             <div className="px-3.5 py-2.5 text-gray-500 text-sm">No options</div>
                         )}
                     </div>
-                </motion.div>
+                </Motion.div>
             )}
         </AnimatePresence>
     )

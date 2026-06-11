@@ -1,9 +1,9 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import LanguageSwitch from "./LanguageSwitch";
 import data from "../../data/data.json";
 import { useTranslation } from "react-i18next";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 
 const NAV = [
     { to: "/", key: "home" },
@@ -25,68 +25,35 @@ function getAppName(lang) {
     }
 }
 
-/** Icon-only “My Order” control (disabled when no receipt) */
-function MyOrderIcon({ disabled, to, active, title }) {
-    const base =
-        "relative inline-flex items-center justify-center h-9 w-9 rounded-xl " +
-        "bg-white ring-1 ring-[var(--ring)] shadow-sm transition";
-    const state = disabled
-        ? "opacity-40 pointer-events-none"
-        : "hover:scale-105 hover:ring-[var(--brand-accent)]/50";
-    const activeCls = active
-        ? "ring-[var(--brand-accent)]/60 outline outline-2 outline-[var(--brand-accent)]/40"
-        : "";
-
-    const Icon = (
-        <span className="relative inline-block">
-      <ShoppingBag aria-hidden="true" className="h-5 w-5 text-[var(--brand-ink)]" />
-            {!disabled && (
-                <span
-                    aria-hidden="true"
-                    className="absolute -right-1 -bottom-1 rounded-full p-[2px] bg-[var(--brand-accent)] text-white ring-2 ring-white"
-                >
-          <Check className="h-3 w-3" />
-        </span>
-            )}
-    </span>
-    );
-
-    return disabled ? (
-        <span
-            className={`${base} ${state} ${activeCls}`}
-            aria-disabled="true"
-            title={title}
-            tabIndex={-1}
-        >
-      {Icon}
-    </span>
-    ) : (
-        <Link
-            to={to}
-            className={`${base} ${state} ${activeCls}`}
-            title={title}
-            aria-label={title}
-            aria-current={active ? "page" : undefined}
-        >
-            {Icon}
-        </Link>
-    );
-}
-
 export default function Navbar() {
     const { t, i18n } = useTranslation();
     const { pathname } = useLocation();
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const scrollFrame = useRef(0);
+    const scrolledRef = useRef(false);
 
     const appName = getAppName(i18n.language);
 
     // --- track scroll for header height/shadow ---
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 6);
+        const updateScrolled = () => {
+            scrollFrame.current = 0;
+            const next = window.scrollY > 6;
+            if (scrolledRef.current === next) return;
+            scrolledRef.current = next;
+            setScrolled(next);
+        };
+        const onScroll = () => {
+            if (scrollFrame.current) return;
+            scrollFrame.current = requestAnimationFrame(updateScrolled);
+        };
         onScroll();
         window.addEventListener("scroll", onScroll, { passive: true });
-        return () => window.removeEventListener("scroll", onScroll);
+        return () => {
+            window.removeEventListener("scroll", onScroll);
+            if (scrollFrame.current) cancelAnimationFrame(scrollFrame.current);
+        };
     }, []);
 
     // --- close mobile menu on route change ---
@@ -120,41 +87,6 @@ export default function Navbar() {
         window.addEventListener("resize", onResize);
         return () => window.removeEventListener("resize", onResize);
     }, []);
-
-    // === hasReceipt: decide whether to enable MyOrder icon ===
-    const [hasReceipt, setHasReceipt] = useState(false);
-
-    const checkHasReceipt = useCallback(() => {
-        try {
-            const raw = localStorage.getItem("receipt");
-            if (!raw) return setHasReceipt(false);
-            const parsed = JSON.parse(raw);
-            setHasReceipt(
-                parsed && typeof parsed === "object" && Object.keys(parsed).length > 0
-            );
-        } catch {
-            setHasReceipt(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        checkHasReceipt();
-        const onStorage = (e) => {
-            if (e.key === "receipt") checkHasReceipt();
-        };
-        window.addEventListener("storage", onStorage);
-        return () => window.removeEventListener("storage", onStorage);
-    }, [checkHasReceipt]);
-
-    useEffect(() => {
-        checkHasReceipt();
-    }, [pathname, checkHasReceipt]);
-
-    const myOrderTo = "/my-order"; // icon goes here when enabled
-    const myOrderTitleEnabled = t("nav.my_order", { defaultValue: "My Order" });
-    const myOrderTitleDisabled = t("myorder.empty_title", {
-        defaultValue: "You don’t have any orders yet",
-    });
 
     return (
         <header
@@ -248,19 +180,19 @@ export default function Navbar() {
                         onClick={() => setOpen((v) => !v)}
                         className="relative w-8 h-8 flex flex-col justify-center items-center"
                     >
-                        <motion.span
+                        <Motion.span
                             initial={false}
                             animate={open ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
                             transition={{ duration: 0.3 }}
                             className="block w-6 h-0.5 bg-black rounded"
                         />
-                        <motion.span
+                        <Motion.span
                             initial={false}
                             animate={open ? { opacity: 0 } : { opacity: 1 }}
                             transition={{ duration: 0.2 }}
                             className="block w-6 h-0.5 bg-black rounded my-1"
                         />
-                        <motion.span
+                        <Motion.span
                             initial={false}
                             animate={open ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
                             transition={{ duration: 0.3 }}
@@ -274,7 +206,7 @@ export default function Navbar() {
             <AnimatePresence>
                 {open && (
                     <>
-                        <motion.div
+                        <Motion.div
                             key="overlay"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -285,7 +217,7 @@ export default function Navbar() {
                             onClick={() => setOpen(false)}
                         />
 
-                        <motion.div
+                        <Motion.div
                             key="drawer"
                             initial={{ y: -40, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
@@ -295,7 +227,7 @@ export default function Navbar() {
                          rounded-b-2xl shadow-2xl overflow-hidden
                          bg-[var(--brand-bg)] border-b border-[var(--ring)]"
                         >
-                            <motion.div
+                            <Motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 0.08 }}
                                 transition={{ duration: 0.6 }}
@@ -303,7 +235,7 @@ export default function Navbar() {
                                 className="absolute inset-0 bg-cover bg-center"
                             />
 
-                            <motion.nav
+                            <Motion.nav
                                 className="relative flex flex-col px-4 py-2 z-10"
                                 initial="hidden"
                                 animate="show"
@@ -314,7 +246,7 @@ export default function Navbar() {
                                 }}
                             >
                                 {NAV.map(({ to, key }, idx) => (
-                                    <motion.div
+                                    <Motion.div
                                         key={key}
                                         variants={{
                                             hidden: { y: 15, opacity: 0 },
@@ -347,10 +279,10 @@ export default function Navbar() {
                                                 <div className="h-px bg-[var(--ring)]/60" />
                                             </div>
                                         )}
-                                    </motion.div>
+                                    </Motion.div>
                                 ))}
-                            </motion.nav>
-                        </motion.div>
+                            </Motion.nav>
+                        </Motion.div>
                     </>
                 )}
             </AnimatePresence>
