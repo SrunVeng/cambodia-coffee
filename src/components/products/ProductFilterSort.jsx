@@ -6,42 +6,47 @@ import cats from "../../data/product-categories.json"
 
 export default function ProductFilterSort({ onChange }) {
     const { t, i18n } = useTranslation()
-    const [cat, setCat] = useState("all")
-    const [sort, setSort] = useState("popular")
-    const [search, setSearch] = useState("")
-    const lastSearchRef = useRef(search)
+    const [filter, setFilter] = useState({ category: "all", sort: "popular", search: "" })
+    const lastEmittedSearchRef = useRef(filter.search)
 
-    const emit = useCallback(
-        (nextCat = cat, nextSort = sort, nextSearch = search) => {
-            onChange?.({
-                category: nextCat,
-                sort: nextSort,
-                search: nextSearch.trim(),
-            })
-        },
-        [onChange, cat, sort, search]
-    )
+    const emit = useCallback((nextFilter) => {
+        onChange?.({
+            ...nextFilter,
+            search: nextFilter.search.trim(),
+        })
+    }, [onChange])
 
     useEffect(() => {
-        if (lastSearchRef.current === search) return
+        if (lastEmittedSearchRef.current === filter.search) return
         const id = setTimeout(() => {
-            lastSearchRef.current = search
-            emit(cat, sort, search)
+            lastEmittedSearchRef.current = filter.search
+            emit(filter)
         }, 220)
         return () => clearTimeout(id)
-    }, [search, cat, sort, emit])
+    }, [filter, emit])
 
-    const handleCategoryChange = useCallback((next) => {
-        setCat(next)
-        lastSearchRef.current = search
-        emit(next, sort, search)
-    }, [emit, sort, search])
+    const updateFilter = useCallback((patch) => {
+        setFilter((current) => {
+            const next = { ...current, ...patch }
+            if (!Object.hasOwn(patch, "search")) {
+                lastEmittedSearchRef.current = next.search
+                emit(next)
+            }
+            return next
+        })
+    }, [emit])
 
-    const handleSortChange = useCallback((next) => {
-        setSort(next)
-        lastSearchRef.current = search
-        emit(cat, next, search)
-    }, [emit, cat, search])
+    const handleCategoryChange = useCallback((category) => {
+        updateFilter({ category })
+    }, [updateFilter])
+
+    const handleSortChange = useCallback((sort) => {
+        updateFilter({ sort })
+    }, [updateFilter])
+
+    const handleSearchChange = useCallback((event) => {
+        updateFilter({ search: event.target.value })
+    }, [updateFilter])
 
     const catItems = useMemo(() => ([
         { id: "all", label: t("products.all") },
@@ -62,8 +67,8 @@ export default function ProductFilterSort({ onChange }) {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
                     type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    value={filter.search}
+                    onChange={handleSearchChange}
                     placeholder={t("products.searchPlaceholder")}
                     className="w-full pl-9 pr-3 py-2 rounded-xl border border-[var(--ring)] text-sm focus:ring-2 focus:ring-[var(--brand-accent)] outline-none"
                 />
@@ -74,7 +79,7 @@ export default function ProductFilterSort({ onChange }) {
                 <span className="text-sm font-medium opacity-70">{t("products.filter")}</span>
                 <Dropdown
                     items={catItems}
-                    value={cat}
+                    value={filter.category}
                     onChange={handleCategoryChange}
                     placeholder={t("products.all")}
                     size="sm"
@@ -88,7 +93,7 @@ export default function ProductFilterSort({ onChange }) {
                 <span className="text-sm font-medium opacity-70">{t("products.sort")}</span>
                 <Dropdown
                     items={sortItems}
-                    value={sort}
+                    value={filter.sort}
                     onChange={handleSortChange}
                     placeholder={t("products.sortPopular")}
                     size="sm"
