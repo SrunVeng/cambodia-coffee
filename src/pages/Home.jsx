@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import data from "../data/data.json";
 import ScrollSection from "../components/ui/ScrollSection.jsx";
 
+
 export default function Home() {
     const { t } = useTranslation();
     const { HOME_IMAGES } = data;
