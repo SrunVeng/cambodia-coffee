@@ -59,7 +59,9 @@ function ProductGrid({ filter }) {
         return out
     }, [deferredFilter])
 
-    const handleOpen = useCallback((p) => setSelected(p), [])
+    const handleOpen = useCallback((productId) => {
+        setSelected(ENRICHED_PRODUCTS.find((product) => product.id === productId) || null)
+    }, [])
     const handleClose = useCallback(() => setSelected(null), [])
 
     return (
@@ -70,7 +72,7 @@ function ProductGrid({ filter }) {
                     <ProductCard
                         key={p.id}
                         p={p}
-                        onClick={() => handleOpen(p)}
+                        onClick={handleOpen}
                     />
                 ))}
             </div>

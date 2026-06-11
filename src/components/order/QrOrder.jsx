@@ -1,38 +1,38 @@
-import React from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion as Motion, useReducedMotion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import data from "../../data/data.json";
+
+const QR_DATA = data.QR_CODES || [];
+
+const CONTAINER_VARIANTS = {
+    hidden: {},
+    visible: {
+        transition: { staggerChildren: 0.08 },
+    },
+};
+
+const getItemVariants = (prefersReducedMotion) => ({
+    hidden: { opacity: 0, y: 12 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: prefersReducedMotion
+            ? { duration: 0 }
+            : { type: "spring", stiffness: 220, damping: 20 },
+    },
+});
 
 export default function ContactPaymentQr() {
     const { t } = useTranslation();
     const prefersReducedMotion = useReducedMotion();
-
-    const qrData = data.QR_CODES || [];
-
-    const container = {
-        hidden: {},
-        visible: {
-            transition: { staggerChildren: 0.08 },
-        },
-    };
-
-    const item = {
-        hidden: { opacity: 0, y: 12 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: prefersReducedMotion
-                ? { duration: 0 }
-                : { type: "spring", stiffness: 220, damping: 20 },
-        },
-    };
+    const item = getItemVariants(prefersReducedMotion);
 
     return (
         <section className="min-h-screen bg-[var(--brand-bg)] px-6 py-16 flex items-center justify-center">
             <div className="w-full max-w-4xl">
 
                 {/* HEADER */}
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
@@ -69,17 +69,17 @@ export default function ContactPaymentQr() {
                             </div>
                         </a>
                     </div>
-                </motion.div>
+                </Motion.div>
 
                 {/* QR GRID */}
-                <motion.div
-                    variants={container}
+                <Motion.div
+                    variants={CONTAINER_VARIANTS}
                     initial="hidden"
                     animate="visible"
                     className="grid grid-cols-1 sm:grid-cols-2 gap-5"
                 >
-                    {qrData.map((qr) => (
-                        <motion.a
+                    {QR_DATA.map((qr) => (
+                        <Motion.a
                             key={qr.key}
                             variants={item}
                             href={qr.link}
@@ -104,6 +104,8 @@ export default function ContactPaymentQr() {
                                 <img
                                     src={qr.imageUrl}
                                     alt={t(`contactOrder.qr.${qr.key}`)}
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-contain p-2"
                                 />
                             </div>
@@ -117,9 +119,9 @@ export default function ContactPaymentQr() {
                             <p className="text-xs text-[#8a7768] mt-1">
                                 {t("contactOrder.tap_hint")}
                             </p>
-                        </motion.a>
+                        </Motion.a>
                     ))}
-                </motion.div>
+                </Motion.div>
             </div>
         </section>
     );

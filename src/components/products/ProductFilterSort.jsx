@@ -1,4 +1,4 @@
-import { useState, useTransition, useCallback, useEffect, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Search } from "lucide-react"
 import Dropdown from "../ui/Dropdown.jsx"
@@ -9,17 +9,39 @@ export default function ProductFilterSort({ onChange }) {
     const [cat, setCat] = useState("all")
     const [sort, setSort] = useState("popular")
     const [search, setSearch] = useState("")
-    const [, startTransition] = useTransition()
+    const lastSearchRef = useRef(search)
 
     const emit = useCallback(
-        (c = cat, s = sort, q = search) => startTransition(() => onChange?.({ category: c, sort: s, search: q })),
+        (nextCat = cat, nextSort = sort, nextSearch = search) => {
+            onChange?.({
+                category: nextCat,
+                sort: nextSort,
+                search: nextSearch.trim(),
+            })
+        },
         [onChange, cat, sort, search]
     )
 
     useEffect(() => {
-        const id = setTimeout(() => emit(cat, sort, search.trim()), 220)
+        if (lastSearchRef.current === search) return
+        const id = setTimeout(() => {
+            lastSearchRef.current = search
+            emit(cat, sort, search)
+        }, 220)
         return () => clearTimeout(id)
     }, [search, cat, sort, emit])
+
+    const handleCategoryChange = useCallback((next) => {
+        setCat(next)
+        lastSearchRef.current = search
+        emit(next, sort, search)
+    }, [emit, sort, search])
+
+    const handleSortChange = useCallback((next) => {
+        setSort(next)
+        lastSearchRef.current = search
+        emit(cat, next, search)
+    }, [emit, cat, search])
 
     const catItems = useMemo(() => ([
         { id: "all", label: t("products.all") },
@@ -53,7 +75,7 @@ export default function ProductFilterSort({ onChange }) {
                 <Dropdown
                     items={catItems}
                     value={cat}
-                    onChange={(next) => { setCat(next); emit(next, sort, search) }}
+                    onChange={handleCategoryChange}
                     placeholder={t("products.all")}
                     size="sm"
                     className="min-w-[250px]"
@@ -67,7 +89,7 @@ export default function ProductFilterSort({ onChange }) {
                 <Dropdown
                     items={sortItems}
                     value={sort}
-                    onChange={(next) => { setSort(next); emit(cat, next, search) }}
+                    onChange={handleSortChange}
                     placeholder={t("products.sortPopular")}
                     size="sm"
                     className="min-w-[150px]"

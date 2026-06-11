@@ -1,14 +1,14 @@
-import { motion } from "framer-motion"
+import { motion as Motion } from "framer-motion"
 import { Link } from "react-router-dom"
 
 const imgVariants = {
-    hidden: { opacity: 0, x: -40, filter: "blur(6px)" },
-    show: { opacity: 1, x: 0, filter: "blur(0px)", transition: { duration: 0.8, ease: "easeOut" } }
+    hidden: { opacity: 0, x: -32 },
+    show: { opacity: 1, x: 0, transition: { duration: 0.55, ease: "easeOut" } }
 }
 
 const textVariants = {
-    hidden: { opacity: 0, y: 30, filter: "blur(6px)" },
-    show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.8, ease: "easeOut", delay: 0.2 } }
+    hidden: { opacity: 0, y: 24 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut", delay: 0.1 } }
 }
 
 export default function ScrollSection({ title, subtitle, image, cta, reverse }) {
@@ -20,7 +20,7 @@ export default function ScrollSection({ title, subtitle, image, cta, reverse }) 
                 }`}
             >
                 {/* Image */}
-                <motion.div
+                <Motion.div
                     variants={imgVariants}
                     initial="hidden"
                     whileInView="show"
@@ -31,13 +31,15 @@ export default function ScrollSection({ title, subtitle, image, cta, reverse }) 
                         <img
                             src={image}
                             alt={title}
+                            loading="lazy"
+                            decoding="async"
                             className="h-full w-full object-cover"
                         />
                     </div>
-                </motion.div>
+                </Motion.div>
 
                 {/* Text */}
-                <motion.div
+                <Motion.div
                     variants={textVariants}
                     initial="hidden"
                     whileInView="show"
@@ -58,7 +60,7 @@ export default function ScrollSection({ title, subtitle, image, cta, reverse }) 
                             </Link>
                         </div>
                     )}
-                </motion.div>
+                </Motion.div>
             </div>
         </section>
     )

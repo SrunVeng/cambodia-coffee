@@ -1,5 +1,6 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion as Motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import data from "../data/data.json";
 import ScrollSection from "../components/ui/ScrollSection.jsx";
@@ -8,37 +9,72 @@ export default function Home() {
     const { t } = useTranslation();
     const { HOME_IMAGES } = data;
 
-    // Parallax for hero background
-    const { scrollYProgress } = useScroll();
-    const yBg = useTransform(scrollYProgress, [0, 1], [0, -80]); // subtle lift on scroll
-
     // Motion settings
     const prefersReducedMotion = useReducedMotion();
-    const baseSpring = prefersReducedMotion
+    const baseSpring = useMemo(() => prefersReducedMotion
         ? { duration: 0 }
-        : { type: "spring", stiffness: 260, damping: 26, mass: 0.8 };
+        : { type: "spring", stiffness: 260, damping: 26, mass: 0.8 }, [prefersReducedMotion]);
 
-    const fadeInUp = prefersReducedMotion
+    const fadeInUp = useMemo(() => prefersReducedMotion
         ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0 } }
-        : { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, ease: "easeOut" } };
+        : { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, ease: "easeOut" } }, [prefersReducedMotion]);
 
     // Stagger containers/items for smoothness
-    const containerStagger = {
+    const containerStagger = useMemo(() => ({
         hidden: {},
         visible: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
-    };
-    const itemRise = {
+    }), []);
+    const itemRise = useMemo(() => ({
         hidden: { opacity: 0, y: 16 },
         visible: { opacity: 1, y: 0, transition: baseSpring },
-    };
+    }), [baseSpring]);
+
+    const valueCards = useMemo(() => ([
+        {
+            title: t("home.cards.fresh.title", { defaultValue: "Fresh Roast" }),
+            text: t("home.cards.fresh.text", {
+                defaultValue: "We roast in small batches and ship quickly for peak flavor.",
+            }),
+        },
+        {
+            title: t("home.cards.origin.title", { defaultValue: "Single Origin" }),
+            text: t("home.cards.origin.text", {
+                defaultValue: "Traceable beans from trusted farms—clean, complex, memorable.",
+            }),
+        },
+        {
+            title: t("home.cards.delivery.title", { defaultValue: "Fast Delivery" }),
+            text: t("home.cards.delivery.text", {
+                defaultValue: "Same-day options in town and reliable shipping nationwide.",
+            }),
+        },
+    ]), [t]);
+
+    const stats = useMemo(() => ([
+        {
+            k: "home.stats.farmers",
+            n: "120+",
+            label: t("home.stats.farmers", { defaultValue: "Partner farmers" }),
+        },
+        {
+            k: "home.stats.profiles",
+            n: "25",
+            label: t("home.stats.profiles", { defaultValue: "Roast profiles" }),
+        },
+        {
+            k: "home.stats.rating",
+            n: "4.9★",
+            label: t("home.stats.rating", { defaultValue: "Average rating" }),
+        },
+    ]), [t]);
 
     return (
         <>
             {/* HERO */}
             <section className="relative h-[92vh] min-h-[560px] flex items-center justify-center overflow-hidden bg-[var(--brand-bg)]">
                 {/* Parallax image */}
-                <motion.div
-                    style={{ y: yBg, backgroundImage: `url(${HOME_IMAGES.hero})` }}
+                <div
+                    style={{ backgroundImage: `url(${HOME_IMAGES.hero})` }}
                     className="absolute inset-0 bg-cover bg-center scale-110 transform-gpu will-change-transform"
                     aria-hidden
                 />
@@ -68,7 +104,7 @@ export default function Home() {
                 />
 
                 {/* Content */}
-                <motion.div
+                <Motion.div
                     initial={fadeInUp.initial}
                     animate={fadeInUp.animate}
                     transition={fadeInUp.transition}
@@ -112,39 +148,20 @@ export default function Home() {
                             {t("nav.about", { defaultValue: "About us" })}
                         </Link>
                     </div>
-                </motion.div>
+                </Motion.div>
             </section>
 
             {/* VALUE CARDS */}
             <section className="relative -mt-10 md:-mt-14 z-10 px-4">
-                <motion.div
+                <Motion.div
                     variants={containerStagger}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, amount: 0.25 }}
                     className="mx-auto max-w-6xl grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4"
                 >
-                    {[
-                        {
-                            title: t("home.cards.fresh.title", { defaultValue: "Fresh Roast" }),
-                            text: t("home.cards.fresh.text", {
-                                defaultValue: "We roast in small batches and ship quickly for peak flavor.",
-                            }),
-                        },
-                        {
-                            title: t("home.cards.origin.title", { defaultValue: "Single Origin" }),
-                            text: t("home.cards.origin.text", {
-                                defaultValue: "Traceable beans from trusted farms—clean, complex, memorable.",
-                            }),
-                        },
-                        {
-                            title: t("home.cards.delivery.title", { defaultValue: "Fast Delivery" }),
-                            text: t("home.cards.delivery.text", {
-                                defaultValue: "Same-day options in town and reliable shipping nationwide.",
-                            }),
-                        },
-                    ].map((c) => (
-                        <motion.article
+                    {valueCards.map((c) => (
+                        <Motion.article
                             key={c.title}
                             variants={itemRise}
                             className="
@@ -157,14 +174,14 @@ export default function Home() {
                         >
                             <h3 className="font-semibold text-[#2d1a14]">{c.title}</h3>
                             <p className="mt-1.5 text-sm text-[#6b5545]">{c.text}</p>
-                        </motion.article>
+                        </Motion.article>
                     ))}
-                </motion.div>
+                </Motion.div>
             </section>
 
             {/* STATS STRIP */}
             <section className="px-4 mt-10">
-                <motion.div
+                <Motion.div
                     variants={containerStagger}
                     initial="hidden"
                     whileInView="visible"
@@ -172,24 +189,8 @@ export default function Home() {
                     className="mx-auto max-w-6xl rounded-2xl border border-[#e7dbc9] bg-white/70 p-5"
                 >
                     <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[#e7dbc9] text-center">
-                        {[
-                            {
-                                k: "home.stats.farmers",
-                                n: "120+",
-                                label: t("home.stats.farmers", { defaultValue: "Partner farmers" }),
-                            },
-                            {
-                                k: "home.stats.profiles",
-                                n: "25",
-                                label: t("home.stats.profiles", { defaultValue: "Roast profiles" }),
-                            },
-                            {
-                                k: "home.stats.rating",
-                                n: "4.9★",
-                                label: t("home.stats.rating", { defaultValue: "Average rating" }),
-                            },
-                        ].map((s) => (
-                            <motion.div
+                        {stats.map((s) => (
+                            <Motion.div
                                 key={s.k}
                                 variants={itemRise}
                                 className="py-4"
@@ -198,10 +199,10 @@ export default function Home() {
                                 <div className="text-xs uppercase tracking-wide text-[#857567] mt-1">
                                     {s.label}
                                 </div>
-                            </motion.div>
+                            </Motion.div>
                         ))}
                     </div>
-                </motion.div>
+                </Motion.div>
             </section>
 
             {/* Your existing scrolly sections */}
@@ -231,7 +232,7 @@ export default function Home() {
 
             {/* CTA BANNER */}
             <section className="px-4 my-12">
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: 24 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -262,7 +263,7 @@ export default function Home() {
                             {t("home.cta", { defaultValue: "Shop Coffee" })}
                         </Link>
                     </div>
-                </motion.div>
+                </Motion.div>
             </section>
         </>
     );
