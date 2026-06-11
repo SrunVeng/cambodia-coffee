@@ -58,7 +58,8 @@ export default function Navbar() {
 
     // --- close mobile menu on route change ---
     useEffect(() => {
-        setOpen(false);
+        const frame = requestAnimationFrame(() => setOpen(false));
+        return () => cancelAnimationFrame(frame);
     }, [pathname]);
 
     // --- lock body scroll when menu open ---

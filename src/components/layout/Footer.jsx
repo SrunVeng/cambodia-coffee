@@ -1,7 +1,7 @@
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import data from "../../data/data.json"
 import { useTranslation } from "react-i18next"
-import { Facebook, Instagram, Send, MessageCircle } from "lucide-react"
+import { Camera, MessageCircle, Send, ThumbsUp } from "lucide-react"
 
 function normalizeLang(lng) {
     return (lng || "EN").split("-")[0].toUpperCase()
@@ -51,7 +51,7 @@ export default function Footer() {
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 hover:text-[var(--brand-accent)] transition"
                     >
-                        <Facebook className="w-5 h-5" />
+                        <ThumbsUp className="w-5 h-5" />
                         {t("footer.facebook")}
                     </a>
                     <a
@@ -60,7 +60,7 @@ export default function Footer() {
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 hover:text-[var(--brand-accent)] transition"
                     >
-                        <Instagram className="w-5 h-5" />
+                        <Camera className="w-5 h-5" />
                         {t("footer.instagram")}
                     </a>
                     <a
